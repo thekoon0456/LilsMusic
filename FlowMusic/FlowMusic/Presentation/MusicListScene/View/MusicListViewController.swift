@@ -6,26 +6,127 @@
 //
 
 import UIKit
+import SwiftUI
 import MusicKit
+
+import SnapKit
+import Kingfisher
 
 final class MusicListViewController: BaseViewController {
     
+    // MARK: - Properties
+
     private let player = MusicPlayer.shared
     private let request = MusicRequest.shared
+    var album: Album
+    
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    private var dataSource: UICollectionViewDiffableDataSource<Int, Track>?
+    
+    private let artworkImageView = UIImageView().then {
+        $0.layer.cornerRadius = 10
+        $0.clipsToBounds = true
+    }
+    
+    private let albumlabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 16)
+        $0.textAlignment = .center
+    }
+    private let artistlabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .lightGray
+        $0.textAlignment = .center
+    }
+    
+    // MARK: - Lifecycles
+    
+    init(album: Album) {
+        self.album = album
+        super.init()
+    }
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         Task {
-            await requestMusicAuthorization()
-            //음악 요청
-            let arr = try await request.requestCatalogAlbumCharts()
-            print(arr)
-            let arr2 = try await request.requestCatalogSongCharts()
-            print(arr2)
+            album = try await album.with([.tracks])
+            DispatchQueue.main.async { [weak self] in
+                guard let self,
+                      let artwork = album.artwork else { return }
+                artworkImageView.kf.setImage(with: album.artwork?.url(width: 200, height: 200))
+                setGradient(startColor: album.artwork?.backgroundColor,
+                            endColor: album.artwork?.backgroundColor)
+                albumlabel.text = album.title
+                artistlabel.text = album.artistName
+            }
+            configureDataSource()
+            updateSnapshot()
         }
     }
     
+    private func configureDataSource() {
+        //1. 타입어노테이션 선언 or 타입 추론이 될 수 있도록
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Track> { cell, indexPath, itemIdentifier in
+            
+            let content = UIListContentConfiguration.subtitleCell().then {
+                $0.text = itemIdentifier.title
+                $0.secondaryText = itemIdentifier.artistName
+            }
+            cell.contentConfiguration = content
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+            return cell
+        }
+    }
+    
+    private func updateSnapshot() {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Track>()
+        snapshot.appendSections([1])
+        guard let track = (album.tracks?.map { $0 }) else { return }
+        snapshot.appendItems(track, toSection: 1)
+        dataSource?.apply(snapshot)
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+        return UICollectionViewCompositionalLayout.list(using: configuration)
+    }
+    
+    // MARK: - Configure
+    
+    override func configureHierarchy() {
+        view.addSubviews(artworkImageView, albumlabel, artistlabel, collectionView)
+    }
+    
+    override func configureLayout() {
+        artworkImageView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.centerX.equalToSuperview()
+            make.size.equalTo(200)
+        }
+        
+        albumlabel.snp.makeConstraints { make in
+            make.top.equalTo(artworkImageView.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+        }
+        
+        artistlabel.snp.makeConstraints { make in
+            make.top.equalTo(albumlabel.snp.bottom).offset(8)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+        }
+        
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(artistlabel.snp.bottom).offset(8)
+            make.horizontalEdges.bottom.equalToSuperview()
+        }
+    }
+    
+    override func configureView() {
+        super.configureView()
+    }
 }
 
 extension MusicListViewController {

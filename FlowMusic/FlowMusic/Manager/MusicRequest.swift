@@ -57,8 +57,8 @@ final class MusicRequest {
     
     // MARK: - Charts
     
-    func requestCatalogAlbumCharts() async throws -> [MusicItemCollection<Album>] {
-        try await MusicCatalogChartsRequest(types: [Album.self]).response().albumCharts.map { $0.items }
+    func requestCatalogAlbumCharts() async throws -> MusicItemCollection<Album>? {
+        try await MusicCatalogChartsRequest(types: [Album.self]).response().albumCharts.first?.items
     }
     
     func requestCatalogPlaylistCharts() async throws -> [MusicItemCollection<Playlist>] {
