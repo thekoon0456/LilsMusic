@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: scene)
         window?.makeKeyAndVisible()
-        let vc = MusicListViewController()
+        let vc = MusicRecommendViewController()
         let nav = UINavigationController(rootViewController: vc)
         window?.rootViewController = nav
     }

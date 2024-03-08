@@ -23,7 +23,9 @@ class BaseViewController: UIViewController {
     
     func configureHierarchy() { }
     func configureLayout() { }
-    func configureView() { }
+    func configureView() { 
+        view.backgroundColor = .white
+    }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {
