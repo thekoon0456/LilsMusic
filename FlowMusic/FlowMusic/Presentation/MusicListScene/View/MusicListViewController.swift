@@ -65,13 +65,8 @@ final class MusicListViewController: BaseViewController {
     
     private func configureDataSource() {
         //1. 타입어노테이션 선언 or 타입 추론이 될 수 있도록
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Track> { cell, indexPath, itemIdentifier in
-            
-            let content = UIListContentConfiguration.subtitleCell().then {
-                $0.text = itemIdentifier.title
-                $0.secondaryText = itemIdentifier.artistName
-            }
-            cell.contentConfiguration = content
+        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
+            cell.configureCell(itemIdentifier)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
