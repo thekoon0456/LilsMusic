@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SwiftUI
 import MusicKit
 
 import SnapKit
@@ -15,7 +14,7 @@ import Kingfisher
 final class MusicListViewController: BaseViewController {
     
     // MARK: - Properties
-
+    
     private let player = MusicPlayer.shared
     private let request = MusicRequest.shared
     var album: Album
@@ -47,46 +46,34 @@ final class MusicListViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        readyFadeInAnimation()
+        loadDataAndUpdateUI()
+    }
+    
+    func loadDataAndUpdateUI() {
+        configureDataSource()
+        
         Task {
             album = try await album.with([.tracks])
-            DispatchQueue.main.async { [weak self] in
-                guard let self,
-                      let artwork = album.artwork else { return }
-                artworkImageView.kf.setImage(with: album.artwork?.url(width: 200, height: 200))
-                setGradient(startColor: album.artwork?.backgroundColor,
-                            endColor: album.artwork?.backgroundColor)
-                albumlabel.text = album.title
-                artistlabel.text = album.artistName
-            }
-            configureDataSource()
             updateSnapshot()
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                updateUI(with: album)
+                fadeInAnimation()
+            }
         }
     }
     
-    private func configureDataSource() {
-        //1. 타입어노테이션 선언 or 타입 추론이 될 수 있도록
-        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
-            cell.configureCell(itemIdentifier)
-        }
-        
-        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-            return cell
-        }
+    func updateUI(with album: Album) {
+        artworkImageView.kf.setImage(with: album.artwork?.url(width: 200, height: 200))
+        setGradient(startColor: album.artwork?.backgroundColor,
+                    endColor: album.artwork?.backgroundColor)
+        albumlabel.text = album.title
+        artistlabel.text = album.artistName
     }
     
-    private func updateSnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<Int, Track>()
-        snapshot.appendSections([1])
-        guard let track = (album.tracks?.map { $0 }) else { return }
-        snapshot.appendItems(track, toSection: 1)
-        dataSource?.apply(snapshot)
-    }
-    
-    private func createLayout() -> UICollectionViewLayout {
-        let configuration = UICollectionLayoutListConfiguration(appearance: .plain)
-        return UICollectionViewCompositionalLayout.list(using: configuration)
-    }
     
     // MARK: - Configure
     
@@ -123,6 +110,57 @@ final class MusicListViewController: BaseViewController {
         super.configureView()
     }
 }
+
+// MARK: - Animation
+
+extension MusicListViewController {
+    
+    func readyFadeInAnimation() {
+        artworkImageView.alpha = 0
+        albumlabel.alpha = 0
+        artistlabel.alpha = 0
+    }
+    
+    func fadeInAnimation() {
+        UIView.animate(withDuration: 0.5) { [weak self] in
+            guard let self else { return }
+            artworkImageView.alpha = 1
+            albumlabel.alpha = 1
+            artistlabel.alpha = 1
+        }
+    }
+}
+
+// MARK: - CollectionView
+
+extension MusicListViewController {
+    
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
+            cell.configureCell(itemIdentifier)
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+            return cell
+        }
+    }
+    
+    private func updateSnapshot() {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Track>()
+        snapshot.appendSections([1])
+        guard let track = (album.tracks?.map { $0 }) else { return }
+        snapshot.appendItems(track, toSection: 1)
+        dataSource?.apply(snapshot)
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+        return UICollectionViewCompositionalLayout.list(using: configuration)
+    }
+}
+
+// MARK: - Auth
 
 extension MusicListViewController {
     
