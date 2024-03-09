@@ -19,7 +19,9 @@ final class MusicListViewController: BaseViewController {
     private let request = MusicRequest.shared
     var album: Album
     
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
+        $0.delegate = self
+    }
     private var dataSource: UICollectionViewDiffableDataSource<Int, Track>?
     
     private let artworkImageView = UIImageView().then {
@@ -46,7 +48,7 @@ final class MusicListViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         readyFadeInAnimation()
         loadDataAndUpdateUI()
     }
@@ -67,7 +69,7 @@ final class MusicListViewController: BaseViewController {
     }
     
     func updateUI(with album: Album) {
-        artworkImageView.kf.setImage(with: album.artwork?.url(width: 200, height: 200))
+        artworkImageView.kf.setImage(with: album.artwork?.url(width: 300, height: 300))
         setGradient(startColor: album.artwork?.backgroundColor,
                     endColor: album.artwork?.backgroundColor)
         albumlabel.text = album.title
@@ -157,6 +159,20 @@ extension MusicListViewController {
     private func createLayout() -> UICollectionViewLayout {
         let configuration = UICollectionLayoutListConfiguration(appearance: .plain)
         return UICollectionViewCompositionalLayout.list(using: configuration)
+    }
+}
+
+extension MusicListViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let track = album.tracks?[indexPath.item] else { return }
+        Task {
+            player.setAlbumQueue(album: album, track: track)
+            try await player.play()
+        }
+
+        let vc = PlayViewController(track: track)
+        navigationController?.present(vc, animated: true)
     }
 }
 

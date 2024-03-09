@@ -4,7 +4,6 @@
 //
 //  Created by Deokhun KIM on 3/8/24.
 //
-import MediaPlayer
 import MusicKit
 import UIKit
 
@@ -12,11 +11,11 @@ import Kingfisher
 import SnapKit
 
 final class PlayViewController: BaseViewController {
+    
     // MARK: - Properties
     
     private let player = MusicPlayer.shared
-    private var currentIndex: Int
-    private var song: Song
+    private var track: Track
     private var timer: Timer?
     
     private let artistLabel = UILabel().then {
@@ -73,9 +72,8 @@ final class PlayViewController: BaseViewController {
     
     // MARK: - Lifecycle
     
-    init(song: Song, currentIndex: Int) {
-        self.song = song
-        self.currentIndex = currentIndex
+    init(track: Track) {
+        self.track = track
         super.init()
     }
     
@@ -86,25 +84,23 @@ final class PlayViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(song.id)
         
         Task {
-            do {
-                try await player.playSong(song)
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    artistLabel.text = song.artistName
-                    songLabel.text = song.title
-                    artworkImage.kf.setImage(with: song.artwork?.url(width: 500, height: 500))
-                }
-            } catch {
-                print(error.localizedDescription)
-            }
+            updateUI(track)
         }
         
-        setGradient(startColor: song.artwork?.backgroundColor,
-                    endColor: song.artwork?.backgroundColor)
+        setGradient(startColor: track.artwork?.backgroundColor,
+                    endColor: track.artwork?.backgroundColor)
         setProgressBarTimer()
+    }
+    
+    func updateUI(_ track: Track) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
+            artistLabel.text = track.artistName
+            songLabel.text = track.title
+        }
     }
     
     // MARK: - Selectors
@@ -113,15 +109,14 @@ final class PlayViewController: BaseViewController {
         let point = sender.location(in: progressBar)
         let progressBarWidth = 300
         let percentage = Double(point.x / CGFloat(progressBarWidth))
-//        let duration = player.player.nowPlayingItem?.playbackDuration ?? 0
-//        let seekTime = percentage * duration
-//        player.player.currentPlaybackTime = seekTime
+        let duration = player.getPlayBackTime()
+        let seekTime = percentage * duration
         
         // TODO: - 프로그레스바 이동 추가
     }
     
     @objc func updateProgressBar() {
-        let progress = Float(player.getPlayBackTime() / (song.duration ?? 0))
+        let progress = Float(player.getPlayBackTime() / (track.duration ?? 0))
         progressBar.setProgress(progress, animated: true)
     }
     
@@ -145,6 +140,7 @@ final class PlayViewController: BaseViewController {
                 try await previousButton.isSelected
                 ? player.restart()
                 : player.skipToPrevious()
+                updateUI(player.getCurrentEntry()?.transientItem as! Track)
             } catch {
                 print(error.localizedDescription)
             }
@@ -155,6 +151,7 @@ final class PlayViewController: BaseViewController {
         Task {
             do {
                 try await player.skipToNext()
+                updateUI(player.getCurrentEntry()?.transientItem as! Track)
             } catch {
                 print(error.localizedDescription)
             }

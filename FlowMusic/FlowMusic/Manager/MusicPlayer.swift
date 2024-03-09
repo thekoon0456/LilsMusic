@@ -23,13 +23,13 @@ final class  MusicPlayer {
     
     // MARK: - Queue
     
-    func insertItemAfterCurrentEntry(song: Song) async throws {
-        try await player.queue.insert(song, position: .afterCurrentEntry)
+    func insertTrackAfterCurrentEntry(track: Track) async throws {
+        try await player.queue.insert(track, position: .afterCurrentEntry)
     }
     
-    func insertItemToTail(song: Song) async throws {
+    func insertTrackToTail(track: Track) async throws {
         // 플레이어의 큐에 설정
-        try await player.queue.insert(song, position: .tail)
+        try await player.queue.insert(track, position: .tail)
     }
     
     func insertItemsAfterCurrentEntry(songs: MusicItemCollection<Song>) async throws {
@@ -46,9 +46,20 @@ final class  MusicPlayer {
         return player.queue.currentEntry
     }
     
+    func setAlbumQueue(album: Album, track: Track) {
+        player.queue = ApplicationMusicPlayer.Queue(album: album, startingAt: track)
+    }
+    
+    func setQueue(album: Album) {
+        player.queue = []
+    }
+
+    
+    
     // MARK: - Play
     
     func play() async throws {
+//        try await player.prepareToPlay()
         try await player.play()
     }
     
