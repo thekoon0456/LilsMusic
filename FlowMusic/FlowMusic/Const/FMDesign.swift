@@ -12,7 +12,7 @@ enum FMDesign {
     enum Icon {
         case recommend
         case reels
-        case playlist
+        case library
         case user
         
         var name: String {
@@ -21,7 +21,7 @@ enum FMDesign {
                 "music.note.tv"
             case .reels:
                 "play.rectangle.on.rectangle"
-            case .playlist:
+            case .library:
                 "list.bullet.rectangle.portrait"
             case .user:
                 "music.note.house"
@@ -34,7 +34,7 @@ enum FMDesign {
                 "music.note.tv.fill"
             case .reels:
                 "play.rectangle.on.rectangle.fill"
-            case .playlist:
+            case .library:
                 "list.bullet.rectangle.portrait.fill"
             case .user:
                 "music.note.house.fill"

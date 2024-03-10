@@ -24,6 +24,11 @@ final class AppCoordinator: Coordinator {
     // MARK: - Helpers
     
     func start() {
+        Task {
+            await requestMusicAuthorization()
+        }
+
+        
         let tabBarController = UITabBarController()
         let recommendNav = UINavigationController()
         let recommendCoordinator = MusicRecommendCoordinator(navigationController: recommendNav)
@@ -31,19 +36,19 @@ final class AppCoordinator: Coordinator {
         recommendCoordinator.start()
         
         let reelsNav = UINavigationController()
-//        let searchCoordinator = SearchCoordinator(navigationController: searchNav)
-//        childCoordinators.append(searchCoordinator)
-//        searchCoordinator.start()
+        let reelsCoordinator = ReelsCoordinator(navigationController: reelsNav)
+        childCoordinators.append(reelsCoordinator)
+        reelsCoordinator.start()
         
         let libraryNav = UINavigationController()
-//        let favoriteCoordinator = FavoriteCoordinator(navigationController: favoriteNav)
-//        childCoordinators.append(favoriteCoordinator)
-//        favoriteCoordinator.start()
+        let libraryCoordinator = LibraryCoordinator(navigationController: libraryNav)
+        childCoordinators.append(libraryCoordinator)
+        libraryCoordinator.start()
         
         let userNav = UINavigationController()
-//        let userCoordinator = UserCoordinator(navigationController: userNav)
-//        childCoordinators.append(userCoordinator)
-//        userCoordinator.start()
+        let userCoordinator = UserCoordinator(navigationController: userNav)
+        childCoordinators.append(userCoordinator)
+        userCoordinator.start()
         
         tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav, userNav]
         navigationController?.pushViewController(tabBarController, animated: false)
