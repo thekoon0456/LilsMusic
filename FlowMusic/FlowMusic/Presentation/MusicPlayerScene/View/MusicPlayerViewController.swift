@@ -10,9 +10,11 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-final class PlayViewController: BaseViewController {
+final class MusicPlayerViewController: BaseViewController {
     
     // MARK: - Properties
+    
+    private let viewModel: MusicPlayerViewModel
     
     private let player = MusicPlayer.shared
     private var track: Track
@@ -72,7 +74,8 @@ final class PlayViewController: BaseViewController {
     
     // MARK: - Lifecycle
     
-    init(track: Track) {
+    init(viewModel: MusicPlayerViewModel, track: Track) {
+        self.viewModel = viewModel
         self.track = track
         super.init()
     }

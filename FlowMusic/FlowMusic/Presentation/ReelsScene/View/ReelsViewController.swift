@@ -7,6 +7,17 @@
 
 import UIKit
 
-final class ReelsViewController {
+final class ReelsViewController: BaseViewController {
+    
+    // MARK: - Properties
+    
+    private let viewModel: ReelsViewModel
+    
+    // MARK: - Lifecycles
+    
+    init(viewModel: ReelsViewModel) {
+        self.viewModel = viewModel
+        super.init()
+    }
     
 }

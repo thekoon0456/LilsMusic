@@ -9,4 +9,11 @@ import Foundation
 
 final class ReelsViewModel: ViewModel {
     
+    weak var coordinator: ReelsCoordinator?
+    
+    init(coordinator: ReelsCoordinator?) {
+        self.coordinator = coordinator
+    }
+    
+    
 }

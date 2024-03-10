@@ -47,10 +47,11 @@ final class  MusicPlayer {
     }
     
     func setAlbumQueue(album: Album, track: Track) {
+        player.queue = []
         player.queue = ApplicationMusicPlayer.Queue(album: album, startingAt: track)
     }
     
-    func setQueue(album: Album) {
+    func setQueue(album: MusicItemCollection<Album>) {
         player.queue = []
     }
     

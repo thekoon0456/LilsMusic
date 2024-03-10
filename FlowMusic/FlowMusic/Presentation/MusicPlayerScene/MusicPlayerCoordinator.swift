@@ -5,6 +5,7 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
+import MusicKit
 import UIKit
 
 final class MusicPlayerCoordinator: Coordinator {
@@ -19,8 +20,10 @@ final class MusicPlayerCoordinator: Coordinator {
         self.type = .musicPlayer
     }
     
-    func start() {
-        
+    func start(track: Track) {
+        let vm = MusicPlayerViewModel(coordinator: self)
+        let vc = MusicPlayerViewController(viewModel: vm, track: track)
+        navigationController?.present(vc, animated: true)
     }
     
     

@@ -9,5 +9,12 @@ import UIKit
 
 final class LibraryViewController: BaseViewController {
     
+    private let viewModel: LibraryViewModel
+    
+    init(viewModel: LibraryViewModel) {
+        self.viewModel = viewModel
+        super.init()
+    }
+    
     
 }

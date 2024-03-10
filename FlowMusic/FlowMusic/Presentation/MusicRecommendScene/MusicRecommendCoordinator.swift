@@ -5,6 +5,7 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
+import MusicKit
 import UIKit
 
 final class MusicRecommendCoordinator: Coordinator {
@@ -20,13 +21,19 @@ final class MusicRecommendCoordinator: Coordinator {
     }
     
     func start() {
-        let vm = MusicRecommendViewModel()
-        let vc = MusicRecommendViewController()
-        vc.tabBarItem = UITabBarItem(title: <#T##String?#>, image: UIImage(named: FMDesign.Icon.recommend.name), selectedImage: <#T##UIImage?#>)
+        let vm = MusicRecommendViewModel(coordinator: self)
+        let vc = MusicRecommendViewController(viewModel: vm)
+        vc.tabBarItem = UITabBarItem(title: nil,
+                                     image: UIImage(systemName: FMDesign.Icon.recommend.name),
+                                     selectedImage: UIImage(systemName: FMDesign.Icon.recommend.fill))
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    
+    func push(album: Album) {
+        let listCoordinator = MusicListCoordinator(navigationController: navigationController)
+        childCoordinators.append(listCoordinator)
+        listCoordinator.start(album: album)
+    }
 }

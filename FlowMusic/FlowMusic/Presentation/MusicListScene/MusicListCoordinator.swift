@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MusicKit
 
 final class MusicListCoordinator: Coordinator {
     
@@ -19,8 +20,16 @@ final class MusicListCoordinator: Coordinator {
         self.type = .musicList
     }
     
-    func start() {
-        
+    func start(album: Album) {
+        let vm = MusicListViewModel(coordinator: self)
+        let vc = MusicListViewController(viewModel: vm, album: album)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func present(track: Track) {
+        let coordinator = MusicPlayerCoordinator(navigationController: navigationController)
+        childCoordinators.append(coordinator)
+        coordinator.start(track: track)
     }
     
     

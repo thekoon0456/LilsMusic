@@ -20,7 +20,14 @@ final class UserCoordinator: Coordinator {
     }
     
     func start() {
+        let vm = UserViewModel(coordinator: self)
+        let vc = UserViewController(viewModel: vm)
+        vc.tabBarItem = UITabBarItem(title: nil,
+                                     image: UIImage(systemName: FMDesign.Icon.user.name),
+                                     selectedImage: UIImage(systemName: FMDesign.Icon.user.fill))
         
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     

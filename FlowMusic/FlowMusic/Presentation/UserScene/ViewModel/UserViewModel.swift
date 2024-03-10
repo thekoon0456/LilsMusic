@@ -9,4 +9,10 @@ import Foundation
 
 final class UserViewModel: ViewModel {
     
+    weak var coordinator: UserCoordinator?
+    
+    init(coordinator: UserCoordinator?) {
+        self.coordinator = coordinator
+    }
+    
 }

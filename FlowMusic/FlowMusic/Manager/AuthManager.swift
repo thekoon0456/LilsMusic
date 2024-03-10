@@ -11,7 +11,5 @@ import UIKit
 
 final class AuthManager {
     
-//    func requestMusicAuthorization() async {
-    
-//    }
+
 }

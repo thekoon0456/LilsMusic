@@ -15,6 +15,8 @@ final class MusicListViewController: BaseViewController {
     
     // MARK: - Properties
     
+    private let viewModel: MusicListViewModel
+    
     private let player = MusicPlayer.shared
     private let request = MusicRequest.shared
     var album: Album
@@ -41,7 +43,8 @@ final class MusicListViewController: BaseViewController {
     
     // MARK: - Lifecycles
     
-    init(album: Album) {
+    init(viewModel: MusicListViewModel, album: Album) {
+        self.viewModel = viewModel
         self.album = album
         super.init()
     }
@@ -170,49 +173,11 @@ extension MusicListViewController: UICollectionViewDelegate {
             player.setAlbumQueue(album: album, track: track)
             try await player.play()
         }
-
-        let vc = PlayViewController(track: track)
-        navigationController?.present(vc, animated: true)
+        
+        viewModel.input.listTapped.onNext(track)
     }
 }
 
 // MARK: - Auth
 
-extension MusicListViewController {
-    
-    func requestMusicAuthorization() async {
-        let status = await MusicAuthorization.request()
-        
-        switch status {
-        case .authorized:
-            print("승인됨")
-        default:
-            moveToUserSetting()
-            print("승인안됨. 재요청")
-        }
-    }
-    
-    private func moveToUserSetting() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            let alert = UIAlertController(title: "음악 접근 권한이 필요합니다.",
-                                          message: "음악 라이브러리에 접근하기 위해서는 설정에서 권한을 허용해주세요",
-                                          preferredStyle: .alert)
-            
-            let primaryButton = UIAlertAction(title: "설정으로 가기", style: .default) { _ in
-                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                    return
-                }
-                if UIApplication.shared.canOpenURL(settingsUrl) {
-                    UIApplication.shared.open(settingsUrl, completionHandler: nil)
-                }
-            }
-            let cancelButton = UIAlertAction(title: "취소", style: .default)
-            
-            alert.addAction(primaryButton)
-            alert.addAction(cancelButton)
-            
-            navigationController?.present(alert, animated: true)
-        }
-    }
-}
+

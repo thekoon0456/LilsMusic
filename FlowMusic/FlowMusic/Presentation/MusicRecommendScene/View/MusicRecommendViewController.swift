@@ -10,8 +10,9 @@ import MusicKit
 
 final class MusicRecommendViewController: BaseViewController {
     
-    private let viewModel: MusicRecommendViewModel
+    // MARK: - Properties
     
+    private let viewModel: MusicRecommendViewModel
     private let player = MusicPlayer.shared
     private let request = MusicRequest.shared
     
@@ -20,25 +21,26 @@ final class MusicRecommendViewController: BaseViewController {
     
     private var album: MusicItemCollection<Album>?
     
-    init(viewModel: MusicRecommendViewModel, dataSource: UICollectionViewDiffableDataSource<Int, Album>? = nil, album: MusicItemCollection<Album>? = nil) {
+    // MARK: - Lifecycles
+    
+    init(viewModel: MusicRecommendViewModel) {
         self.viewModel = viewModel
-        self.dataSource = dataSource
-        self.album = album
+        super.init()
     }
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         
         collectionView.delegate = self
+        configureDataSource()
+        
         Task {
-            await requestMusicAuthorization()
-            //음악 요청
-            
-            album = try await request.requestCatalogAlbumCharts()
-            print(try await request.requestCatalogAlbumCharts())
-            configureDataSource()
-            updateSnapshot()
+            do {
+                album = try await request.requestCatalogAlbumCharts()
+                updateSnapshot()
+            } catch {
+                print(error.localizedDescription)
+            }
         }
     }
     
@@ -96,8 +98,7 @@ extension MusicRecommendViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let album = album?[indexPath.item] else { return }
-        let vc = MusicListViewController(album: album)
-        navigationController?.pushViewController(vc, animated: true)
+        viewModel.input.push.onNext(album)
     }
 }
 

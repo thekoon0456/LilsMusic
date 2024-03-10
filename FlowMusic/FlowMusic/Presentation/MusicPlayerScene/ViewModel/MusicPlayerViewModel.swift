@@ -9,4 +9,11 @@ import Foundation
 
 final class MusicPlayerViewModel: ViewModel {
     
+    weak var coordinator: MusicPlayerCoordinator?
+    
+    init(coordinator: MusicPlayerCoordinator?) {
+        self.coordinator = coordinator
+    }
+    
+    
 }
