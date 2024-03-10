@@ -10,6 +10,8 @@ import MusicKit
 
 final class MusicRecommendViewController: BaseViewController {
     
+    private let viewModel: MusicRecommendViewModel
+    
     private let player = MusicPlayer.shared
     private let request = MusicRequest.shared
     
@@ -17,6 +19,12 @@ final class MusicRecommendViewController: BaseViewController {
     private var dataSource: UICollectionViewDiffableDataSource<Int, Album>?
     
     private var album: MusicItemCollection<Album>?
+    
+    init(viewModel: MusicRecommendViewModel, dataSource: UICollectionViewDiffableDataSource<Int, Album>? = nil, album: MusicItemCollection<Album>? = nil) {
+        self.viewModel = viewModel
+        self.dataSource = dataSource
+        self.album = album
+    }
     
     override func viewDidLoad() {
         

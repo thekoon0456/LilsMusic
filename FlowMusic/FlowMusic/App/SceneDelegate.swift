@@ -10,15 +10,18 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    var appCoordinator: AppCoordinator?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        
+    
         guard let scene = (scene as? UIWindowScene) else { return }
-        
         window = UIWindow(windowScene: scene)
         window?.makeKeyAndVisible()
-        let vc = MusicRecommendViewController()
-        let nav = UINavigationController(rootViewController: vc)
+    
+        let nav = UINavigationController()
+        nav.isNavigationBarHidden = true
+        appCoordinator = AppCoordinator(navigationController: nav)
+        appCoordinator?.start()
         window?.rootViewController = nav
     }
 
@@ -32,4 +35,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidEnterBackground(_ scene: UIScene) { }
 }
-

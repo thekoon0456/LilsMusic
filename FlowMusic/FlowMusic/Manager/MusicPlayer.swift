@@ -53,13 +53,11 @@ final class  MusicPlayer {
     func setQueue(album: Album) {
         player.queue = []
     }
-
-    
     
     // MARK: - Play
     
     func play() async throws {
-//        try await player.prepareToPlay()
+        try await player.prepareToPlay()
         try await player.play()
     }
     
