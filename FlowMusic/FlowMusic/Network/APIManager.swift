@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Test
+
 final class APIManager {
     
     static let shared = APIManager()
