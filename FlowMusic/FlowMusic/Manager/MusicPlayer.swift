@@ -42,12 +42,15 @@ final class  MusicPlayer {
     }
     
     func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
+        // MARK: - entry가 한칸씩 밀려서 + 1해서 싱크 맞춤
         // 플레이어의 큐에 설정
-        return player.queue.currentEntry
+        guard let entry = player.queue.currentEntry,
+              let index = player.queue.entries.firstIndex(of: entry)
+        else { return nil }
+        return player.queue.entries[index + 1]
     }
     
     func setAlbumQueue(album: Album, track: Track) {
-        resetQueue()
         player.queue = ApplicationMusicPlayer.Queue(album: album, startingAt: track)
     }
     

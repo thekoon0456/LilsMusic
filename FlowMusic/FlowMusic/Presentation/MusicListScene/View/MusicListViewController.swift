@@ -168,7 +168,7 @@ extension MusicListViewController {
 extension MusicListViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let track = album.tracks?[indexPath.item] else { return }
+        guard let track = album.tracks?.first else { return }
         Task {
             player.setAlbumQueue(album: album, track: track)
             try await player.play()

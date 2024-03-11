@@ -90,7 +90,7 @@ final class MusicPlayerViewController: BaseViewController {
         super.viewDidLoad()
         
         updateUI(track)
-        
+        print(player.getCurrentEntry()?.item)
         setProgressBarTimer()
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
@@ -155,22 +155,16 @@ final class MusicPlayerViewController: BaseViewController {
             do {
                 try await player.skipToNext()
                 // MARK: - UIUpdate코드 추가
-            } catch {
-                print(error.localizedDescription)
+                guard let song = try await musicRequest.requestSearchSongIDCatalog(id: player.getCurrentEntry()?.item?.id) else { return }
+                print("2", song)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
+                    artistLabel.text =  song.artistName
+                    songLabel.text = song.title
+                }
+                print("3", song)
             }
-        }
-        
-        Task {
-            guard let song = try await musicRequest.requestSearchSongIDCatalog(id: player.getCurrentEntry()?.item?.id) else { return }
-            print("2", song)
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
-                artistLabel.text =  song.artistName
-                songLabel.text = song.title
-
-            }
-            print("3", song)
         }
     }
     
