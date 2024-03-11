@@ -13,7 +13,7 @@ final class  MusicPlayer {
     // MARK: - Properties
     
     static let shared = MusicPlayer()
-    private let player = ApplicationMusicPlayer.shared
+    let player = ApplicationMusicPlayer.shared
     
     // MARK: - Lifecycles
     
@@ -47,11 +47,11 @@ final class  MusicPlayer {
     }
     
     func setAlbumQueue(album: Album, track: Track) {
-        player.queue = []
+        resetQueue()
         player.queue = ApplicationMusicPlayer.Queue(album: album, startingAt: track)
     }
     
-    func setQueue(album: MusicItemCollection<Album>) {
+    func resetQueue() {
         player.queue = []
     }
     

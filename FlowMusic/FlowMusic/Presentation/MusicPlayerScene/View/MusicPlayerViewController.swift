@@ -17,6 +17,7 @@ final class MusicPlayerViewController: BaseViewController {
     private let viewModel: MusicPlayerViewModel
     
     private let player = MusicPlayer.shared
+    private let musicRequest = MusicRequest.shared
     private var track: Track
     private var timer: Timer?
     
@@ -88,13 +89,11 @@ final class MusicPlayerViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Task {
-            updateUI(track)
-        }
+        updateUI(track)
         
+        setProgressBarTimer()
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
-        setProgressBarTimer()
     }
     
     func updateUI(_ track: Track) {
@@ -143,7 +142,8 @@ final class MusicPlayerViewController: BaseViewController {
                 try await previousButton.isSelected
                 ? player.restart()
                 : player.skipToPrevious()
-                updateUI(player.getCurrentEntry()?.transientItem as! Track)
+                // MARK: - updateUI 함수 넣기
+                
             } catch {
                 print(error.localizedDescription)
             }
@@ -154,10 +154,23 @@ final class MusicPlayerViewController: BaseViewController {
         Task {
             do {
                 try await player.skipToNext()
-                updateUI(player.getCurrentEntry()?.transientItem as! Track)
+                // MARK: - UIUpdate코드 추가
             } catch {
                 print(error.localizedDescription)
             }
+        }
+        
+        Task {
+            guard let song = try await musicRequest.requestSearchSongIDCatalog(id: player.getCurrentEntry()?.item?.id) else { return }
+            print("2", song)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
+                artistLabel.text =  song.artistName
+                songLabel.text = song.title
+
+            }
+            print("3", song)
         }
     }
     

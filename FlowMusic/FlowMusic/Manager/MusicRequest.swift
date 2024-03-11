@@ -71,6 +71,11 @@ final class MusicRequest {
     
     // MARK: - Search
     
+    func requestSearchSongIDCatalog(id: MusicItemID?) async throws -> Song? {
+        guard let id else { return nil }
+        return try await MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: id).response().items.first
+    }
+    
     func requestSearchArtistCatalog(term: String) async throws -> MusicItemCollection<Artist> {
         try await MusicCatalogSearchRequest(term: term, types: [Artist.self]).response().artists
     }

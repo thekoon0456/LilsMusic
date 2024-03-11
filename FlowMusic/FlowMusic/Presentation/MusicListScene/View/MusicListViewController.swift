@@ -177,7 +177,3 @@ extension MusicListViewController: UICollectionViewDelegate {
         viewModel.input.listTapped.onNext(track)
     }
 }
-
-// MARK: - Auth
-
-
