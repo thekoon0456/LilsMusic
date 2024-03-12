@@ -56,20 +56,14 @@ final class ReelsViewController: BaseViewController {
         configureDataSource()
         
         Task {
-            musicVideos = try await musicRequest.requestCatalogMVCharts()[0]
-            videoURL = MVRepository.shared.cachedVideoURLs
-            print(musicVideos?.count)
-            print(videoURL.count)
-//            print(musicVideos)
+            musicVideos = try await musicRequest.requestCatalogMVCharts(index: 0)
             updateSnapshot()
         }
     }
     
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
- 
             cell.configureCell(itemIdentifier)
-            cell.DisplayVideoFromUrl(url: self.videoURL[indexPath.item], view: cell.musicVideoView)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
@@ -119,25 +113,6 @@ final class ReelsViewController: BaseViewController {
 }
 
 extension ReelsViewController: UICollectionViewDelegate {
-    
-//        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) { // 현재 보이는 셀의 인덱스를 계산하는 메서드
-//            let mvRepo = MVRepository.shared
-//            let nextIndex = currentIndex.item + 1
-//    
-//            // 다음 동영상이 이미 다운로드 대기열에 있는지 확인하고, 아니라면 다운로드 시작
-//            if nextIndex < mvRepo.videoURLs?.count ?? 0 {
-//                
-//                Task {
-//                    try await mvRepo.fetchTodayMVURL(index: nextIndex)
-//                    mvRepo.videoURLs?.forEach({ url in
-//                        guard let url else { return }
-//                        mvRepo.downloadVideoIfNotCached(for: url) { result in
-//                            print("캐싱 다운로드 완료", result)
-//                        }
-//                    })
-//                }
-//            }
-//        }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? ReelsCell else { return }

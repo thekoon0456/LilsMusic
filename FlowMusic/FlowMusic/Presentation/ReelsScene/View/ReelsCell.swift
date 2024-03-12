@@ -16,7 +16,7 @@ final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Properties
     
-//    let resourceLoaderDelegate = CustomResourceLoaderDelegate()
+    let resourceLoaderDelegate = CustomResourceLoaderDelegate()
     
     let musicPlayer = MusicPlayer.shared
     private let musicRequest = MusicRequest.shared
@@ -66,20 +66,19 @@ final class ReelsCell: BaseCollectionViewCell {
         print(#function)
         
         guard let url = data.previewAssets?.first?.hlsURL else { return }
-//        let asset = AVURLAsset(url: url)
-//       asset.resourceLoader.setDelegate(resourceLoaderDelegate, queue: DispatchQueue.main)
-//        
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self else { return }
-//            DisplayVideoFromAssets(asset: asset, view: musicVideoView)
-//            play()
-//        }
+        let asset = AVURLAsset(url: url)
+       asset.resourceLoader.setDelegate(resourceLoaderDelegate, queue: DispatchQueue.main)
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            DisplayVideoFromAssets(asset: asset, view: musicVideoView)
+            play()
+        }
+        
 //        DispatchQueue.main.async { [weak self] in
 //            guard let self else { return }
 //            DisplayVideoFromUrl(url: <#T##URL?#>, view: <#T##UIView#>)
 //        }
-        
-
         musicLabel.text = data.title
         artistLabel.text = data.artistName
         genreLabel.text = data.genreNames.first
@@ -133,28 +132,27 @@ final class ReelsCell: BaseCollectionViewCell {
         }
     }
     
-    func DisplayVideoFromUrl(url: URL?, view: UIView) {
-        guard let url else { return }
-        player = AVPlayer(url: url).then {
-            $0.isMuted = true
-        }
-        print(url)
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
-        playerLayer.needsDisplayOnBoundsChange = true
-        playerLayer.frame = view.bounds
-        view.layer.masksToBounds = true
-        view.layer.addSublayer(playerLayer)
-        
-        play()
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-                                               object: player?.currentItem,
-                                               queue: .main) { [weak self] _ in
-            guard let self else { return }
-            player?.seek(to: .zero)
-            player?.play()
-        }
-    }
+//    func DisplayVideoFromUrl(url: URL?, view: UIView) {
+//        guard let url else { return }
+//        player = AVPlayer(url: url).then {
+//            $0.isMuted = true
+//        }
+//        print(url)
+//        let playerLayer = AVPlayerLayer(player: player)
+//        playerLayer.videoGravity = .resizeAspectFill
+//        playerLayer.needsDisplayOnBoundsChange = true
+//        playerLayer.frame = view.bounds
+//        view.layer.masksToBounds = true
+//        view.layer.addSublayer(playerLayer)
+//        
+//        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+//                                               object: player?.currentItem,
+//                                               queue: .main) { [weak self] _ in
+//            guard let self else { return }
+//            player?.seek(to: .zero)
+//            player?.play()
+//        }
+//    }
     
     func play() {
         print(#function)
@@ -178,71 +176,38 @@ final class ReelsCell: BaseCollectionViewCell {
     }
 }
 
-//extension ReelsCell {
-//    
-//    func downloadVideoIfNotCached(for url: URL, completion: @escaping (URL?, Error?) -> Void) {
-//        let fileManager = FileManager.default
-//        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-//        let cachedUrl = cacheDirectory.appendingPathComponent(url.lastPathComponent)
-//        
-//        // 이미 캐시되어 있다면, 바로 로컬 URL을 반환합니다.
-//        if fileManager.fileExists(atPath: cachedUrl.path) {
-//            completion(cachedUrl, nil)
-//            return
-//        }
-//        
-//        // 캐시되어 있지 않다면, 동영상을 다운로드합니다.
-//        let downloadTask = URLSession.shared.downloadTask(with: url) { tempUrl, response, error in
-//            guard let tempUrl = tempUrl, error == nil else {
-//                completion(nil, error)
-//                return
-//            }
-//            
-//            // 다운로드된 파일을 캐시 디렉터리로 이동합니다.
-//            do {
-//                try fileManager.moveItem(at: tempUrl, to: cachedUrl)
-//                completion(cachedUrl, nil)
-//            } catch {
-//                completion(nil, error)
-//            }
-//        }
-//        
-//        downloadTask.resume()
-//    }
-//}
-
-//class CustomResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate {
-//    
-//    func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-//        
-//        guard let url = loadingRequest.request.url else { return false }
-//        // 비동기적으로 실제 데이터 로드
-//        URLSession.shared.dataTask(with: url) { data, response, error in
-//            guard let httpResponse = response as? HTTPURLResponse,
-//                  httpResponse.statusCode == 200,
-//                  let mimeType = httpResponse.mimeType,
-//                  let data = data else {
-//                loadingRequest.finishLoading(with: error)
-//                return
-//            }
-//            
-//            // 컨텐츠 정보 설정
-//            if let contentInformationRequest = loadingRequest.contentInformationRequest {
-//                contentInformationRequest.contentType = AVFileType.mp4.rawValue
-//                contentInformationRequest.contentLength = Int64(data.count)
-//                contentInformationRequest.isByteRangeAccessSupported = true
-//            }
-//            
-//            // 데이터 제공
-//            loadingRequest.dataRequest?.respond(with: data)
-//            
-//            // 로딩 완료
-//            loadingRequest.finishLoading()
-//        }.resume()
-//        
-//        return true
-//    }
-//}
+class CustomResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate {
+    
+    func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
+        
+        guard let url = loadingRequest.request.url else { return false }
+        // 비동기적으로 실제 데이터 로드
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200,
+                  let mimeType = httpResponse.mimeType,
+                  let data = data else {
+                loadingRequest.finishLoading(with: error)
+                return
+            }
+            
+            // 컨텐츠 정보 설정
+            if let contentInformationRequest = loadingRequest.contentInformationRequest {
+                contentInformationRequest.contentType = AVFileType.mp4.rawValue
+                contentInformationRequest.contentLength = Int64(data.count)
+                contentInformationRequest.isByteRangeAccessSupported = true
+            }
+            
+            // 데이터 제공
+            loadingRequest.dataRequest?.respond(with: data)
+            
+            // 로딩 완료
+            loadingRequest.finishLoading()
+        }.resume()
+        
+        return true
+    }
+}
 
 //
 //func configureCell(_ data: MusicVideo) {
