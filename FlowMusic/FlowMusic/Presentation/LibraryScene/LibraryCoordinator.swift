@@ -26,8 +26,6 @@ final class LibraryCoordinator: Coordinator {
         vc.tabBarItem = UITabBarItem(title: nil,
                                      image: UIImage(systemName: FMDesign.Icon.library.name),
                                      selectedImage: UIImage(systemName: FMDesign.Icon.library.fill))
-        
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.pushViewController(vc, animated: true)
     }
     

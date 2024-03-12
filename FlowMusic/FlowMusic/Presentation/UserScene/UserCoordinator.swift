@@ -25,8 +25,6 @@ final class UserCoordinator: Coordinator {
         vc.tabBarItem = UITabBarItem(title: nil,
                                      image: UIImage(systemName: FMDesign.Icon.user.name),
                                      selectedImage: UIImage(systemName: FMDesign.Icon.user.fill))
-        
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.pushViewController(vc, animated: true)
     }
     

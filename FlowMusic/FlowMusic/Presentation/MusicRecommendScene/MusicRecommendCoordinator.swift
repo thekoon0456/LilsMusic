@@ -26,8 +26,6 @@ final class MusicRecommendCoordinator: Coordinator {
         vc.tabBarItem = UITabBarItem(title: nil,
                                      image: UIImage(systemName: FMDesign.Icon.recommend.name),
                                      selectedImage: UIImage(systemName: FMDesign.Icon.recommend.fill))
-        
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.pushViewController(vc, animated: true)
     }
     

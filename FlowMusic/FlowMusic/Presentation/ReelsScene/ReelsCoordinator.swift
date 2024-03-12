@@ -25,8 +25,6 @@ final class ReelsCoordinator: Coordinator {
         vc.tabBarItem = UITabBarItem(title: nil,
                                      image: UIImage(systemName: FMDesign.Icon.reels.name),
                                      selectedImage: UIImage(systemName: FMDesign.Icon.reels.fill))
-        
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.pushViewController(vc, animated: true)
     }
     

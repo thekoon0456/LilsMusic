@@ -33,7 +33,8 @@ final class ReelsCell: BaseCollectionViewCell {
             musicPlayer.setSongQueue(song: song[0])
             print(song[0])
             try await musicPlayer.play()
-            DisplayVideoFromUrl(url: data.previewAssets?.first?.hlsURL, view: musicVideoView)
+            print(data.previewAssets?.first?.hlsURL)
+            DisplayVideoFromUrl(url: data.previewAssets?.first?.url, view: musicVideoView)
         }
     }
     

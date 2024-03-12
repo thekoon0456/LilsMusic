@@ -18,16 +18,19 @@ final class ReelsViewController: BaseViewController {
     
     // MARK: - Properties
     
-    private let musicRequest = MusicRequest.shared
-    
-    private var musicVideos: MusicItemCollection<MusicVideo>?
-    
     private let viewModel: ReelsViewModel
-    
+    private let musicRequest = MusicRequest.shared
+    private var musicVideos: MusicItemCollection<MusicVideo>?
+    private let titleView = UILabel().then {
+        $0.text = "MV Reels"
+        $0.font = .boldSystemFont(ofSize: 20)
+    }
+
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero,
                                   collectionViewLayout: createLayout())
         cv.delegate = self
+        cv.isPagingEnabled = true
         return cv
     }()
     
@@ -75,17 +78,12 @@ final class ReelsViewController: BaseViewController {
     // MARK: - Layout
     
     private func createLayout() -> UICollectionViewCompositionalLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1))
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0)
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(0.4))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(10)
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
         let layout = UICollectionViewCompositionalLayout(section: section)
-        layout.configuration.scrollDirection = .vertical
-        layout.collectionView?.isPagingEnabled = true
         return layout
     }
     
@@ -101,7 +99,7 @@ final class ReelsViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationItem.title = "Reels"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
     }
 }
 

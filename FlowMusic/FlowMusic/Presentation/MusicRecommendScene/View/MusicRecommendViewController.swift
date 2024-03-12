@@ -16,9 +16,13 @@ final class MusicRecommendViewController: BaseViewController {
     private let player = MusicPlayer.shared
     private let request = MusicRequest.shared
     
+    private let titleView = UILabel().then {
+        $0.text = "Recommend Albums"
+        $0.font = .boldSystemFont(ofSize: 20)
+    }
+    
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     private var dataSource: UICollectionViewDiffableDataSource<Int, Album>?
-    
     private var album: MusicItemCollection<Album>?
     
     // MARK: - Lifecycles
@@ -91,7 +95,7 @@ final class MusicRecommendViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationItem.title = "Albums"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
     }
 }
 
