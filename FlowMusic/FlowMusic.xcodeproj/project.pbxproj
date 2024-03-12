@@ -57,6 +57,7 @@
 		7CF60D772B9EE7FC001769BD /* MusicVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D762B9EE7FC001769BD /* MusicVideo.swift */; };
 		7CF60D7A2B9F0558001769BD /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D792B9F0558001769BD /* APIManager.swift */; };
 		7CF60D7D2B9F0D43001769BD /* ExReels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D7C2B9F0D43001769BD /* ExReels.swift */; };
+		7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF64B872BA064640040E416 /* PaddingLabel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +111,7 @@
 		7CF60D762B9EE7FC001769BD /* MusicVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicVideo.swift; sourceTree = "<group>"; };
 		7CF60D792B9F0558001769BD /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		7CF60D7C2B9F0D43001769BD /* ExReels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExReels.swift; sourceTree = "<group>"; };
+		7CF64B872BA064640040E416 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -406,6 +408,7 @@
 			isa = PBXGroup;
 			children = (
 				7C813DFF2B9B153800CDFF1D /* MarqueeLabel.swift */,
+				7CF64B872BA064640040E416 /* PaddingLabel.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -569,6 +572,7 @@
 				7C813DEB2B9AE39300CDFF1D /* MusicListViewController.swift in Sources */,
 				7C813E032B9B15D900CDFF1D /* MusicListCell.swift in Sources */,
 				7C813DE42B9AE33200CDFF1D /* MusicPlayerViewModel.swift in Sources */,
+				7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */,
 				7C77400E2B9DA44C00B2E6E7 /* UserViewModel.swift in Sources */,
 				7C7740032B9DA18700B2E6E7 /* MusicListCoordinator.swift in Sources */,
 				7CF60D772B9EE7FC001769BD /* MusicVideo.swift in Sources */,

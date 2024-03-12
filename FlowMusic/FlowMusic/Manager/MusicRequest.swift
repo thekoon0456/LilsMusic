@@ -69,8 +69,8 @@ final class MusicRequest {
         try await MusicCatalogChartsRequest(types: [Song.self]).response().songCharts.map { $0.items }
     }
     
-    func requestCatalogMVCharts() async throws -> [MusicItemCollection<MusicVideo>] {
-        try await MusicCatalogChartsRequest(types: [MusicVideo.self]).response().musicVideoCharts.map { $0.items }
+    func requestCatalogMVCharts(index: Int) async throws -> MusicItemCollection<MusicVideo> {
+        try await MusicCatalogChartsRequest(types: [MusicVideo.self]).response().musicVideoCharts.map { $0.items }[index]
     }
     
     // MARK: - Search

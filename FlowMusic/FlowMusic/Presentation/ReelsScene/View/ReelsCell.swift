@@ -15,21 +15,46 @@ import SnapKit
 final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Properties
-
+    
     let musicPlayer = MusicPlayer.shared
     private let musicRequest = MusicRequest.shared
-    private var musicVideoView = UIView().then {
-        $0.backgroundColor = .systemGray
+    
+    var musicVideoView = UIView().then {
+        $0.backgroundColor = .tertiarySystemBackground
+    }
+    
+    private let musicLabel = UILabel().then {
+        $0.font = .boldSystemFont(ofSize: 28)
+        $0.textColor = .white
+    }
+    
+    private let artistLabel = UILabel().then {
+        $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .white
+    }
+    
+    private let genreLabel = PaddingLabel().then {
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .label
+        $0.backgroundColor = .tertiarySystemGroupedBackground
+        $0.layer.cornerRadius = 12
+        $0.clipsToBounds = true
+    }
+    
+    private let addToPlaylistButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "list.bullet.rectangle.portrait"), for: .normal)
     }
     
     private var player: AVPlayer?
     
     // MARK: - Lifecycles
-//    
+    //
     override func prepareForReuse() {
         super.prepareForReuse()
         print(#function)
-        //cell재사용시 레이아웃 초기화 필요
+        player?.pause()
+        NotificationCenter.default.removeObserver(self)
+        //cell 재사용시 레이아웃 초기화 필요
         musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
     }
     
@@ -37,37 +62,65 @@ final class ReelsCell: BaseCollectionViewCell {
     
     func configureCell(_ data: MusicVideo) {
         print(#function)
-        Task {
-            DisplayVideoFromUrl(url: data.previewAssets?.first?.hlsURL,
-                                view: musicVideoView)
+        
+        guard let url = data.previewAssets?.first?.hlsURL else { return }
+        let asset = AVURLAsset(url: url)
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            DisplayVideoFromAssets(asset: asset, view: musicVideoView)
             play()
         }
+        
+//        DispatchQueue.main.async { [weak self] in
+//            guard let self else { return }
+//            DisplayVideoFromUrl(url: <#T##URL?#>, view: <#T##UIView#>)
+//        }
+        musicLabel.text = data.title
+        artistLabel.text = data.artistName
+        genreLabel.text = data.genreNames.first
     }
     
     override func configureHierarchy() {
-        contentView.addSubview(musicVideoView)
+        contentView.addSubviews(musicVideoView, musicLabel, artistLabel, genreLabel)
     }
     
     override func configureLayout() {
         musicVideoView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-    }
-    
-    func DisplayVideoFromUrl(url: URL?, view: UIView) {
-        player = AVPlayer(url: url!).then {
-            $0.isMuted = true
+        
+        musicLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(artistLabel.snp.top).offset(-4)
         }
         
-        let playerLayer = AVPlayerLayer(player: player)
+        artistLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).offset(-60)
+        }
         
+        genreLabel.snp.makeConstraints { make in
+            make.height.equalTo(24)
+            make.leading.equalToSuperview().offset(20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).offset(-30)
+        }
+    }
+    
+    func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
+        let playerItem = AVPlayerItem(asset: asset)
+        player = AVPlayer(playerItem: playerItem).then {
+            $0.isMuted = true
+        }
+        let playerLayer = AVPlayerLayer(player: player)
         playerLayer.videoGravity = .resizeAspectFill
         playerLayer.needsDisplayOnBoundsChange = true
         playerLayer.frame = view.bounds
-        
         view.layer.masksToBounds = true
         view.layer.addSublayer(playerLayer)
-
+        
         NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
                                                object: player?.currentItem,
                                                queue: .main) { [weak self] _ in
@@ -98,6 +151,28 @@ final class ReelsCell: BaseCollectionViewCell {
         player?.pause()
     }
 }
+
+//    func DisplayVideoFromUrl(url: URL?, view: UIView) {
+//        guard let url else { return }
+//        player = AVPlayer(url: url).then {
+//            $0.isMuted = true
+//        }
+//        print(url)
+//        let playerLayer = AVPlayerLayer(player: player)
+//        playerLayer.videoGravity = .resizeAspectFill
+//        playerLayer.needsDisplayOnBoundsChange = true
+//        playerLayer.frame = view.bounds
+//        view.layer.masksToBounds = true
+//        view.layer.addSublayer(playerLayer)
+//
+//        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+//                                               object: player?.currentItem,
+//                                               queue: .main) { [weak self] _ in
+//            guard let self else { return }
+//            player?.seek(to: .zero)
+//            player?.play()
+//        }
+//    }
 
 //
 //func configureCell(_ data: MusicVideo) {

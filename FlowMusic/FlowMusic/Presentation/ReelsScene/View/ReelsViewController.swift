@@ -20,13 +20,16 @@ final class ReelsViewController: BaseViewController {
     
     private let viewModel: ReelsViewModel
     private let musicRequest = MusicRequest.shared
-    private var musicVideos: MusicItemCollection<MusicVideo>?
+
     private let titleView = UILabel().then {
         $0.text = "MV Reels"
         $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .white
     }
     
-    var currentIndex: IndexPath?
+    private var musicVideos: MusicItemCollection<MusicVideo>?
+    var videoURL = [URL]()
+    var currentIndex: IndexPath = IndexPath(item: 0, section: 0)
 
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero,
@@ -53,8 +56,7 @@ final class ReelsViewController: BaseViewController {
         configureDataSource()
         
         Task {
-            musicVideos = try await musicRequest.requestCatalogMVCharts().first
-            print(musicVideos)
+            musicVideos = try await musicRequest.requestCatalogMVCharts(index: 0)
             updateSnapshot()
         }
     }
@@ -106,8 +108,7 @@ final class ReelsViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationController?.navigationBar.isHidden = true
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
     }
 }
 
