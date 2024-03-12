@@ -57,6 +57,8 @@
 		7CF60D772B9EE7FC001769BD /* MusicVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D762B9EE7FC001769BD /* MusicVideo.swift */; };
 		7CF60D7A2B9F0558001769BD /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D792B9F0558001769BD /* APIManager.swift */; };
 		7CF60D7D2B9F0D43001769BD /* ExReels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D7C2B9F0D43001769BD /* ExReels.swift */; };
+		7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF64B872BA064640040E416 /* PaddingLabel.swift */; };
+		7CF64B8B2BA0A2E00040E416 /* MVRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF64B8A2BA0A2E00040E416 /* MVRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +112,8 @@
 		7CF60D762B9EE7FC001769BD /* MusicVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicVideo.swift; sourceTree = "<group>"; };
 		7CF60D792B9F0558001769BD /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		7CF60D7C2B9F0D43001769BD /* ExReels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExReels.swift; sourceTree = "<group>"; };
+		7CF64B872BA064640040E416 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		7CF64B8A2BA0A2E00040E416 /* MVRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MVRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +212,7 @@
 				7C813DC62B9AE1DD00CDFF1D /* Manager */,
 				7C813DC32B9AE1BC00CDFF1D /* Data */,
 				7CF60D782B9F0548001769BD /* Network */,
+				7CF64B892BA0A2CB0040E416 /* Repository */,
 				7C813DC52B9AE1C500CDFF1D /* Presentation */,
 				7C7740172B9DB72400B2E6E7 /* Utility */,
 				7C813DDC2B9AE2EC00CDFF1D /* Const */,
@@ -406,6 +411,7 @@
 			isa = PBXGroup;
 			children = (
 				7C813DFF2B9B153800CDFF1D /* MarqueeLabel.swift */,
+				7CF64B872BA064640040E416 /* PaddingLabel.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -459,6 +465,14 @@
 				7CF60D7C2B9F0D43001769BD /* ExReels.swift */,
 			);
 			path = ETC;
+			sourceTree = "<group>";
+		};
+		7CF64B892BA0A2CB0040E416 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				7CF64B8A2BA0A2E00040E416 /* MVRepository.swift */,
+			);
+			path = Repository;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -569,7 +583,9 @@
 				7C813DEB2B9AE39300CDFF1D /* MusicListViewController.swift in Sources */,
 				7C813E032B9B15D900CDFF1D /* MusicListCell.swift in Sources */,
 				7C813DE42B9AE33200CDFF1D /* MusicPlayerViewModel.swift in Sources */,
+				7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */,
 				7C77400E2B9DA44C00B2E6E7 /* UserViewModel.swift in Sources */,
+				7CF64B8B2BA0A2E00040E416 /* MVRepository.swift in Sources */,
 				7C7740032B9DA18700B2E6E7 /* MusicListCoordinator.swift in Sources */,
 				7CF60D772B9EE7FC001769BD /* MusicVideo.swift in Sources */,
 				7C916E142B9DA01200C5F6C0 /* ReelsCell.swift in Sources */,

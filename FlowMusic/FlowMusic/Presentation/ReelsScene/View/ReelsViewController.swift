@@ -20,13 +20,16 @@ final class ReelsViewController: BaseViewController {
     
     private let viewModel: ReelsViewModel
     private let musicRequest = MusicRequest.shared
-    private var musicVideos: MusicItemCollection<MusicVideo>?
+
     private let titleView = UILabel().then {
         $0.text = "MV Reels"
         $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .white
     }
     
-    var currentIndex: IndexPath?
+    private var musicVideos: MusicItemCollection<MusicVideo>?
+    var videoURL = [URL]()
+    var currentIndex: IndexPath = IndexPath(item: 0, section: 0)
 
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero,
@@ -53,15 +56,20 @@ final class ReelsViewController: BaseViewController {
         configureDataSource()
         
         Task {
-            musicVideos = try await musicRequest.requestCatalogMVCharts().first
-            print(musicVideos)
+            musicVideos = try await musicRequest.requestCatalogMVCharts()[0]
+            videoURL = MVRepository.shared.cachedVideoURLs
+            print(musicVideos?.count)
+            print(videoURL.count)
+//            print(musicVideos)
             updateSnapshot()
         }
     }
     
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
+ 
             cell.configureCell(itemIdentifier)
+            cell.DisplayVideoFromUrl(url: self.videoURL[indexPath.item], view: cell.musicVideoView)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
@@ -106,12 +114,30 @@ final class ReelsViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationController?.navigationBar.isHidden = true
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
     }
 }
 
 extension ReelsViewController: UICollectionViewDelegate {
+    
+//        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) { // 현재 보이는 셀의 인덱스를 계산하는 메서드
+//            let mvRepo = MVRepository.shared
+//            let nextIndex = currentIndex.item + 1
+//    
+//            // 다음 동영상이 이미 다운로드 대기열에 있는지 확인하고, 아니라면 다운로드 시작
+//            if nextIndex < mvRepo.videoURLs?.count ?? 0 {
+//                
+//                Task {
+//                    try await mvRepo.fetchTodayMVURL(index: nextIndex)
+//                    mvRepo.videoURLs?.forEach({ url in
+//                        guard let url else { return }
+//                        mvRepo.downloadVideoIfNotCached(for: url) { result in
+//                            print("캐싱 다운로드 완료", result)
+//                        }
+//                    })
+//                }
+//            }
+//        }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? ReelsCell else { return }

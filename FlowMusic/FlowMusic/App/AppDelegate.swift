@@ -12,6 +12,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
+        
+        let mvRepo = MVRepository.shared
+        Task {
+            try await mvRepo.fetchTodayMVURL(index: 0)
+            mvRepo.downloadInitialVideos(videoURLs: mvRepo.videoURLs)
+            print(mvRepo.cachedVideoURLs.count)
+        }
+
+        
         return true
     }
 
