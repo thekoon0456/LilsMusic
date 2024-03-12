@@ -17,6 +17,7 @@ final class ReelsCoordinator: Coordinator {
         self.childCoordinators = []
         self.navigationController = navigationController
         self.type = .reels
+        setNavigationBar()
     }
     
     func start() {
@@ -25,8 +26,21 @@ final class ReelsCoordinator: Coordinator {
         vc.tabBarItem = UITabBarItem(title: nil,
                                      image: UIImage(systemName: FMDesign.Icon.reels.name),
                                      selectedImage: UIImage(systemName: FMDesign.Icon.reels.fill))
-        navigationController?.pushViewController(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: false)
     }
     
+}
+
+extension ReelsCoordinator {
     
+    private func setNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundImage = UIImage()
+        appearance.shadowImage = UIImage()
+        appearance.backgroundColor = .clear
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
 }
