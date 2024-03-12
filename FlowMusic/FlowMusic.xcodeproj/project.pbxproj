@@ -210,7 +210,6 @@
 				7C813DC62B9AE1DD00CDFF1D /* Manager */,
 				7C813DC32B9AE1BC00CDFF1D /* Data */,
 				7CF60D782B9F0548001769BD /* Network */,
-				7CF64B892BA0A2CB0040E416 /* Repository */,
 				7C813DC52B9AE1C500CDFF1D /* Presentation */,
 				7C7740172B9DB72400B2E6E7 /* Utility */,
 				7C813DDC2B9AE2EC00CDFF1D /* Const */,
@@ -463,13 +462,6 @@
 				7CF60D7C2B9F0D43001769BD /* ExReels.swift */,
 			);
 			path = ETC;
-			sourceTree = "<group>";
-		};
-		7CF64B892BA0A2CB0040E416 /* Repository */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Repository;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

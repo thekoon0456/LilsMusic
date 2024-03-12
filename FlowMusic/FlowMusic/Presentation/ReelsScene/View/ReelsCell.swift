@@ -16,8 +16,6 @@ final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Properties
     
-    let resourceLoaderDelegate = CustomResourceLoaderDelegate()
-    
     let musicPlayer = MusicPlayer.shared
     private let musicRequest = MusicRequest.shared
     
@@ -56,7 +54,7 @@ final class ReelsCell: BaseCollectionViewCell {
         print(#function)
         player?.pause()
         NotificationCenter.default.removeObserver(self)
-        //cell재사용시 레이아웃 초기화 필요
+        //cell 재사용시 레이아웃 초기화 필요
         musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
     }
     
@@ -67,7 +65,6 @@ final class ReelsCell: BaseCollectionViewCell {
         
         guard let url = data.previewAssets?.first?.hlsURL else { return }
         let asset = AVURLAsset(url: url)
-       asset.resourceLoader.setDelegate(resourceLoaderDelegate, queue: DispatchQueue.main)
         
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -113,7 +110,8 @@ final class ReelsCell: BaseCollectionViewCell {
     }
     
     func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
-        player = AVPlayer(playerItem: AVPlayerItem(asset: asset)).then {
+        let playerItem = AVPlayerItem(asset: asset)
+        player = AVPlayer(playerItem: playerItem).then {
             $0.isMuted = true
         }
         let playerLayer = AVPlayerLayer(player: player)
@@ -131,28 +129,6 @@ final class ReelsCell: BaseCollectionViewCell {
             player?.play()
         }
     }
-    
-//    func DisplayVideoFromUrl(url: URL?, view: UIView) {
-//        guard let url else { return }
-//        player = AVPlayer(url: url).then {
-//            $0.isMuted = true
-//        }
-//        print(url)
-//        let playerLayer = AVPlayerLayer(player: player)
-//        playerLayer.videoGravity = .resizeAspectFill
-//        playerLayer.needsDisplayOnBoundsChange = true
-//        playerLayer.frame = view.bounds
-//        view.layer.masksToBounds = true
-//        view.layer.addSublayer(playerLayer)
-//        
-//        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-//                                               object: player?.currentItem,
-//                                               queue: .main) { [weak self] _ in
-//            guard let self else { return }
-//            player?.seek(to: .zero)
-//            player?.play()
-//        }
-//    }
     
     func play() {
         print(#function)
@@ -176,38 +152,27 @@ final class ReelsCell: BaseCollectionViewCell {
     }
 }
 
-class CustomResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate {
-    
-    func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-        
-        guard let url = loadingRequest.request.url else { return false }
-        // 비동기적으로 실제 데이터 로드
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200,
-                  let mimeType = httpResponse.mimeType,
-                  let data = data else {
-                loadingRequest.finishLoading(with: error)
-                return
-            }
-            
-            // 컨텐츠 정보 설정
-            if let contentInformationRequest = loadingRequest.contentInformationRequest {
-                contentInformationRequest.contentType = AVFileType.mp4.rawValue
-                contentInformationRequest.contentLength = Int64(data.count)
-                contentInformationRequest.isByteRangeAccessSupported = true
-            }
-            
-            // 데이터 제공
-            loadingRequest.dataRequest?.respond(with: data)
-            
-            // 로딩 완료
-            loadingRequest.finishLoading()
-        }.resume()
-        
-        return true
-    }
-}
+//    func DisplayVideoFromUrl(url: URL?, view: UIView) {
+//        guard let url else { return }
+//        player = AVPlayer(url: url).then {
+//            $0.isMuted = true
+//        }
+//        print(url)
+//        let playerLayer = AVPlayerLayer(player: player)
+//        playerLayer.videoGravity = .resizeAspectFill
+//        playerLayer.needsDisplayOnBoundsChange = true
+//        playerLayer.frame = view.bounds
+//        view.layer.masksToBounds = true
+//        view.layer.addSublayer(playerLayer)
+//
+//        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+//                                               object: player?.currentItem,
+//                                               queue: .main) { [weak self] _ in
+//            guard let self else { return }
+//            player?.seek(to: .zero)
+//            player?.play()
+//        }
+//    }
 
 //
 //func configureCell(_ data: MusicVideo) {
