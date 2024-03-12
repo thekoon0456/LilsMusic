@@ -69,6 +69,10 @@ final class MusicRequest {
         try await MusicCatalogChartsRequest(types: [Song.self]).response().songCharts.map { $0.items }
     }
     
+    func requestCatalogMVCharts() async throws -> [MusicItemCollection<MusicVideo>] {
+        try await MusicCatalogChartsRequest(types: [MusicVideo.self]).response().musicVideoCharts.map { $0.items }
+    }
+    
     // MARK: - Search
     
     func requestSearchSongIDCatalog(id: MusicItemID?) async throws -> Song? {
@@ -82,10 +86,6 @@ final class MusicRequest {
         let items = response.items
         let songs = items.first?.songs
         let song = songs?.first
-        print(response)
-        print(items)
-        print(songs)
-        print(song)
         return song
     }
     

@@ -91,6 +91,7 @@ final class MusicRecommendViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
+        navigationItem.title = "Albums"
     }
 }
 
