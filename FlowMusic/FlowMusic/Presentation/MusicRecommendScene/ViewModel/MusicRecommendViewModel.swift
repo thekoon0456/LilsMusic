@@ -11,7 +11,7 @@ import MusicKit
 final class MusicRecommendViewModel: ViewModel {
     
     struct Input {
-        let push = Observable<Album?>(nil)
+//        let push = Observable<Album?>(nil)
     }
     
     struct Output {
@@ -21,23 +21,23 @@ final class MusicRecommendViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicRecommendCoordinator?
-    let input = Input()
-    let output = Output()
+//    let input = Input()
+//    let output = Output()
     
     // MARK: - Lifecycles
     
     init(coordinator: MusicRecommendCoordinator?) {
         self.coordinator = coordinator
-        transform()
+//        transform()
     }
     
-    private func transform() {
-        input.push.bind { [weak self] album in
-            guard let self,
-                  let album else { return }
-            coordinator?.push(album: album)
-        }
-    }
+//    private func transform() {
+//        input.push.bind { [weak self] album in
+//            guard let self,
+//                  let album else { return }
+//            coordinator?.push(album: album)
+//        }
+//    }
     
     
 }

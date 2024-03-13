@@ -13,7 +13,7 @@ final class MusicRecommendViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: MusicRecommendViewModel
-    private let player = MusicPlayer.shared
+    private let player = MusicPlayerManager.shared
     private let request = MusicRequest.shared
     
     private let titleView = UILabel().then {
@@ -102,8 +102,12 @@ final class MusicRecommendViewController: BaseViewController {
 extension MusicRecommendViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let album = album?[indexPath.item] else { return }
-        viewModel.input.push.onNext(album)
+        guard var album = album?[indexPath.item] else { return }
+//        viewModel.input.push.onNext(album)
+        Task {
+            try await album = album.with(.tracks)
+            viewModel.coordinator?.push(album: album)
+        }
     }
 }
 

@@ -1,0 +1,147 @@
+//
+//  MusicPlayer.swift
+//  FlowMusic
+//
+//  Created by Deokhun KIM on 3/8/24.
+//
+
+import Foundation
+import MusicKit
+
+final class MusicPlayerManager {
+    
+    // MARK: - Properties
+    
+    static let shared = MusicPlayerManager()
+    let player = ApplicationMusicPlayer.shared
+    
+    // MARK: - Lifecycles
+    
+    private init() { }
+    
+    func getCurrentEntry() async throws -> ApplicationMusicPlayer.Queue.Entry? {
+        //바로 넘기면 이전 엔트리가 나와서 0.2초 슬립
+        try await Task.sleep(nanoseconds: 200_000_000)
+        return player.queue.currentEntry
+    }
+    
+    // MARK: - Set Queue
+    
+    func getQueue() -> ApplicationMusicPlayer.Queue.Entries {
+        player.queue.entries
+    }
+    
+    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        try await play()
+    }
+    
+    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[0])
+        player.queue = queue
+        try await play()
+    }
+    
+    func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    //한곡 재생
+    func playSong(_ song: Song) async throws {
+        player.queue = [song]
+        try await play()
+    }
+    
+    func resetQueue() {
+        player.queue = []
+    }
+    
+    // MARK: - Play
+    
+    func play() async throws {
+        try await player.prepareToPlay()
+        try await player.play()
+    }
+    
+    func pause() {
+        player.pause()
+    }
+    
+    func stop() {
+        player.stop()
+    }
+    
+    func restart() {
+        player.restartCurrentEntry()
+    }
+    
+    func skipToNext() async throws {
+        try await player.skipToNextEntry()
+        
+        if player.queue.entries.isEmpty {
+            player.restartCurrentEntry()
+        }
+    }
+    
+    func skipToPrevious() async throws  {
+        try await player.skipToPreviousEntry()
+    }
+    
+    func setRepeatMode(mode: MusicPlayer.RepeatMode) {
+        player.state.repeatMode = mode
+    }
+    
+    func setRandomMode(mode: MusicPlayer.ShuffleMode?) {
+        player.state.shuffleMode = mode
+    }
+    
+    // MARK: - Player Status
+    
+    //현재 플레이타임
+    func getPlayBackTime() -> TimeInterval {
+        player.playbackTime
+    }
+     
+    //재생준비 상태
+    func isPreparedToPlay() -> Bool {
+        player.isPreparedToPlay
+    }
+}
+
+// MARK: - Queue
+//
+//    func setSongQueue(item: Song, startIndex: Int) async throws {
+//        let entry = ApplicationMusicPlayer.Queue.Entry(item)
+//        player.queue.entries.insert(entry, at: startIndex)
+//        try await play()
+//    }
+//
+//    func setAlbumQueue(item: Album, startIndex: Int) async throws {
+//        let entry = ApplicationMusicPlayer.Queue.Entry(item)
+//        player.queue.entries.insert(entry, at: startIndex)
+//        try await play()
+//    }
+//
+//    func setPlaylistQueue(item: Playlist, startIndex: Int) async throws {
+//        let entry = ApplicationMusicPlayer.Queue.Entry(item)
+//        player.queue.entries.insert(entry, at: startIndex)
+//        try await play()
+//    }
+//
+//    //현재 재생 다음에 큐 설정
+//    func insertSongsAfterCurrentEntry(songs: MusicItemCollection<Song>) async throws {
+//        try await player.queue.insert(songs, position: .afterCurrentEntry)
+//    }
+//
+//    //큐 가장 마지막에 설정
+//    func insertSongsToTail(songs: MusicItemCollection<Song>) async throws {
+//        try await player.queue.insert(songs, position: .tail)
+//    }

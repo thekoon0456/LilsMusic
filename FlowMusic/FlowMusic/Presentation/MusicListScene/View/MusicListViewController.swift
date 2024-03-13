@@ -17,9 +17,9 @@ final class MusicListViewController: BaseViewController {
     
     private let viewModel: MusicListViewModel
     
-    private let player = MusicPlayer.shared
+    private let player = MusicPlayerManager.shared
     private let request = MusicRequest.shared
-    var album: Album
+    var tracks: MusicItemCollection<Track>
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
         $0.delegate = self
@@ -43,15 +43,15 @@ final class MusicListViewController: BaseViewController {
     
     // MARK: - Lifecycles
     
-    init(viewModel: MusicListViewModel, album: Album) {
+    init(viewModel: MusicListViewModel, album: MusicItemCollection<Album>) {
         self.viewModel = viewModel
-        self.album = album
+        self.tracks = album.first?.tracks ?? []
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        player.setRepeatMode(mode: .all)
         readyFadeInAnimation()
         loadDataAndUpdateUI()
     }
@@ -60,23 +60,23 @@ final class MusicListViewController: BaseViewController {
         configureDataSource()
         
         Task {
-            album = try await album.with([.tracks])
+//            album = try await album ?? []
             updateSnapshot()
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                updateUI(with: album)
+                updateUI(with: tracks.first!)
                 fadeInAnimation()
             }
         }
     }
     
-    func updateUI(with album: Album) {
-        artworkImageView.kf.setImage(with: album.artwork?.url(width: 300, height: 300))
-        setGradient(startColor: album.artwork?.backgroundColor,
-                    endColor: album.artwork?.backgroundColor)
-        albumlabel.text = album.title
-        artistlabel.text = album.artistName
+    func updateUI(with track: Track) {
+        artworkImageView.kf.setImage(with: track.artwork?.url(width: 300, height: 300))
+        setGradient(startColor: track.artwork?.backgroundColor,
+                    endColor: track.artwork?.backgroundColor)
+        albumlabel.text = track.title
+        artistlabel.text = track.artistName
     }
     
     
@@ -154,8 +154,8 @@ extension MusicListViewController {
     private func updateSnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<Int, Track>()
         snapshot.appendSections([1])
-        guard let track = (album.tracks?.map { $0 }) else { return }
-        snapshot.appendItems(track, toSection: 1)
+//        guard let track = (tracks.map { $0 }) else { return }
+        snapshot.appendItems(Array(tracks), toSection: 1)
         dataSource?.apply(snapshot)
     }
     
@@ -168,12 +168,12 @@ extension MusicListViewController {
 extension MusicListViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let track = album.tracks?.first else { return }
+//        guard let track = album.tracks?.first else { return }
         Task {
-            player.setAlbumQueue(album: album, track: track)
-            try await player.play()
+            try await player.setTrackQueue(item: tracks, startIndex: indexPath.item)
+            viewModel.coordinator?.present(track: tracks[indexPath.item])
         }
         
-        viewModel.input.listTapped.onNext(track)
+//        viewModel.input.listTapped.onNext(track)
     }
 }

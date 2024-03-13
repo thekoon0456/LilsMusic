@@ -21,6 +21,7 @@ final class MusicListCoordinator: Coordinator {
     }
     
     func start(album: Album) {
+        let album = MusicItemCollection(arrayLiteral: album)
         let vm = MusicListViewModel(coordinator: self)
         let vc = MusicListViewController(viewModel: vm, album: album)
         navigationController?.pushViewController(vc, animated: true)

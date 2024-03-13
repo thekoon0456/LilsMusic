@@ -11,7 +11,7 @@ import MusicKit
 final class MusicListViewModel: ViewModel {
     
     struct Input {
-        let listTapped = Observable<Track?>(nil)
+//        let listTapped = Observable<Track?>(nil)
     }
     
     struct Output {
@@ -24,16 +24,16 @@ final class MusicListViewModel: ViewModel {
     
     init(coordinator: MusicListCoordinator?) {
         self.coordinator = coordinator
-        transform()
+//        transform()
     }
     
-    private func transform() {
-        input.listTapped.bind { [weak self] track in
-            guard let self,
-                  let track else { return }
-            coordinator?.present(track: track)
-        }
-    }
+//    private func transform() {
+//        input.listTapped.bind { [weak self] track in
+//            guard let self,
+//                  let track else { return }
+//            coordinator?.present(track: track)
+//        }
+//    }
     
     
     

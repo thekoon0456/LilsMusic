@@ -16,7 +16,7 @@ final class MusicPlayerViewController: BaseViewController {
     
     private let viewModel: MusicPlayerViewModel
     
-    private let player = MusicPlayer.shared
+    private let player = MusicPlayerManager.shared
     private let musicRequest = MusicRequest.shared
     private var track: Track
     private var timer: Timer?
@@ -90,7 +90,7 @@ final class MusicPlayerViewController: BaseViewController {
         super.viewDidLoad()
         
         updateUI(track)
-        print(player.getCurrentEntry()?.item)
+//        print(try await player.getCurrentEntry()?.item)
         setProgressBarTimer()
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
@@ -142,33 +142,37 @@ final class MusicPlayerViewController: BaseViewController {
                 try await previousButton.isSelected
                 ? player.restart()
                 : player.skipToPrevious()
-                // MARK: - updateUI 함수 넣기
-                
+                try await updateCurrentEntryUI()
             } catch {
                 print(error.localizedDescription)
             }
         }
     }
-    
+
     @objc private func nextButtonTapped(sender: UIButton) {
         Task {
-            do {
-                try await player.skipToNext()
-                // MARK: - UIUpdate코드 추가
-                guard let song = try await musicRequest.requestSearchSongIDCatalog(id: player.getCurrentEntry()?.item?.id) else { return }
-                print("2", song)
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
-                    artistLabel.text =  song.artistName
-                    songLabel.text = song.title
-                }
-                print("3", song)
-            }
+            try await player.skipToNext()
+            try await updateCurrentEntryUI()
         }
     }
     
     // MARK: - Helpers
+    
+    func updateCurrentEntryUI() async throws {
+        Task {
+            let entry = try await player.getCurrentEntry()
+            guard let song = try await musicRequest.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                //여기서 하면 현재 엔트리가 나와
+                artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
+                artistLabel.text =  song.artistName
+                songLabel.text = song.title
+            }
+        }
+    }
+    
     
     private func setProgressBarTimer() {
         timer = Timer.scheduledTimer(timeInterval: 1,

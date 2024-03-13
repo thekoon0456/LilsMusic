@@ -5,6 +5,20 @@
 //  Created by Deokhun KIM on 3/8/24.
 //
 
+
+/*
+ T##[MusicCatalogSearchable.Type]
+ Album
+ Artist
+ Curator
+ MusicVideo
+ Playlist
+ RadioShow
+ RecordLabel
+ Song
+ Station
+ */
+
 import Foundation
 import MusicKit
 
@@ -14,46 +28,7 @@ final class MusicRequest {
     
     private init() { }
     
-    // MARK: - Library
-    
-    func requestLibraryAlbum() async throws -> MusicItemCollection<Album> {
-        try await MusicLibraryRequest<Album>().response().items
-    }
-    
-    func requestLibraryArtist() async throws -> MusicItemCollection<Artist> {
-        try await MusicLibraryRequest<Artist>().response().items
-    }
-    
-    func requestLibrarySong() async throws -> MusicItemCollection<Song> {
-        try await MusicLibraryRequest<Song>().response().items
-    }
-    
-    func requestLibraryTrack() async throws -> MusicItemCollection<Track> {
-        try await MusicLibraryRequest<Track>().response().items
-    }
-    
-    func requestLibraryGenre() async throws -> MusicItemCollection<Genre> {
-        try await MusicLibraryRequest<Genre>().response().items
-    }
-    
-    func requestLibraryMV() async throws -> MusicItemCollection<MusicVideo> {
-        try await MusicLibraryRequest<MusicVideo>().response().items
-    }
-    
     // MARK: - Catalog
-    
-    /*
-     T##[MusicCatalogSearchable.Type]
-     Album
-     Artist
-     Curator
-     MusicVideo
-     Playlist
-     RadioShow
-     RecordLabel
-     Song
-     Station
-     */
     
     // MARK: - Charts
     
@@ -142,4 +117,33 @@ final class MusicRequest {
     //    func requestCatalogGenre() async throws -> MusicItemCollection<Genre> {
     //        try await MusicCatalogResourceRequest(matching: KeyPath<(FilterableMusicItem & Decodable).FilterType, Value>, equalTo: <#T##Value#>)<Genre>().response().items
     //    }
+}
+
+// MARK: - Library Request
+
+extension MusicRequest {
+    
+    func requestLibraryAlbum() async throws -> MusicItemCollection<Album> {
+        try await MusicLibraryRequest<Album>().response().items
+    }
+    
+    func requestLibraryArtist() async throws -> MusicItemCollection<Artist> {
+        try await MusicLibraryRequest<Artist>().response().items
+    }
+    
+    func requestLibrarySong() async throws -> MusicItemCollection<Song> {
+        try await MusicLibraryRequest<Song>().response().items
+    }
+    
+    func requestLibraryTrack() async throws -> MusicItemCollection<Track> {
+        try await MusicLibraryRequest<Track>().response().items
+    }
+    
+    func requestLibraryGenre() async throws -> MusicItemCollection<Genre> {
+        try await MusicLibraryRequest<Genre>().response().items
+    }
+    
+    func requestLibraryMV() async throws -> MusicItemCollection<MusicVideo> {
+        try await MusicLibraryRequest<MusicVideo>().response().items
+    }
 }
