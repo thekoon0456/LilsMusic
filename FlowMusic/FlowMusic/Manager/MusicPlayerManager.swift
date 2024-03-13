@@ -114,6 +114,10 @@ final class MusicPlayerManager {
     func isPreparedToPlay() -> Bool {
         player.isPreparedToPlay
     }
+    
+    func getCurrentPlayer() -> ApplicationMusicPlayer {
+        player
+    }
 }
 
 // MARK: - Queue

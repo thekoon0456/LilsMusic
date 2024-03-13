@@ -6,9 +6,13 @@
 //
 import MusicKit
 import UIKit
+import Combine
 
 import Kingfisher
 import SnapKit
+
+import RxSwift
+import RxCocoa
 
 final class MusicPlayerViewController: BaseViewController {
     
@@ -86,14 +90,23 @@ final class MusicPlayerViewController: BaseViewController {
         timer = nil
     }
     
+    private var cancellables = Set<AnyCancellable>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print(track)
         updateUI(track)
-//        print(try await player.getCurrentEntry()?.item)
+        //        print(try await player.getCurrentEntry()?.item)
         setProgressBarTimer()
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
+        
+        player.getCurrentPlayer().queue.objectWillChange.sink { _ in
+            print("노래바뀜")
+            Task {
+                try await self.updateCurrentEntryUI()
+            }
+        }.store(in: &cancellables)
     }
     
     func updateUI(_ track: Track) {
@@ -148,7 +161,7 @@ final class MusicPlayerViewController: BaseViewController {
             }
         }
     }
-
+    
     @objc private func nextButtonTapped(sender: UIButton) {
         Task {
             try await player.skipToNext()
@@ -162,6 +175,7 @@ final class MusicPlayerViewController: BaseViewController {
         Task {
             let entry = try await player.getCurrentEntry()
             guard let song = try await musicRequest.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+            print(song)
             
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
@@ -229,6 +243,7 @@ final class MusicPlayerViewController: BaseViewController {
     
     override func configureView() {
         view.backgroundColor = .white
+        sheetPresentationController?.prefersGrabberVisible = true
     }
 }
 
