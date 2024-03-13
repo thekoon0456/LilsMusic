@@ -15,6 +15,8 @@
 		7C03F7CC2BA177FA00FB748C /* UserPlaylistRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C03F7CB2BA177FA00FB748C /* UserPlaylistRepository.swift */; };
 		7C03F7CE2BA1792C00FB748C /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C03F7CD2BA1792C00FB748C /* Repository.swift */; };
 		7C03F7D02BA179D800FB748C /* Array+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C03F7CF2BA179D800FB748C /* Array+.swift */; };
+		7C6B06DA2BA1FE8000726AD0 /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */; };
+		7C6B06DC2BA2012D00726AD0 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */; };
 		7C773FFD2B9DA13F00B2E6E7 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C773FFC2B9DA13F00B2E6E7 /* LibraryViewModel.swift */; };
 		7C773FFF2B9DA15100B2E6E7 /* LibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C773FFE2B9DA15100B2E6E7 /* LibraryViewController.swift */; };
 		7C7740012B9DA16F00B2E6E7 /* LibraryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7740002B9DA16F00B2E6E7 /* LibraryCoordinator.swift */; };
@@ -68,6 +70,7 @@
 		7C03F7CB2BA177FA00FB748C /* UserPlaylistRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPlaylistRepository.swift; sourceTree = "<group>"; };
 		7C03F7CD2BA1792C00FB748C /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
 		7C03F7CF2BA179D800FB748C /* Array+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+.swift"; sourceTree = "<group>"; };
+		7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		7C773FFC2B9DA13F00B2E6E7 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
 		7C773FFE2B9DA15100B2E6E7 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
 		7C7740002B9DA16F00B2E6E7 /* LibraryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCoordinator.swift; sourceTree = "<group>"; };
@@ -127,6 +130,7 @@
 				7C03F7BF2BA1762500FB748C /* Realm in Frameworks */,
 				7C03F7C42BA1765A00FB748C /* RxCocoa in Frameworks */,
 				7C03F7C92BA176A700FB748C /* RxDataSources in Frameworks */,
+				7C6B06DA2BA1FE8000726AD0 /* CollectionViewPagingLayout in Frameworks */,
 				7C813DCD2B9AE24D00CDFF1D /* Kingfisher in Frameworks */,
 				7C813DCA2B9AE24300CDFF1D /* SnapKit in Frameworks */,
 			);
@@ -165,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				7C773FFE2B9DA15100B2E6E7 /* LibraryViewController.swift */,
+				7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -495,6 +500,7 @@
 				7C03F7C32BA1765A00FB748C /* RxCocoa */,
 				7C03F7C52BA1765A00FB748C /* RxSwift */,
 				7C03F7C82BA176A700FB748C /* RxDataSources */,
+				7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */,
 			);
 			productName = FlowMusic;
 			productReference = 7C813DA82B9ADFEF00CDFF1D /* FlowMusic.app */;
@@ -530,6 +536,7 @@
 				7C03F7BD2BA1762500FB748C /* XCRemoteSwiftPackageReference "realm-swift" */,
 				7C03F7C22BA1765A00FB748C /* XCRemoteSwiftPackageReference "RxSwift" */,
 				7C03F7C72BA176A700FB748C /* XCRemoteSwiftPackageReference "RxDataSources" */,
+				7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */,
 			);
 			productRefGroup = 7C813DA92B9ADFEF00CDFF1D /* Products */;
 			projectDirPath = "";
@@ -596,6 +603,7 @@
 				7CF60D752B9EE6B3001769BD /* MusicStorage.swift in Sources */,
 				7C916E102B9D9FF500C5F6C0 /* ReelsViewModel.swift in Sources */,
 				7C813DE62B9AE34100CDFF1D /* ViewModel.swift in Sources */,
+				7C6B06DC2BA2012D00726AD0 /* LibraryCell.swift in Sources */,
 				7C813DED2B9AE3A500CDFF1D /* MusicListViewModel.swift in Sources */,
 				7C7740142B9DA62F00B2E6E7 /* FMDesign.swift in Sources */,
 				7C7740122B9DA45B00B2E6E7 /* UserCoordinator.swift in Sources */,
@@ -853,6 +861,14 @@
 				minimumVersion = 5.0.2;
 			};
 		};
+		7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amirdew/CollectionViewPagingLayout";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
 		7C813DC82B9AE24300CDFF1D /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -896,6 +912,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C03F7C72BA176A700FB748C /* XCRemoteSwiftPackageReference "RxDataSources" */;
 			productName = RxDataSources;
+		};
+		7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */;
+			productName = CollectionViewPagingLayout;
 		};
 		7C813DC92B9AE24300CDFF1D /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
