@@ -101,7 +101,8 @@ final class MusicPlayerViewController: BaseViewController {
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
         
-        player.getCurrentPlayer().queue.objectWillChange.sink { _ in
+        player.getCurrentPlayer().queue.objectWillChange.sink { [weak self]  _ in
+            guard let self else { return }
             print("노래바뀜")
             Task {
                 try await self.updateCurrentEntryUI()
@@ -155,7 +156,6 @@ final class MusicPlayerViewController: BaseViewController {
                 try await previousButton.isSelected
                 ? player.restart()
                 : player.skipToPrevious()
-                try await updateCurrentEntryUI()
             } catch {
                 print(error.localizedDescription)
             }
@@ -165,7 +165,6 @@ final class MusicPlayerViewController: BaseViewController {
     @objc private func nextButtonTapped(sender: UIButton) {
         Task {
             try await player.skipToNext()
-            try await updateCurrentEntryUI()
         }
     }
     
@@ -173,13 +172,10 @@ final class MusicPlayerViewController: BaseViewController {
     
     func updateCurrentEntryUI() async throws {
         Task {
-            let entry = try await player.getCurrentEntry()
+            let entry = player.getCurrentEntry()
             guard let song = try await musicRequest.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
-            print(song)
-            
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                //여기서 하면 현재 엔트리가 나와
                 artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
                 artistLabel.text =  song.artistName
                 songLabel.text = song.title

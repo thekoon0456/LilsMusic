@@ -19,9 +19,7 @@ final class MusicPlayerManager {
     
     private init() { }
     
-    func getCurrentEntry() async throws -> ApplicationMusicPlayer.Queue.Entry? {
-        //바로 넘기면 이전 엔트리가 나와서 0.2초 슬립
-        try await Task.sleep(nanoseconds: 200_000_000)
+    func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
         return player.queue.currentEntry
     }
     
@@ -33,6 +31,7 @@ final class MusicPlayerManager {
     
     func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
         try await play()
     }
     
