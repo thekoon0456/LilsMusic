@@ -7,7 +7,15 @@
 
 import UIKit
 
+import RxSwift
+
 class BaseViewController: UIViewController {
+    
+    // MARK: - Properties
+    
+    var disposeBag = DisposeBag()
+    
+    // MARK: - Lifecycles
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -19,13 +27,15 @@ class BaseViewController: UIViewController {
         configureHierarchy()
         configureLayout()
         configureView()
+        bind()
     }
+    
+    // MARK: - Helpers
     
     func configureHierarchy() { }
     func configureLayout() { }
-    func configureView() { 
-        view.backgroundColor = .white
-    }
+    func configureView() { view.backgroundColor = .white }
+    func bind() { }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {

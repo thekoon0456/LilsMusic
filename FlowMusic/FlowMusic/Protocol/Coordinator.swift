@@ -8,6 +8,11 @@
 import UIKit
 import MusicKit
 
+protocol CoordinatorDelegate: AnyObject {
+    
+    func didFinish(childCoordinator: Coordinator)
+}
+
 enum CoordinatorType {
     case app
     case recommend
@@ -19,22 +24,49 @@ enum CoordinatorType {
 }
 
 protocol Coordinator: AnyObject {
-    var childCoordinators: [Coordinator] { get set }
+    
+    var delegate: CoordinatorDelegate? { get set }
     var navigationController: UINavigationController? { get set }
+    var childCoordinators: [Coordinator] { get set }
     var type: CoordinatorType { get }
     
     func start()
-    func removeChildCoordinator()
+    func finish()
+    func popViewController()
+    func dismissViewController()
+    func presentErrorAlert(title: String?, message: String?, handler: (() -> Void)?)
 }
 
 extension Coordinator {
     
     func start() { }
     
-    func removeChildCoordinator() {
+    func finish() {
         childCoordinators.removeAll()
+        delegate?.didFinish(childCoordinator: self)
+    }
+    
+    func popViewController() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func dismissViewController() {
+        navigationController?.dismiss(animated: true)
+    }
+    
+    func presentErrorAlert(
+        title: String? = nil,
+        message: String? = "에러 발생",
+        handler: (() -> Void)? = nil
+    ) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            .appendingAction(title: "확인", handler: handler)
+        
+        navigationController?.present(alertController, animated: true)
     }
 }
+
+// MARK: - Auth
 
 extension Coordinator {
     

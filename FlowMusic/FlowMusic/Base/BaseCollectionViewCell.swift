@@ -7,11 +7,19 @@
 
 import UIKit
 
+import RxSwift
+
 class BaseCollectionViewCell: UICollectionViewCell {
+    
+    // MARK: - Properties
     
     static var identifier: String {
         return self.description()
     }
+
+    var disposeBag = DisposeBag()
+    
+    // MARK: - Lifecycles
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,11 +27,15 @@ class BaseCollectionViewCell: UICollectionViewCell {
         configureHierarchy()
         configureLayout()
         configureView()
+        bind()
     }
+    
+    // MARK: - Helpers
     
     func configureHierarchy() { }
     func configureLayout() { }
     func configureView() { }
+    func bind() { }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {

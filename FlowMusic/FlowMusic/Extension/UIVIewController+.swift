@@ -20,3 +20,21 @@ extension UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 }
+
+extension UIAlertController {
+
+    func appendingAction(
+        title: String?,
+        style: UIAlertAction.Style = .default,
+        handler: (() -> Void)? = nil
+    ) -> Self {
+        let alertAction = UIAlertAction(title: title, style: style) { _ in handler?() }
+        
+        self.addAction(alertAction)
+        return self
+    }
+    
+    func appendingCancel() -> Self {
+        return self.appendingAction(title: "취소", style: .cancel)
+    }
+}

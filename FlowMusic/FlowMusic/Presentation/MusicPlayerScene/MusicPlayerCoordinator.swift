@@ -10,6 +10,7 @@ import UIKit
 
 final class MusicPlayerCoordinator: Coordinator {
     
+    weak var delegate: CoordinatorDelegate?
     var childCoordinators: [Coordinator]
     var navigationController: UINavigationController?
     var type: CoordinatorType
@@ -25,6 +26,4 @@ final class MusicPlayerCoordinator: Coordinator {
         let vc = MusicPlayerViewController(viewModel: vm, track: track)
         navigationController?.present(vc, animated: true)
     }
-    
-    
 }

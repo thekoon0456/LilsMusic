@@ -10,6 +10,7 @@ import UIKit
 
 final class LibraryCoordinator: Coordinator {
     
+    weak var delegate: CoordinatorDelegate?
     var childCoordinators: [Coordinator]
     var navigationController: UINavigationController?
     var type: CoordinatorType

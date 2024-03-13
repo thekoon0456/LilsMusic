@@ -5,9 +5,14 @@
 //  Created by Deokhun KIM on 3/8/24.
 //
 
-import Foundation
+import RxSwift
 
-protocol ViewModel {
+protocol ViewModel: AnyObject {
     
-    
+//    associatedtype Input
+//    associatedtype Output
+//    
+//    var disposeBag: DisposeBag { get }
+//
+//    func transform(input: Input) -> Output
 }

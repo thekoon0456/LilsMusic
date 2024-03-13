@@ -9,6 +9,7 @@ import UIKit
 
 final class UserCoordinator: Coordinator {
     
+    weak var delegate: CoordinatorDelegate?
     var childCoordinators: [Coordinator]
     var navigationController: UINavigationController?
     var type: CoordinatorType

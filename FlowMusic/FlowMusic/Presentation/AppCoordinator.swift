@@ -11,6 +11,7 @@ final class AppCoordinator: Coordinator {
 
     // MARK: - Properties
     
+    weak var delegate: CoordinatorDelegate?
     var navigationController: UINavigationController?
     var childCoordinators: [Coordinator]
     var type: CoordinatorType
