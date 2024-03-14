@@ -70,11 +70,33 @@ final class MusicPlayerViewController: BaseViewController {
         $0.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
     }
     
-    private lazy var progressBar = UIProgressView(progressViewStyle: .default).then {
-        $0.tintColor = .systemGray6
-        $0.backgroundColor = .clear
-        let gesture = UISwipeGestureRecognizer(target: self, action: #selector(pregressBarSlide))
-        $0.addGestureRecognizer(gesture)
+    private lazy var progressSlider = FMSlider(barHeight: 8).then {
+        $0.isContinuous = true
+        $0.minimumValue = 0
+        $0.setThumbImage(UIImage(), for: .normal)
+        $0.setThumbImage(UIImage(), for: .highlighted)
+        $0.layer.cornerRadius = 4
+        $0.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped))
+        $0.addGestureRecognizer(tapGesture)
+    }
+    
+    private lazy var repeatButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "repeat"), for: .normal)
+        $0.contentVerticalAlignment = .fill
+        $0.contentHorizontalAlignment = .fill
+        $0.tintColor = .white
+        $0.addTarget(self, action: #selector(repeatButtonTapped), for: .touchUpInside)
+        $0.isSelected = true
+    }
+    
+    private lazy var shuffleButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
+        $0.contentVerticalAlignment = .fill
+        $0.contentHorizontalAlignment = .fill
+        $0.tintColor = .white
+        $0.addTarget(self, action: #selector(shuffleButtonTapped), for: .touchUpInside)
+        $0.isSelected = true
     }
     
     // MARK: - Lifecycle
@@ -97,7 +119,9 @@ final class MusicPlayerViewController: BaseViewController {
         print(track)
         updateUI(track)
         //        print(try await player.getCurrentEntry()?.item)
+        
         setProgressBarTimer()
+        
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
         
@@ -116,25 +140,66 @@ final class MusicPlayerViewController: BaseViewController {
             artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
             artistLabel.text = track.artistName
             songLabel.text = track.title
+            //mark 현재 음악 끝 시간 설정
+            progressSlider.maximumValue = Float(track.duration ?? 0)
         }
     }
     
     // MARK: - Selectors
+
+    // MARK: - SetProgress
     
-    @objc func pregressBarSlide(sender: UISwipeGestureRecognizer) {
-        let point = sender.location(in: progressBar)
-        let progressBarWidth = 300
-        let percentage = Double(point.x / CGFloat(progressBarWidth))
-        let duration = player.getPlayBackTime()
-        let seekTime = percentage * duration
-        
-        // TODO: - 프로그레스바 이동 추가
+    private func setProgressBarTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 1,
+                                     target: self,
+                                     selector: #selector(updateProgressBar),
+                                     userInfo: nil,
+                                     repeats: true)
     }
     
     @objc func updateProgressBar() {
-        let progress = Float(player.getPlayBackTime() / (track.duration ?? 0))
-        progressBar.setProgress(progress, animated: true)
+        let value = Float(player.getPlayBackTime())
+        progressSlider.setValue(value, animated: true)
     }
+    
+    @objc func sliderValueChanged(_ sender: UISlider) {
+        let newValue = sender.value
+        player.player.playbackTime = TimeInterval(floatLiteral: Double(newValue))
+    }
+    
+    @objc func sliderTapped(_ gestureRecognizer: UITapGestureRecognizer) {
+        let tapPoint = gestureRecognizer.location(in: progressSlider)
+        let sliderWidth = progressSlider.frame.size.width
+        let tapValue = tapPoint.x / sliderWidth
+        let value = (progressSlider.maximumValue - progressSlider.minimumValue) * Float(tapValue)
+        progressSlider.setValue(value, animated: true)
+        player.player.playbackTime = TimeInterval(floatLiteral: Double(value))
+    }
+    
+    // MARK: - setStatus
+    
+    @objc private func repeatButtonTapped() {
+        repeatButton.isSelected.toggle()
+        
+        if repeatButton.isSelected {
+            repeatButton.alpha = 1
+            player.setRepeatMode(mode: .all)
+        } else {
+            repeatButton.alpha = 0.5
+            player.setRepeatMode(mode: .none)
+        }
+    }
+    
+    @objc private func shuffleButtonTapped() {
+        shuffleButton.isSelected.toggle()
+        shuffleButton.isSelected
+        ? (shuffleButton.alpha = 1)
+        : (shuffleButton.alpha = 0.5)
+        shuffleButton.isSelected
+        ? player.setRandomMode(mode: .songs)
+        : player.setRandomMode(mode: .off)
+    }
+
     
     @objc private func playButtonTapped() {
         playButton.isSelected.toggle()
@@ -179,20 +244,16 @@ final class MusicPlayerViewController: BaseViewController {
                 artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
                 artistLabel.text =  song.artistName
                 songLabel.text = song.title
+                // MARK: - 현재 음악 끝 시간 설정
+                progressSlider.maximumValue = Float(song.duration ?? 0)
             }
         }
     }
     
-    private func setProgressBarTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 1,
-                                     target: self,
-                                     selector: #selector(updateProgressBar),
-                                     userInfo: nil,
-                                     repeats: true)
-    }
+    // MARK: - Configure
     
     override func configureHierarchy() {
-        view.addSubviews(artworkImage, songLabel, artistLabel, playButton, previousButton, nextButton, progressBar)
+        view.addSubviews(artworkImage, songLabel, artistLabel, playButton, previousButton, nextButton, progressSlider, shuffleButton, repeatButton)
     }
     
     override func configureLayout() {
@@ -204,79 +265,58 @@ final class MusicPlayerViewController: BaseViewController {
         
         songLabel.snp.makeConstraints { make in
             make.top.equalTo(artworkImage.snp.bottom).offset(20)
-            make.width.equalToSuperview()
+            make.width.equalToSuperview().offset(-20)
+            make.centerX.equalToSuperview()
         }
         
         artistLabel.snp.makeConstraints { make in
             make.top.equalTo(songLabel.snp.bottom).offset(4)
-            make.width.equalToSuperview()
+            make.width.equalToSuperview().offset(-20)
+            make.centerX.equalToSuperview()
         }
         
         previousButton.snp.makeConstraints { make in
+            make.size.equalTo(32)
             make.centerY.equalTo(playButton.snp.centerY)
-            make.trailing.equalTo(playButton.snp.leading).offset(-20)
+            make.trailing.equalTo(playButton.snp.leading).offset(-40)
         }
         
         playButton.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(artistLabel.snp.bottom).offset(8)
             make.size.equalTo(60)
+            make.centerX.equalToSuperview()
+            make.top.equalTo(artistLabel.snp.bottom).offset(16)
         }
         
         nextButton.snp.makeConstraints { make in
+            make.size.equalTo(32)
             make.centerY.equalTo(playButton.snp.centerY)
-            make.leading.equalTo(playButton.snp.trailing).offset(20)
+            make.leading.equalTo(playButton.snp.trailing).offset(40)
         }
         
-        progressBar.snp.makeConstraints { make in
+        progressSlider.snp.makeConstraints { make in
+            make.top.equalTo(playButton.snp.bottom).offset(52)
             make.centerX.equalToSuperview()
             make.width.equalTo(300)
-            make.height.equalTo(8)
-            make.top.equalTo(playButton.snp.bottom).offset(20)
+            make.height.equalTo(16)
+        }
+        
+        shuffleButton.snp.makeConstraints { make in
+            make.height.equalTo(16)
+            make.width.equalTo(24)
+            make.leading.equalTo(progressSlider.snp.leading)
+            make.bottom.equalToSuperview().offset(-80)
+        }
+        
+        repeatButton.snp.makeConstraints { make in
+            make.height.equalTo(16)
+            make.width.equalTo(24)
+            make.trailing.equalTo(progressSlider.snp.trailing)
+            make.bottom.equalToSuperview().offset(-80)
         }
     }
     
     override func configureView() {
-        view.backgroundColor = .white
+        super.configureView()
         sheetPresentationController?.prefersGrabberVisible = true
     }
 }
-
-// MARK: - MediaPicker
-
-//    @objc private func presentLibrary(sender: UIButton) {
-//        let controller = MPMediaPickerController(mediaTypes: .music)
-//        controller.allowsPickingMultipleItems = true
-//        controller.popoverPresentationController?.sourceView = sender
-//        controller.delegate = self
-//        present(controller, animated: true)
-//    }
-
-//
-// MARK: - MediaPicker
-//
-//extension PlayViewController: MPMediaPickerControllerDelegate {
-//    func mediaPicker(_ mediaPicker: MPMediaPickerController,
-//                     didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
-//        // Get the system music player.
-//        player.player.setQueue(with: mediaItemCollection)
-//        let item = mediaItemCollection.items.first
-//
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self else { return }
-//            artistLabel.text = item?.albumTitle
-//            songLabel.text = item?.title
-//            artworkImage.image = item?.artwork?.image(at: .init(width: 300, height: 300))
-//        }
-//
-//        mediaPicker.dismiss(animated: true)
-//        // Begin playback.
-//        player.player.prepareToPlay()
-//        player.player.play()
-//    }
-//
-//
-//    func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
-//        mediaPicker.dismiss(animated: true)
-//    }
-//}

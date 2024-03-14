@@ -63,4 +63,8 @@ final class MusicListCell: BaseCollectionViewCell {
             make.trailing.equalToSuperview().offset(-8)
         }
     }
+    
+    override func configureView() {
+        backgroundColor = .clear
+    }
 }

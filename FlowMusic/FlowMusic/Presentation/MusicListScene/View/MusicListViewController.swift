@@ -24,6 +24,7 @@ final class MusicListViewController: BaseViewController {
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
         $0.delegate = self
+        $0.backgroundColor = .clear
     }
     private var dataSource: UICollectionViewDiffableDataSource<Int, Track>?
     
@@ -126,7 +127,8 @@ final class MusicListViewController: BaseViewController {
         
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(artistlabel.snp.bottom).offset(8)
-            make.horizontalEdges.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
