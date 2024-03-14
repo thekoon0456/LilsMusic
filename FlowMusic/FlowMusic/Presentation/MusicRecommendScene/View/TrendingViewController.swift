@@ -84,6 +84,7 @@ final class MusicRecommendViewController: BaseViewController {
     override func configureView() {
         super.configureView()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
+        navigationItem.backButtonDisplayMode = .minimal
     }
 }
 // MARK: - CollectionView
@@ -91,7 +92,18 @@ final class MusicRecommendViewController: BaseViewController {
 extension MusicRecommendViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        guard let section = Section(rawValue: indexPath.section) else { return }
+        switch section {
+        case .trending:
+            guard let song = songs?[indexPath.row] else { return }
+            viewModel.coordinator?.push(item: song)
+        case .playlist:
+            guard let playlist = playlists?[indexPath.row] else { return }
+            viewModel.coordinator?.push(item: playlist)
+        case .album:
+            guard let album = albums?[indexPath.row] else { return }
+            viewModel.coordinator?.push(item: album)
+        }
     }
 }
 

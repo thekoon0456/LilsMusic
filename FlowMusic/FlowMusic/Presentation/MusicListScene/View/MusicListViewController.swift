@@ -134,6 +134,7 @@ final class MusicListViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
+        navigationItem.backButtonDisplayMode = .minimal
     }
 }
 

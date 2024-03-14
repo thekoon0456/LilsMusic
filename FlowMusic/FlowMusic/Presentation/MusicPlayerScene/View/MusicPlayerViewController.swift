@@ -29,12 +29,14 @@ final class MusicPlayerViewController: BaseViewController {
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .white
         $0.textAlignment = .center
+        $0.addShadow()
     }
     
     private let songLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 18)
         $0.textColor = .white
         $0.textAlignment = .center
+        $0.addShadow()
     }
     
     private var artworkImage = UIImageView().then {
@@ -52,6 +54,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: "play.fill"), for: .selected)
         $0.tintColor = .white
         $0.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
+        $0.addShadow()
     }
     
     private lazy var nextButton = UIButton().then {
@@ -60,6 +63,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
         $0.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        $0.addShadow()
     }
     
     private lazy var previousButton = UIButton().then {
@@ -68,6 +72,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
         $0.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
+        $0.addShadow()
     }
     
     private lazy var progressSlider = FMSlider(barHeight: 8).then {
@@ -79,6 +84,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped))
         $0.addGestureRecognizer(tapGesture)
+        $0.addShadow()
     }
     
     private lazy var repeatButton = UIButton().then {
@@ -88,6 +94,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.tintColor = .white
         $0.addTarget(self, action: #selector(repeatButtonTapped), for: .touchUpInside)
         $0.isSelected = true
+        $0.addShadow()
     }
     
     private lazy var shuffleButton = UIButton().then {
@@ -97,6 +104,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.tintColor = .white
         $0.addTarget(self, action: #selector(shuffleButtonTapped), for: .touchUpInside)
         $0.isSelected = true
+        $0.addShadow()
     }
     
     // MARK: - Lifecycle
@@ -320,3 +328,4 @@ final class MusicPlayerViewController: BaseViewController {
         sheetPresentationController?.prefersGrabberVisible = true
     }
 }
+

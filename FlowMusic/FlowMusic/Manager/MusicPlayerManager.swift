@@ -85,9 +85,9 @@ final class MusicPlayerManager {
     func skipToNext() async throws {
         try await player.skipToNextEntry()
         
-        if player.queue.entries.isEmpty {
-            player.restartCurrentEntry()
-        }
+//        if player.queue.entries.isEmpty {
+//            player.restartCurrentEntry()
+//        }
     }
     
     func skipToPrevious() async throws  {

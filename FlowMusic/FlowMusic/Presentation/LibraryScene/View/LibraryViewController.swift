@@ -70,6 +70,7 @@ final class LibraryViewController: BaseViewController {
     override func configureView() {
         super.configureView()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
+        navigationItem.backButtonDisplayMode = .minimal
     }
 }
 
@@ -90,9 +91,8 @@ extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath.item)
-        guard var playlist else { return }
+        guard let playlist else { return }
         Task {
-//            playlist = try await MusicRequest.playlistToTracks(playlist)
             viewModel.coordinator?.pushToList(playlist: playlist[indexPath.item])
         }
 

@@ -30,9 +30,9 @@ final class MusicRecommendCoordinator: Coordinator {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    func push(album: Album) {
+    func push(item: MusicItem) {
         let listCoordinator = MusicListCoordinator(navigationController: navigationController,
-                                                   item: album)
+                                                   item: item)
         childCoordinators.append(listCoordinator)
         listCoordinator.start()
     }
