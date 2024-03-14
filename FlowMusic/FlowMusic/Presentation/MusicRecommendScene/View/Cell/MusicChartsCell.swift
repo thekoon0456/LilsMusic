@@ -35,7 +35,7 @@ final class MusicChartsCell: BaseCollectionViewCell {
         $0.textAlignment = .center
     }
     
-    func configureCell(_ data: Album) {
+    func configureCell(_ data: Song) {
         artworkImageView.kf.setImage(with: data.artwork?.url(width: 200, height: 200))
         albumlabel.text = data.title
         artistlabel.text = data.artistName
@@ -63,16 +63,16 @@ final class MusicChartsCell: BaseCollectionViewCell {
         albumlabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalTo(artistlabel.snp.top).offset(-4)
-            make.height.equalTo(22)
         }
         
         artistlabel.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalToSuperview()
-            make.height.equalTo(14)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-4)
         }
     }
     
     override func configureView() {
+        super.configureView()
         layer.masksToBounds = false
         layer.shadowOpacity = 0.8
         layer.shadowOffset = .init(width: 0, height: 0)

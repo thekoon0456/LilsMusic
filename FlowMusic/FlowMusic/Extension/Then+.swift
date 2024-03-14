@@ -35,3 +35,4 @@ extension UIButton.Configuration: Then {}
 extension UIListContentConfiguration: Then {}
 extension UICollectionLayoutListConfiguration: Then {}
 extension NSDiffableDataSourceSnapshot: Then {}
+extension NSDiffableDataSourceSectionSnapshot: Then {}
