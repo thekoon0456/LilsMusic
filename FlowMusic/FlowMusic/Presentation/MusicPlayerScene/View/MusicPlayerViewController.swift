@@ -159,7 +159,7 @@ final class MusicPlayerViewController: BaseViewController {
     
     @objc func updateProgressBar() {
         let value = Float(player.getPlayBackTime())
-        progressSlider.setValue(value, animated: true)
+        progressSlider.setValue(value, animated: false)
     }
     
     @objc func sliderValueChanged(_ sender: UISlider) {
