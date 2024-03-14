@@ -14,19 +14,19 @@ final class MusicListCoordinator: Coordinator {
     var childCoordinators: [Coordinator]
     var navigationController: UINavigationController?
     var type: CoordinatorType
-    var album: Album
+    var item: MusicItem //album, playlist
     
-    init(navigationController: UINavigationController?, album: Album) {
+    init(navigationController: UINavigationController?, item: MusicItem) {
         self.childCoordinators = []
         self.navigationController = navigationController
         self.type = .musicList
-        self.album = album
+        self.item = item
     }
     
     func start() {
-        let album = MusicItemCollection(arrayLiteral: album)
+//        let album = MusicItemCollection(arrayLiteral: item)
         let vm = MusicListViewModel(coordinator: self)
-        let vc = MusicListViewController(viewModel: vm, album: album)
+        let vc = MusicListViewController(viewModel: vm, item: item)
         navigationController?.pushViewController(vc, animated: true)
     }
     

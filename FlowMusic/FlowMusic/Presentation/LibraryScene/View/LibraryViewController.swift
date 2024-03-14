@@ -90,6 +90,11 @@ extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath.item)
-//        viewModel.coordinator?.pushToList(album: <#T##Album#>)
+        guard var playlist else { return }
+        Task {
+//            playlist = try await MusicRequest.playlistToTracks(playlist)
+            viewModel.coordinator?.pushToList(playlist: playlist[indexPath.item])
+        }
+
     }
 }

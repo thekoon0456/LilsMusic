@@ -31,10 +31,19 @@ final class LibraryCoordinator: Coordinator {
     }
     
     func pushToList(album: Album) {
-        let coorinator = MusicListCoordinator(navigationController: navigationController,
-                                              album: album)
-        coorinator.start()
+        let coordinator = MusicListCoordinator(navigationController: navigationController,
+                                              item: album)
+        childCoordinators.append(coordinator)
+        coordinator.start()
     }
     
+    func pushToList(playlist: Playlist) {
+        let coordinator = MusicListCoordinator(navigationController: navigationController,
+                                              item: playlist)
+        childCoordinators.append(coordinator)
+        coordinator.start()
+    }
+    
+//    func pushToList()
     
 }

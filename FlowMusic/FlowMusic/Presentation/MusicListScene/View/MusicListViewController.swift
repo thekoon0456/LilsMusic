@@ -19,7 +19,8 @@ final class MusicListViewController: BaseViewController {
     
     private let player = MusicPlayerManager.shared
     private let request = MusicRequest.shared
-    var tracks: MusicItemCollection<Track>
+    var tracks: MusicItemCollection<Track>?
+    var item: MusicItem
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
         $0.delegate = self
@@ -43,14 +44,30 @@ final class MusicListViewController: BaseViewController {
     
     // MARK: - Lifecycles
     
-    init(viewModel: MusicListViewModel, album: MusicItemCollection<Album>) {
+    init(viewModel: MusicListViewModel, item: MusicItem) {
         self.viewModel = viewModel
-        self.tracks = album.first?.tracks ?? []
+        self.item = item
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let item = item as? Playlist {
+            Task {
+                tracks = try await request.playlistToTracks(item)
+                loadDataAndUpdateUI()
+            }
+        }
+        
+        if let item = item as? Album {
+            Task {
+                tracks = try await request.albumToTracks(item)
+                loadDataAndUpdateUI()
+            }
+        }
+        
+        
         player.setRepeatMode(mode: .all)
         readyFadeInAnimation()
         loadDataAndUpdateUI()
@@ -61,13 +78,15 @@ final class MusicListViewController: BaseViewController {
         
         Task {
 //            album = try await album ?? []
-            updateSnapshot()
-            
+
+            guard let track = tracks?.first else { return }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                updateUI(with: tracks.first!)
+                updateUI(with: track)
                 fadeInAnimation()
+                updateSnapshot()
             }
+
         }
     }
     
@@ -155,6 +174,7 @@ extension MusicListViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Int, Track>()
         snapshot.appendSections([1])
 //        guard let track = (tracks.map { $0 }) else { return }
+        guard let tracks else { return }
         snapshot.appendItems(Array(tracks), toSection: 1)
         dataSource?.apply(snapshot)
     }
@@ -168,7 +188,7 @@ extension MusicListViewController {
 extension MusicListViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard let track = album.tracks?.first else { return }
+        guard let tracks else { return }
         Task {
             try await player.setTrackQueue(item: tracks, startIndex: indexPath.item)
             viewModel.coordinator?.present(track: tracks[indexPath.item])
