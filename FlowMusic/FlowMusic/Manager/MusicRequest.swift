@@ -30,13 +30,29 @@ final class MusicRequest {
     
     private init() { }
     
-    // MARK: - Catalog
-    
-    //RequestNextBatch
+    // MARK: - RequestNextBatch
     func requestNextBatch<T: MusicItem>(items: MusicItemCollection<T>) async throws -> MusicItemCollection<T>? {
         let hasNextBatch = items.hasNextBatch
         return hasNextBatch ? try await items.nextBatch() : nil
     }
+    
+    // MARK: - Catalog
+    
+    // MARK: - collectionToTracks
+    
+    func albumToTracks(_ item: Album) async throws -> MusicItemCollection<Track>? {
+        try await item.with(.tracks).tracks
+    }
+    
+    func playlistToTracks(_ item: Playlist) async throws -> MusicItemCollection<Track>? {
+        try await item.with(.tracks).tracks
+    }
+    
+    func MusicVideoToSong(_ item: MusicVideo) async throws -> Song? {
+        let song = try await requestSearchSongCatalog(term: "\(item.title) \(item.artistName)")
+        return song.first
+    }
+    
     
     // MARK: - Charts
     //albumCharts

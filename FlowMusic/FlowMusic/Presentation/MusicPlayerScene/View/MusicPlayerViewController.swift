@@ -183,7 +183,6 @@ final class MusicPlayerViewController: BaseViewController {
         }
     }
     
-    
     private func setProgressBarTimer() {
         timer = Timer.scheduledTimer(timeInterval: 1,
                                      target: self,

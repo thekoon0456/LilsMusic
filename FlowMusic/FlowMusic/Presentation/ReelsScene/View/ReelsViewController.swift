@@ -63,7 +63,7 @@ final class ReelsViewController: BaseViewController {
     
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
-            cell.configureCell(itemIdentifier)
+                cell.configureCell(itemIdentifier)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
@@ -116,26 +116,20 @@ extension ReelsViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? ReelsCell else { return }
-        
         //cellPlayer초기화 시점 뒤로 미룸
         DispatchQueue.main.async {
             cell.soundOn()
         }
-
-        print("1")
         if currentIndex != indexPath {
             cell.play()
-            print("2")
         }
         
         currentIndex = indexPath
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        print("3")
         if currentIndex != indexPath {
             guard let cell = cell as? ReelsCell else { return }
-            print("4")
             cell.mute()
         }
     }

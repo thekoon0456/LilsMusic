@@ -79,6 +79,11 @@ final class ReelsCell: BaseCollectionViewCell {
         musicLabel.text = data.title
         artistLabel.text = data.artistName
         genreLabel.text = data.genreNames.first
+        
+        Task {
+            let result = try await musicRequest.MusicVideoToSong(data)
+            print("==", result)
+        }
     }
     
     override func configureHierarchy() {

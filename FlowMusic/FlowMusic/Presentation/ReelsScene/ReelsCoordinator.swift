@@ -29,11 +29,10 @@ final class ReelsCoordinator: Coordinator {
                                      selectedImage: UIImage(systemName: FMDesign.Icon.reels.fill))
         navigationController?.pushViewController(vc, animated: false)
     }
-    
 }
 
 extension ReelsCoordinator {
-    
+    //투명 네비게이션 바
     private func setNavigationBar() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()

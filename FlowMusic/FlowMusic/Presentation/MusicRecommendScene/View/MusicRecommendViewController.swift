@@ -24,7 +24,7 @@ final class MusicRecommendViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     private var dataSource: UICollectionViewDiffableDataSource<Int, Album>?
     private var album: MusicItemCollection<Album>?
-    private var songs: MusicItemCollection<Song>?
+    
     // MARK: - Lifecycles
     
     init(viewModel: MusicRecommendViewModel) {
@@ -40,16 +40,11 @@ final class MusicRecommendViewController: BaseViewController {
         
         Task {
             do {
-                let a = try await request.requestCatalogSongCharts()
-                print("aaaaaa", a)
-                songs = a
-                let b = try await request.requestNextBatch(items: a!)
-                print("bbbbbb", b)
+                album = try await request.requestCatalogAlbumCharts()
                 updateSnapshot()
             } catch {
                 print(error.localizedDescription)
             }
-
         }
     }
     
@@ -112,6 +107,8 @@ extension MusicRecommendViewController: UICollectionViewDelegate {
         Task {
             try await album = album.with(.tracks)
             viewModel.coordinator?.push(album: album)
+            
+
         }
     }
 }
