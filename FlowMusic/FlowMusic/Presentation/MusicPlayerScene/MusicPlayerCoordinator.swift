@@ -14,14 +14,16 @@ final class MusicPlayerCoordinator: Coordinator {
     var childCoordinators: [Coordinator]
     var navigationController: UINavigationController?
     var type: CoordinatorType
+    var track: Track
     
-    init(navigationController: UINavigationController?) {
+    init(navigationController: UINavigationController?, track: Track) {
         self.childCoordinators = []
         self.navigationController = navigationController
         self.type = .musicPlayer
+        self.track = track
     }
     
-    func start(track: Track) {
+    func start() {
         let vm = MusicPlayerViewModel(coordinator: self)
         let vc = MusicPlayerViewController(viewModel: vm, track: track)
         navigationController?.present(vc, animated: true)

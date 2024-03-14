@@ -30,5 +30,11 @@ final class LibraryCoordinator: Coordinator {
         navigationController?.pushViewController(vc, animated: true)
     }
     
+    func pushToList(album: Album) {
+        let coorinator = MusicListCoordinator(navigationController: navigationController,
+                                              album: album)
+        coorinator.start()
+    }
+    
     
 }

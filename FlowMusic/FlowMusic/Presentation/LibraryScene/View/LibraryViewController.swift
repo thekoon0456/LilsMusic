@@ -15,10 +15,14 @@ final class LibraryViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: LibraryViewModel
-    
     private let player = MusicPlayerManager.shared
     private let request = MusicRequest.shared
     private let layout = CollectionViewPagingLayout()
+    
+    private let titleView = UILabel().then {
+        $0.text = "Library"
+        $0.font = .boldSystemFont(ofSize: 20)
+    }
     
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -48,8 +52,8 @@ final class LibraryViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         Task {
-            self.playlist = try await request.requestCatalogPlaylistCharts().first
-            print(playlist)
+            self.playlist = try await request.requestCatalogPlaylistCharts()
+//            print(playlist)
         }
     }
     override func configureHierarchy() {
@@ -65,6 +69,7 @@ final class LibraryViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
     }
 }
 
@@ -85,5 +90,6 @@ extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath.item)
+//        viewModel.coordinator?.pushToList(album: <#T##Album#>)
     }
 }

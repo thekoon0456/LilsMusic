@@ -17,6 +17,8 @@
  RecordLabel
  Song
  Station
+ 
+ Album, Playlist => .with(tracks) => track .with(Song)
  */
 
 import Foundation
@@ -30,18 +32,31 @@ final class MusicRequest {
     
     // MARK: - Catalog
     
+    //RequestNextBatch
+    func requestNextBatch<T: MusicItem>(items: MusicItemCollection<T>) async throws -> MusicItemCollection<T>? {
+        let hasNextBatch = items.hasNextBatch
+        return hasNextBatch ? try await items.nextBatch() : nil
+    }
+    
     // MARK: - Charts
-    
+    //albumCharts
     func requestCatalogAlbumCharts() async throws -> MusicItemCollection<Album>? {
-        try await MusicCatalogChartsRequest(types: [Album.self]).response().albumCharts.first?.items
+        let response = try await MusicCatalogChartsRequest(types: [Album.self]).response()
+        let charts = response.albumCharts.first
+        return charts?.items
     }
     
-    func requestCatalogPlaylistCharts() async throws -> [MusicItemCollection<Playlist>] {
-        try await MusicCatalogChartsRequest(types: [Playlist.self]).response().playlistCharts.map { $0.items }
+    //playlistCharts
+    func requestCatalogPlaylistCharts() async throws -> MusicItemCollection<Playlist>? {
+        let response = try await MusicCatalogChartsRequest(types: [Playlist.self]).response()
+        let charts = response.playlistCharts.first
+        return charts?.items
     }
     
-    func requestCatalogSongCharts() async throws -> [MusicItemCollection<Song>] {
-        try await MusicCatalogChartsRequest(types: [Song.self]).response().songCharts.map { $0.items }
+    func requestCatalogSongCharts() async throws -> MusicItemCollection<Song>? {
+        let response = try await MusicCatalogChartsRequest(types: [Song.self]).response()
+        let charts = response.songCharts.first
+        return charts?.items
     }
     
     func requestCatalogMVCharts(index: Int) async throws -> MusicItemCollection<MusicVideo> {
