@@ -11,19 +11,19 @@ import Combine
 import Kingfisher
 import SnapKit
 
-import RxSwift
 import RxCocoa
+import RxRelay
+import RxSwift
+
 
 final class MusicPlayerViewController: BaseViewController {
     
     // MARK: - Properties
     
     private let viewModel: MusicPlayerViewModel
-    
-    private let player = MusicPlayerManager.shared
-    private let musicRequest = MusicRequest.shared
-    private var track: Track
     private var timer: Timer?
+    
+    // MARK: - UI
     
     private let artistLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 20)
@@ -53,7 +53,6 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentHorizontalAlignment = .fill
         $0.setImage(UIImage(systemName: "play.fill"), for: .selected)
         $0.tintColor = .white
-        $0.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
         $0.addShadow()
     }
     
@@ -62,7 +61,6 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
-        $0.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         $0.addShadow()
     }
     
@@ -71,7 +69,6 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
-        $0.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
         $0.addShadow()
     }
     
@@ -92,7 +89,6 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
-        $0.addTarget(self, action: #selector(repeatButtonTapped), for: .touchUpInside)
         $0.isSelected = true
         $0.addShadow()
     }
@@ -102,16 +98,14 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
-        $0.addTarget(self, action: #selector(shuffleButtonTapped), for: .touchUpInside)
         $0.isSelected = true
         $0.addShadow()
     }
     
     // MARK: - Lifecycle
     
-    init(viewModel: MusicPlayerViewModel, track: Track) {
+    init(viewModel: MusicPlayerViewModel) {
         self.viewModel = viewModel
-        self.track = track
         super.init()
     }
     
@@ -120,41 +114,70 @@ final class MusicPlayerViewController: BaseViewController {
         timer = nil
     }
     
-    private var cancellables = Set<AnyCancellable>()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(track)
-        updateUI(track)
-        //        print(try await player.getCurrentEntry()?.item)
         
         setProgressBarTimer()
+    }
+    
+    override func bind() {
+        super.bind()
+        /*
+         try await playButton.isSelected
+         ? viewModel.player.pause()
+         : viewModel.player.play()
+         */
         
-        setGradient(startColor: track.artwork?.backgroundColor,
-                    endColor: track.artwork?.backgroundColor)
+        let playButtonTapped = playButton.rx.tap.map { [weak playButton] in
+            return playButton?.isSelected ?? true
+        }
         
-        player.getCurrentPlayer().queue.objectWillChange.sink { [weak self]  _ in
-            guard let self else { return }
-            print("노래바뀜")
-            Task {
-                try await self.updateCurrentEntryUI()
-            }
-        }.store(in: &cancellables)
+        let previousButtonTapped = playButton.rx.tap.map { [weak playButton] in
+            return playButton?.isSelected ?? true
+        }
+        
+        let nextButtonTapped = playButton.rx.tap.map { [weak playButton] in
+            return playButton?.isSelected ?? true
+        }
+        
+        let repeatButtonTapped = playButton.rx.tap.map { [weak playButton] in
+            return playButton?.isSelected ?? true
+        }
+        
+        let shuffleButtonTapped = playButton.rx.tap.map { [weak playButton] in
+            return playButton?.isSelected ?? true
+        }
+        
+        let input = MusicPlayerViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
+                                               playButtonTapped: playButtonTapped,
+                                               previousButtonTapped: previousButton.rx.tap,
+                                               nextButtonTapped: nextButton.rx.tap,
+                                               repeatButtonTapped: repeatButton.rx.tap,
+                                               shuffleButtonTapped: shuffleButton.rx.tap,
+                                               viewDidDisappear: self.rx.viewDidDisappear.map { _ in })
+        let output = viewModel.transform(input)
+        
+        output.updateEntry.drive(with: self) { owner, track in
+            guard let track else { return }
+            owner.updateUI(track)
+        }.disposed(by: disposeBag)
+        
+        output.playState.drive(with: self) { owner, bool in
+            owner.playButton.isSelected.toggle()
+        }.disposed(by: disposeBag)
     }
     
     func updateUI(_ track: Track) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
-            artistLabel.text = track.artistName
-            songLabel.text = track.title
-            //mark 현재 음악 끝 시간 설정
-            progressSlider.maximumValue = Float(track.duration ?? 0)
-        }
+        artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
+        artistLabel.text = track.artistName
+        songLabel.text = track.title
+        //백그라운드
+        setGradient(startColor: track.artwork?.backgroundColor,
+                    endColor: track.artwork?.backgroundColor)
+        //현재 음악 끝 시간 설정
+        progressSlider.maximumValue = Float(track.duration ?? 0)
     }
     
-    // MARK: - Selectors
-
     // MARK: - SetProgress
     
     private func setProgressBarTimer() {
@@ -166,13 +189,13 @@ final class MusicPlayerViewController: BaseViewController {
     }
     
     @objc func updateProgressBar() {
-        let value = Float(player.getPlayBackTime())
+        let value = Float(viewModel.player.getPlayBackTime())
         progressSlider.setValue(value, animated: false)
     }
     
     @objc func sliderValueChanged(_ sender: UISlider) {
         let newValue = sender.value
-        player.player.playbackTime = TimeInterval(floatLiteral: Double(newValue))
+        viewModel.player.setPlayBackTime(value: Double(newValue))
     }
     
     @objc func sliderTapped(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -181,20 +204,20 @@ final class MusicPlayerViewController: BaseViewController {
         let tapValue = tapPoint.x / sliderWidth
         let value = (progressSlider.maximumValue - progressSlider.minimumValue) * Float(tapValue)
         progressSlider.setValue(value, animated: true)
-        player.player.playbackTime = TimeInterval(floatLiteral: Double(value))
+        viewModel.player.setPlayBackTime(value: Double(value))
     }
     
-    // MARK: - setStatus
+    //    // MARK: - setStatus
     
     @objc private func repeatButtonTapped() {
         repeatButton.isSelected.toggle()
         
         if repeatButton.isSelected {
             repeatButton.alpha = 1
-            player.setRepeatMode(mode: .all)
+            viewModel.player.setRepeatMode(mode: .all)
         } else {
             repeatButton.alpha = 0.5
-            player.setRepeatMode(mode: .none)
+            viewModel.player.setRepeatMode(mode: .none)
         }
     }
     
@@ -204,67 +227,55 @@ final class MusicPlayerViewController: BaseViewController {
         ? (shuffleButton.alpha = 1)
         : (shuffleButton.alpha = 0.5)
         shuffleButton.isSelected
-        ? player.setRandomMode(mode: .songs)
-        : player.setRandomMode(mode: .off)
-    }
-
-    
-    @objc private func playButtonTapped() {
-        playButton.isSelected.toggle()
-        Task {
-            do {
-                try await playButton.isSelected
-                ? player.pause()
-                : player.play()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
+        ? viewModel.player.setRandomMode(mode: .songs)
+        : viewModel.player.setRandomMode(mode: .off)
     }
     
-    @objc private func previousButtonTapped() {
-        previousButton.isSelected.toggle()
-        Task {
-            do {
-                try await previousButton.isSelected
-                ? player.restart()
-                : player.skipToPrevious()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-    }
     
-    @objc private func nextButtonTapped(sender: UIButton) {
-        Task {
-            try await player.skipToNext()
-        }
-    }
-    
-    // MARK: - Helpers
-    
-    func updateCurrentEntryUI() async throws {
-        Task {
-            let entry = player.getCurrentEntry()
-            guard let song = try await musicRequest.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                artworkImage.kf.setImage(with: song.artwork?.url(width: 300, height: 300))
-                artistLabel.text =  song.artistName
-                songLabel.text = song.title
-                // MARK: - 현재 음악 끝 시간 설정
-                progressSlider.maximumValue = Float(song.duration ?? 0)
-            }
-        }
-    }
+//    @objc private func playButtonTapped() {
+//        playButton.isSelected.toggle()
+//        Task {
+//            do {
+//                try await playButton.isSelected
+//                ? viewModel.player.pause()
+//                : viewModel.player.play()
+//            } catch {
+//                print(error.localizedDescription)
+//            }
+//        }
+//    }
     
     // MARK: - Configure
     
     override func configureHierarchy() {
-        view.addSubviews(artworkImage, songLabel, artistLabel, playButton, previousButton, nextButton, progressSlider, shuffleButton, repeatButton)
+        super.configureHierarchy()
+        view.addSubviews(artworkImage, songLabel, artistLabel, playButton,
+                         previousButton, nextButton, progressSlider, shuffleButton, repeatButton)
     }
     
     override func configureLayout() {
+        super.configureLayout()
+        setLayout()
+    }
+    
+    override func configureView() {
+        super.configureView()
+        sheetPresentationController?.prefersGrabberVisible = true
+    }
+}
+
+// MARK: - ProgressBar
+
+extension MusicPlayerViewController {
+    
+    
+}
+
+// MARK: - Configure
+
+extension MusicPlayerViewController {
+    
+    func setLayout() {
         artworkImage.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.size.equalTo(300)
@@ -322,10 +333,4 @@ final class MusicPlayerViewController: BaseViewController {
             make.bottom.equalToSuperview().offset(-80)
         }
     }
-    
-    override func configureView() {
-        super.configureView()
-        sheetPresentationController?.prefersGrabberVisible = true
-    }
 }
-

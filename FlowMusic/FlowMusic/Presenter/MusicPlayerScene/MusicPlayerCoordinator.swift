@@ -24,8 +24,8 @@ final class MusicPlayerCoordinator: Coordinator {
     }
     
     func start() {
-        let vm = MusicPlayerViewModel(coordinator: self)
-        let vc = MusicPlayerViewController(viewModel: vm, track: track)
+        let vm = MusicPlayerViewModel(coordinator: self, track: track)
+        let vc = MusicPlayerViewController(viewModel: vm)
         navigationController?.present(vc, animated: true)
     }
 }

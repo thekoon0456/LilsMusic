@@ -29,7 +29,7 @@ final class MusicRecommendViewModel: ViewModel {
     
     weak var coordinator: MusicRecommendCoordinator?
     private let musicRepository = MusicRepository()
-    private let disposeBag = DisposeBag()
+    let disposeBag = DisposeBag()
     
     // MARK: - Lifecycles
     
@@ -38,7 +38,6 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        print(#function)
         let songs = input.viewWillAppear
             .withUnretained(self)
             .flatMapLatest { owner, void in

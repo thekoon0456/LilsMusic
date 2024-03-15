@@ -108,6 +108,10 @@ final class MusicPlayerManager {
     func getPlayBackTime() -> TimeInterval {
         player.playbackTime
     }
+    
+    func setPlayBackTime(value: Double) {
+        player.playbackTime = TimeInterval(floatLiteral: value)
+    }
      
     //재생준비 상태
     func isPreparedToPlay() -> Bool {

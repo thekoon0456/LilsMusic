@@ -119,7 +119,6 @@ final class MusicRecommendViewController: BaseViewController {
 extension MusicRecommendViewController {
     
     private func configureDataSource() {
-        print(#function)
         let trendingCellRegistration = trendingCellRegistration()
         let playlistCellRegistration = playlistCellRegistration()
         let albumCellRegistration = albumCellRegistration()
