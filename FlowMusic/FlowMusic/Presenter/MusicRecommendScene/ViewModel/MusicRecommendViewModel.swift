@@ -75,11 +75,9 @@ final class MusicRecommendViewModel: ViewModel {
                 guard let self else { return }
                 do {
                     let songs = try await musicRepository.requestCatalogSongCharts()
-                    print(songs)
                     observer.onNext(songs)
                     observer.onCompleted()
                 } catch {
-                    print("Error fetching songs: \(error)")
                     observer.onError(error)
                 }
             }

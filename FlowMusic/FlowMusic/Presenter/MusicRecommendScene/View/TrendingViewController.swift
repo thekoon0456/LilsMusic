@@ -20,8 +20,8 @@ final class MusicRecommendViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: MusicRecommendViewModel
-    private let itemSelected = PublishSubject<MusicItem>()
     private var dataSource: DataSource?
+    private let itemSelected = PublishSubject<MusicItem>()
     
     // MARK: - UI
     
@@ -114,7 +114,7 @@ final class MusicRecommendViewController: BaseViewController {
     }
 }
 
-// MARK: - CollectionView Data
+// MARK: - CollectionView DataSource
 
 extension MusicRecommendViewController {
     
@@ -158,10 +158,9 @@ extension MusicRecommendViewController {
     }
     
     private func updateSnapshot<T: Hashable>(withItems items: MusicItemCollection<T>, toSection section: Section) {
-        print(#function)
         var snapshot = dataSource?.snapshot() ?? Snapshot()
         
-        let items = items.map { item -> Item in
+        let items = items.compactMap { item -> Item? in
             switch item {
             case let song as Song:
                 return .song(song)
@@ -170,7 +169,7 @@ extension MusicRecommendViewController {
             case let album as Album:
                 return .album(album)
             default:
-                fatalError("Unsupported item type")
+                return nil
             }
         }
         snapshot.appendItems(items, toSection: section)
@@ -214,6 +213,8 @@ extension MusicRecommendViewController {
         case album(Album)
     }
     
+    //CellRegistration
+    
     private func trendingCellRegistration() -> UICollectionView.CellRegistration<MusicChartsCell, Song> {
         UICollectionView.CellRegistration { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier)
@@ -231,6 +232,8 @@ extension MusicRecommendViewController {
             cell.configureCell(itemIdentifier)
         }
     }
+    
+    //layout
     
     private func createSectionLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in

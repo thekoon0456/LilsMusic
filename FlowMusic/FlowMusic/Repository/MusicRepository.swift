@@ -37,16 +37,13 @@ final class MusicRepository {
     // MARK: - Charts
 
     func requestCatalogSongCharts() async throws -> MusicItemCollection<Song> {
-        print(#function)
         let response = try await MusicCatalogChartsRequest(types: [Song.self]).response()
         guard let charts = response.songCharts.first else { return [] }
-        print(charts)
         return charts.items
     }
     
     //playlistCharts
     func requestCatalogPlaylistCharts() async throws -> MusicItemCollection<Playlist> {
-        print(#function)
         let response = try await MusicCatalogChartsRequest(types: [Playlist.self]).response()
         guard let charts = response.playlistCharts.first else { return [] }
         return charts.items
@@ -54,7 +51,6 @@ final class MusicRepository {
     
     //albumCharts
     func requestCatalogAlbumCharts() async throws -> MusicItemCollection<Album> {
-        print(#function)
         let response = try await MusicCatalogChartsRequest(types: [Album.self]).response()
         guard let charts = response.albumCharts.first else { return [] }
         return charts.items
