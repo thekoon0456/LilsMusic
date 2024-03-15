@@ -38,12 +38,14 @@ final class MusicListCell: BaseCollectionViewCell {
     // MARK: - Configure
     
     override func configureHierarchy() {
+        super.configureHierarchy()
         contentView.addSubviews(iconImageView,
                                 titleLabel,
                                 subtitleLabel)
     }
     
     override func configureLayout() {
+        super.configureLayout()
         iconImageView.snp.makeConstraints { make in
             make.width.height.equalTo(40)
             make.top.equalToSuperview().offset(8)
@@ -65,6 +67,7 @@ final class MusicListCell: BaseCollectionViewCell {
     }
     
     override func configureView() {
+        super.configureView()
         backgroundColor = .clear
     }
 }

@@ -45,13 +45,11 @@ final class MusicPlayerViewController: BaseViewController {
         $0.backgroundColor = .systemGray
     }
     
-    let pauseImage = UIImage(systemName: "pause")
-    
     private lazy var playButton = UIButton().then {
-        $0.setImage(pauseImage, for: .normal)
+        $0.setImage(UIImage(systemName: "pause"), for: .normal)
+        $0.setImage(UIImage(systemName: "play.fill"), for: .selected)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
-        $0.setImage(UIImage(systemName: "play.fill"), for: .selected)
         $0.tintColor = .white
         $0.addShadow()
     }

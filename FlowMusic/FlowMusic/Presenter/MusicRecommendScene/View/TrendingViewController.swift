@@ -36,6 +36,8 @@ final class MusicRecommendViewController: BaseViewController {
         $0.font = .boldSystemFont(ofSize: 20)
     }
     
+    private let miniPlayerView = MiniPlayerView()
+    
     // MARK: - Lifecycles
     
     init(viewModel: MusicRecommendViewModel) {
@@ -58,6 +60,11 @@ final class MusicRecommendViewController: BaseViewController {
         let input = MusicRecommendViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                   itemSelected: itemSelected.asObservable())
         let output = viewModel.transform(input)
+        
+        output.currentPlaySong.drive(with: self) { owner, track in
+            guard let track else { return }
+            owner.miniPlayerView.configureView(track)
+        }.disposed(by: disposeBag)
         
         output.recommendSongs.drive(with: self) { owner, songs in
             owner.updateSnapshot(withItems: songs, toSection: .trending)
@@ -98,12 +105,20 @@ final class MusicRecommendViewController: BaseViewController {
     // MARK: - Configure
     
     override func configureHierarchy() {
-        view.addSubview(collectionView)
+        super.configureHierarchy()
+        view.addSubviews(collectionView, miniPlayerView)
     }
     
     override func configureLayout() {
+        super.configureLayout()
         collectionView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        miniPlayerView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
         }
     }
     

@@ -20,6 +20,7 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     struct Output {
+        let currentPlaySong: Driver<Track?>
         let recommendSongs: Driver<MusicItemCollection<Song>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
@@ -28,6 +29,7 @@ final class MusicRecommendViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicRecommendCoordinator?
+    private let musicPlayer = MusicPlayerManager.shared
     private let musicRepository = MusicRepository()
     let disposeBag = DisposeBag()
     
@@ -38,6 +40,13 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
+        let currentPlaySong = input
+            .viewWillAppear
+            .withUnretained(self)
+            .flatMap { owner, void in
+                owner.getCurrentPlaySong()
+            }.asDriver(onErrorJustReturn: nil)
+        
         let songs = input.viewWillAppear
             .withUnretained(self)
             .flatMapLatest { owner, void in
@@ -63,9 +72,28 @@ final class MusicRecommendViewModel: ViewModel {
             owner.coordinator?.push(item: item)
         }.disposed(by: disposeBag)
         
-        return Output(recommendSongs: songs,
+        return Output(currentPlaySong: currentPlaySong,
+                      recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums)
+    }
+    
+    func getCurrentPlaySong() -> Observable<Track?> {
+        return Observable.create { observer in
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    guard let entry = musicPlayer.getCurrentEntry(),
+                          let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+                    let track = Track.song(song)
+                    observer.onNext(track)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
     }
     
     func fetchRecommendSongs() -> Observable<MusicItemCollection<Song>> {
