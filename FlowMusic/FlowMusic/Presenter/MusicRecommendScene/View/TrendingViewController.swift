@@ -36,7 +36,9 @@ final class MusicRecommendViewController: BaseViewController {
         $0.font = .boldSystemFont(ofSize: 20)
     }
     
-    private let miniPlayerView = MiniPlayerView()
+    private let miniPlayerView = MiniPlayerView().then {
+        $0.isHidden = true
+    }
     
     // MARK: - Lifecycles
     
@@ -65,7 +67,11 @@ final class MusicRecommendViewController: BaseViewController {
         let output = viewModel.transform(input)
         
         output.currentPlaySong.drive(with: self) { owner, track in
-            guard let track else { return }
+            guard let track else { 
+                owner.miniPlayerView.isHidden = true
+                return
+            }
+            owner.miniPlayerView.isHidden = false
             owner.miniPlayerView.configureView(track)
         }.disposed(by: disposeBag)
         

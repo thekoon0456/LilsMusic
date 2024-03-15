@@ -56,7 +56,7 @@ final class MusicRecommendViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, track in
                 guard let track else { return }
-                owner.coordinator?.present(track: track)
+                owner.coordinator?.presentMusicPlayer(track: track)
             }.disposed(by: disposeBag)
         
         let songs = input.viewDidLoad
@@ -78,7 +78,7 @@ final class MusicRecommendViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
         input.itemSelected.withUnretained(self).subscribe { owner, item in
-            owner.coordinator?.push(item: item)
+            owner.coordinator?.pushToList(item: item)
         }.disposed(by: disposeBag)
         
         return Output(currentPlaySong: currentPlaySong,

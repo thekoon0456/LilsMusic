@@ -107,6 +107,12 @@ final class MusicPlayerViewModel: ViewModel {
                 owner.setShuffleButton(isSelected: bool)
             }.asDriver(onErrorJustReturn: true)
         
+        input.viewDidDisappear
+            .withUnretained(self)
+            .subscribe{ owner, _ in
+                owner.coordinator?.finish()
+            }.disposed(by: disposeBag)
+        
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: playState,
                       repeatMode: repeatMode,

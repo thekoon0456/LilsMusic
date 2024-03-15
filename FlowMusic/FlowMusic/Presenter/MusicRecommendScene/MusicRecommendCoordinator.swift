@@ -8,8 +8,8 @@
 import MusicKit
 import UIKit
 
-final class MusicRecommendCoordinator: Coordinator {
-    
+final class MusicRecommendCoordinator: Coordinator, CoordinatorDelegate {
+
     weak var delegate: CoordinatorDelegate?
     var childCoordinators: [Coordinator]
     var navigationController: UINavigationController?
@@ -30,17 +30,29 @@ final class MusicRecommendCoordinator: Coordinator {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    func push(item: MusicItem) {
+    func pushToList(item: MusicItem) {
         let listCoordinator = MusicListCoordinator(navigationController: navigationController,
                                                    item: item)
+        listCoordinator.delegate = self
         childCoordinators.append(listCoordinator)
         listCoordinator.start()
     }
     
-    func present(track: Track) {
+    func presentMusicPlayer(track: Track) {
         let coordinator = MusicPlayerCoordinator(navigationController: navigationController,
                                                  track: track)
+        coordinator.delegate = self
         childCoordinators.append(coordinator)
         coordinator.start()
+    }
+    
+    func didFinish(childCoordinator: any Coordinator) {
+        childCoordinators.forEach { coordinator in
+            if let musicCoordinator = coordinator as? MusicPlayerCoordinator {
+                childCoordinators.removeAll { coordinator in
+                    musicCoordinator === coordinator
+                }
+            }
+        }
     }
 }

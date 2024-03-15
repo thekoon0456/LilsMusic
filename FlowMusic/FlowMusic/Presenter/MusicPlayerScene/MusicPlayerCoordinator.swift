@@ -26,6 +26,7 @@ final class MusicPlayerCoordinator: Coordinator {
     func start() {
         let vm = MusicPlayerViewModel(coordinator: self, track: track)
         let vc = MusicPlayerViewController(viewModel: vm)
+        vc.modalPresentationStyle = .fullScreen
         navigationController?.present(vc, animated: true)
     }
 }
