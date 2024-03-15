@@ -16,7 +16,8 @@ final class MusicPlayerManager {
     
     // MARK: - Lifecycles
     
-    func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
+    func getCurrentEntry() async throws -> ApplicationMusicPlayer.Queue.Entry? {
+        try await Task.sleep(nanoseconds: 200_000_000)
         return player.queue.currentEntry
     }
     

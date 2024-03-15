@@ -64,7 +64,7 @@ final class MusicRecommendViewModel: ViewModel {
             .flatMapLatest { owner, void in
                 owner.fetchRecommendSongs()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Song>())
-
+        
         let playlists = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
@@ -88,11 +88,12 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     func getCurrentPlaySong() -> Observable<Track?> {
-        return Observable.create { [weak self] observer in
-            guard let self, let entry = musicPlayer.getCurrentEntry() else { return Disposables.create() }
-            Task {
+        return Observable.create { observer in
+            Task { [weak self] in
                 do {
-                    guard let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
+                    guard let self,
+                          let entry = try await musicPlayer.getCurrentEntry(),
+                          let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
                     observer.onNext(track)

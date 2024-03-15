@@ -90,7 +90,7 @@ final class MusicPlayerViewModel: ViewModel {
                 UserDefaultsManager.shared.isRepeat = bool
                 owner.musicPlayer.setRepeatMode(isRepeat: bool)
                 print(UserDefaultsManager.shared.isRepeat)
-//                print(owner.musicPlayer.player.state.repeatMode)
+                //                print(owner.musicPlayer.player.state.repeatMode)
             }
             .flatMap { owner, bool in
                 owner.setRepeatButton(isSelected: bool)
@@ -103,7 +103,7 @@ final class MusicPlayerViewModel: ViewModel {
                 UserDefaultsManager.shared.isShuffle = bool
                 owner.musicPlayer.setShuffleMode(isShuffle: bool)
                 print(UserDefaultsManager.shared.isShuffle)
-//                print(owner.musicPlayer.player.state.shuffleMode)
+                //                print(owner.musicPlayer.player.state.shuffleMode)
             }
             .flatMap { owner, bool in
                 owner.setShuffleButton(isSelected: bool)
@@ -155,10 +155,11 @@ final class MusicPlayerViewModel: ViewModel {
     
     //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { [weak self] _  in
-            guard let self, let entry = musicPlayer.getCurrentEntry() else { return }
-            Task {
-                guard let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _  in
+            Task { [weak self] in
+                guard let self,
+                      let entry = try await musicPlayer.getCurrentEntry(),
+                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
                 let track = Track.song(song)
                 self.trackSubject.onNext(track)
             }
