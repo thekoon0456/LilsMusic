@@ -18,6 +18,7 @@
 		7C131C572BA45D48004B3FF2 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C562BA45D48004B3FF2 /* RxRelay */; };
 		7C131C592BA4730A004B3FF2 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */; };
 		7C131C5B2BA4ADC1004B3FF2 /* MiniPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */; };
+		7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C5D2BA4B93F004B3FF2 /* RxGesture */; };
 		7C3927672BA32B150074F87E /* FMSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927662BA32B150074F87E /* FMSlider.swift */; };
 		7C3927692BA341590074F87E /* TrendingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927682BA341590074F87E /* TrendingViewController.swift */; };
 		7C39276B2BA341840074F87E /* TrendingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C39276A2BA341840074F87E /* TrendingViewModel.swift */; };
@@ -146,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C131C572BA45D48004B3FF2 /* RxRelay in Frameworks */,
+				7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */,
 				7C03F7C62BA1765A00FB748C /* RxSwift in Frameworks */,
 				7C03F7C12BA1762500FB748C /* RealmSwift in Frameworks */,
 				7C03F7BF2BA1762500FB748C /* Realm in Frameworks */,
@@ -539,6 +541,7 @@
 				7C03F7C52BA1765A00FB748C /* RxSwift */,
 				7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */,
 				7C131C562BA45D48004B3FF2 /* RxRelay */,
+				7C131C5D2BA4B93F004B3FF2 /* RxGesture */,
 			);
 			productName = FlowMusic;
 			productReference = 7C813DA82B9ADFEF00CDFF1D /* FlowMusic.app */;
@@ -574,6 +577,7 @@
 				7C03F7BD2BA1762500FB748C /* XCRemoteSwiftPackageReference "realm-swift" */,
 				7C03F7C22BA1765A00FB748C /* XCRemoteSwiftPackageReference "RxSwift" */,
 				7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */,
+				7C131C5C2BA4B93F004B3FF2 /* XCRemoteSwiftPackageReference "RxGesture" */,
 			);
 			productRefGroup = 7C813DA92B9ADFEF00CDFF1D /* Products */;
 			projectDirPath = "";
@@ -900,6 +904,14 @@
 				minimumVersion = 6.6.0;
 			};
 		};
+		7C131C5C2BA4B93F004B3FF2 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.4;
+			};
+		};
 		7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/amirdew/CollectionViewPagingLayout";
@@ -951,6 +963,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C03F7C22BA1765A00FB748C /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxRelay;
+		};
+		7C131C5D2BA4B93F004B3FF2 /* RxGesture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C131C5C2BA4B93F004B3FF2 /* XCRemoteSwiftPackageReference "RxGesture" */;
+			productName = RxGesture;
 		};
 		7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */ = {
 			isa = XCSwiftPackageProductDependency;

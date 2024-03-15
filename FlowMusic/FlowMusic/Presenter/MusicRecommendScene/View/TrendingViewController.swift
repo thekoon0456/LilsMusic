@@ -22,7 +22,7 @@ final class MusicRecommendViewController: BaseViewController {
     private let viewModel: MusicRecommendViewModel
     private var dataSource: DataSource?
     private let itemSelected = PublishSubject<MusicItem>()
-    
+    private let viewDidLoadTrigger = PublishSubject<Void>()
     // MARK: - UI
     
     private lazy var collectionView = {
@@ -50,6 +50,7 @@ final class MusicRecommendViewController: BaseViewController {
         
         configureDataSource()
         configureSnapshot()
+        viewDidLoadTrigger.onNext(())
     }
     
     // MARK: - Helpers
@@ -57,8 +58,10 @@ final class MusicRecommendViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-        let input = MusicRecommendViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
-                                                  itemSelected: itemSelected.asObservable())
+        let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
+                                                  viewWillAppear: self.rx.viewWillAppear.map { _ in },
+                                                  itemSelected: itemSelected.asObservable(),
+                                                  miniPlayerTapped: miniPlayerView.tap)
         let output = viewModel.transform(input)
         
         output.currentPlaySong.drive(with: self) { owner, track in

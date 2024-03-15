@@ -36,4 +36,11 @@ final class MusicRecommendCoordinator: Coordinator {
         childCoordinators.append(listCoordinator)
         listCoordinator.start()
     }
+    
+    func present(track: Track) {
+        let coordinator = MusicPlayerCoordinator(navigationController: navigationController,
+                                                 track: track)
+        childCoordinators.append(coordinator)
+        coordinator.start()
+    }
 }

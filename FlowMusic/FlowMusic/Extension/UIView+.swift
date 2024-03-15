@@ -17,7 +17,7 @@ extension UIView {
 }
 
 extension UIView {
-    func addShadow(color: UIColor = .black, offset: CGSize = CGSize(width: 1, height: 1), opacity: Float = 0.5, radius: CGFloat = 1) {
+    func addShadow(color: UIColor = .label, offset: CGSize = CGSize(width: 1, height: 1), opacity: Float = 0.5, radius: CGFloat = 1) {
         layer.shadowColor = color.cgColor
         layer.shadowOffset = offset
         layer.shadowOpacity = opacity

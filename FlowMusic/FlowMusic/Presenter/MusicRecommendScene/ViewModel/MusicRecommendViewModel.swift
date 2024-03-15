@@ -15,8 +15,10 @@ import RxSwift
 final class MusicRecommendViewModel: ViewModel {
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let viewWillAppear: Observable<Void>
         let itemSelected: Observable<MusicItem>
+        let miniPlayerTapped: Observable<Void>
     }
     
     struct Output {
@@ -47,26 +49,33 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.getCurrentPlaySong()
             }.asDriver(onErrorJustReturn: nil)
         
-        let songs = input.viewWillAppear
+        input.miniPlayerTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.getCurrentPlaySong()
+            }.asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, track in
+                guard let track else { return }
+                owner.coordinator?.present(track: track)
+            }.disposed(by: disposeBag)
+        
+        let songs = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendSongs()
-            }
-            .asDriver(onErrorJustReturn: MusicItemCollection<Song>())
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Song>())
 
-        let playlists = input.viewWillAppear
+        let playlists = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendPlaylists()
-            }
-            .asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
-        let albums = input.viewWillAppear
+        let albums = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendAlbums()
-            }
-            .asDriver(onErrorJustReturn: MusicItemCollection<Album>())
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
         input.itemSelected.withUnretained(self).subscribe { owner, item in
             owner.coordinator?.push(item: item)
@@ -86,6 +95,7 @@ final class MusicRecommendViewModel: ViewModel {
                     guard let entry = musicPlayer.getCurrentEntry(),
                           let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
                     let track = Track.song(song)
+                    print(track)
                     observer.onNext(track)
                     observer.onCompleted()
                 } catch {
