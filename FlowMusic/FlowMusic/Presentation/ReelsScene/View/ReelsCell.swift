@@ -54,7 +54,7 @@ final class ReelsCell: BaseCollectionViewCell {
         print(#function)
         player?.pause()
         NotificationCenter.default.removeObserver(self)
-        //cell 재사용시 레이아웃 초기화 필요
+        //cell 재사용시 뮤비 플레이어 레이아웃 초기화 필요
         musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
     }
     
@@ -81,7 +81,9 @@ final class ReelsCell: BaseCollectionViewCell {
         genreLabel.text = data.genreNames.first
         
         Task {
+            //뮤비의 song타입
             let result = try await musicRequest.MusicVideoToSong(data)
+            
         }
     }
     

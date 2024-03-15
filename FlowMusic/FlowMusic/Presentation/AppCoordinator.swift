@@ -25,12 +25,14 @@ final class AppCoordinator: Coordinator {
     // MARK: - Helpers
     
     func start() {
+        //TODO: -온보딩 분기처리
         Task {
             await requestMusicAuthorization()
         }
 
-        
         let tabBarController = UITabBarController()
+        tabBarController.tabBar.backgroundColor = .systemBackground
+        
         let recommendNav = UINavigationController()
         let recommendCoordinator = MusicRecommendCoordinator(navigationController: recommendNav)
         childCoordinators.append(recommendCoordinator)

@@ -8,6 +8,8 @@
 import MusicKit
 import UIKit
 
+import RxCocoa
+import RxSwift
 import SnapKit
 
 final class MusicRecommendViewController: BaseViewController {
@@ -15,6 +17,7 @@ final class MusicRecommendViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: MusicRecommendViewModel
+    
     private let player = MusicPlayerManager.shared
     private let request = MusicRequest.shared
     
