@@ -16,6 +16,7 @@ final class MusicRecommendViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let itemSelected: Observable<MusicItem>
     }
     
     struct Output {
@@ -58,6 +59,10 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.fetchRecommendAlbums()
             }
             .asDriver(onErrorJustReturn: MusicItemCollection<Album>())
+        
+        input.itemSelected.withUnretained(self).subscribe { owner, item in
+            owner.coordinator?.push(item: item)
+        }.disposed(by: disposeBag)
         
         return Output(recommendSongs: songs,
                       recommendPlaylists: playlists,

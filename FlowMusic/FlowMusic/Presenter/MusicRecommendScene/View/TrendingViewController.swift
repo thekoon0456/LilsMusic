@@ -20,15 +20,10 @@ final class MusicRecommendViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: MusicRecommendViewModel
-    
-    private let player = MusicPlayerManager.shared
-    private let request = MusicRequest.shared
-    
+    private let itemSelected = PublishSubject<MusicItem>()
     private var dataSource: DataSource?
     
-    var songs: MusicItemCollection<Song>?
-    var playlists: MusicItemCollection<Playlist>?
-    var albums: MusicItemCollection<Album>?
+    // MARK: - UI
     
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createSectionLayout())
@@ -40,8 +35,6 @@ final class MusicRecommendViewController: BaseViewController {
         $0.text = "Trending"
         $0.font = .boldSystemFont(ofSize: 20)
     }
-    
-    private let musicRepository = MusicRepository()
     
     // MARK: - Lifecycles
     
@@ -55,21 +48,6 @@ final class MusicRecommendViewController: BaseViewController {
         
         configureDataSource()
         configureSnapshot()
-        
-//        // MARK: - input
-//        Task {
-//            async let songsResult = request.requestCatalogSongCharts()
-//            async let playlistResult = request.requestCatalogPlaylistCharts()
-//            async let albumResult = request.requestCatalogAlbumCharts()
-//            let (songs, playlists, albums) = try await (songsResult, playlistResult, albumResult)
-//            
-//            DispatchQueue.main.async {
-//                self.songs = songs
-//                self.playlists = playlists
-//                self.albums = albums
-//                self.updateSnapshotSection()
-//            }
-//        }
     }
     
     // MARK: - Helpers
@@ -77,8 +55,10 @@ final class MusicRecommendViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-        let input = MusicRecommendViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in } )
+        let input = MusicRecommendViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
+                                                  itemSelected: itemSelected.asObservable())
         let output = viewModel.transform(input)
+        
         output.recommendSongs.drive(with: self) { owner, songs in
             owner.updateSnapshot(withItems: songs, toSection: .trending)
         }.disposed(by: disposeBag)
@@ -97,14 +77,20 @@ final class MusicRecommendViewController: BaseViewController {
                 guard let section = Section(rawValue: indexPath.section) else { return }
                 switch section {
                 case .trending:
-                    let item = owner.dataSource?.itemIdentifier(for: indexPath)
-//                    self.viewModel.coordinator?.push(item: song)
+                    guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                    if case let .song(song) = item {
+                        owner.itemSelected.onNext(song)
+                    }
                 case .playlist:
-                    let item = owner.dataSource?.itemIdentifier(for: indexPath)
-//                    self.viewModel.coordinator?.push(item: playlist)
+                    guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                    if case let .playlist(playlist) = item {
+                        owner.itemSelected.onNext(playlist)
+                    }
                 case .album:
-                    let item = owner.dataSource?.itemIdentifier(for: indexPath)
-//                    self.viewModel.coordinator?.push(item: album)
+                    guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                    if case let .album(album) = item {
+                        owner.itemSelected.onNext(album)
+                    }
                 }
             }.disposed(by: disposeBag)
     }
@@ -127,29 +113,6 @@ final class MusicRecommendViewController: BaseViewController {
         navigationItem.backButtonDisplayMode = .minimal
     }
 }
-//// MARK: - CollectionViewDelegate
-//
-//extension MusicRecommendViewController: UICollectionViewDelegate {
-//    
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard let section = Section(rawValue: indexPath.section) else { return }
-//        switch section {
-//        case .trending:
-//            guard let song = songs?[indexPath.row] else { return }
-//            // MARK: - input
-////            collectionView.rx.itemSelected
-//            viewModel.coordinator?.push(item: song)
-//        case .playlist:
-//            guard let playlist = playlists?[indexPath.row] else { return }
-//            // MARK: - input
-//            viewModel.coordinator?.push(item: playlist)
-//        case .album:
-//            guard let album = albums?[indexPath.row] else { return }
-//            // MARK: - input
-//            viewModel.coordinator?.push(item: album)
-//        }
-//    }
-//}
 
 // MARK: - CollectionView Data
 
