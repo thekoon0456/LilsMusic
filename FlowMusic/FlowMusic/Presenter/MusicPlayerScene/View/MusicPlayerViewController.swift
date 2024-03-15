@@ -147,7 +147,6 @@ final class MusicPlayerViewController: BaseViewController {
         output.updateEntry.drive(with: self) { owner, track in
             guard let track else { return }
             owner.updateUI(track)
-            owner.setButtonAlpha()
         }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, bool in
@@ -155,12 +154,12 @@ final class MusicPlayerViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.repeatMode.drive(with: self) { owner, bool in
-            owner.repeatButton.isSelected.toggle()
+            owner.repeatButton.isSelected = bool
             owner.setButtonAlpha()
         }.disposed(by: disposeBag)
         
         output.shuffleMode.drive(with: self) { owner, bool in
-            owner.shuffleButton.isSelected.toggle()
+            owner.shuffleButton.isSelected = bool
             owner.setButtonAlpha()
         }.disposed(by: disposeBag)
     }

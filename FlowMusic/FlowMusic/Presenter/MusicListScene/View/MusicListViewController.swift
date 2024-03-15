@@ -68,8 +68,6 @@ final class MusicListViewController: BaseViewController {
             }
         }
         
-        
-        player.setRepeatMode(mode: .all)
         readyFadeInAnimation()
         loadDataAndUpdateUI()
     }

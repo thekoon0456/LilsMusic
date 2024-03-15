@@ -20,6 +20,8 @@ extension UIViewController {
         gradientLayer.colors = [startColor, endColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        //기존에 추가된 레이어 삭제
+        view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 }

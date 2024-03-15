@@ -54,17 +54,11 @@ final class MusicPlayerViewModel: ViewModel {
     
     func transform(_ input: Input) -> Output {
         let playState = input.playButtonTapped
-            .map { bool in
-                var bool = bool
-                bool.toggle()
-                return bool
-            }
+            .map { !$0 }
             .withUnretained(self)
             .do { owner, bool in
                 Task {
-                    try await bool
-                    ? owner.player.pause()
-                    : owner.player.play()
+                    try await bool ? owner.player.pause() : owner.player.play()
                 }
             }
             .flatMap { owner, bool in
@@ -88,18 +82,12 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
-            .map { bool in
-                var bool = bool
-                bool.toggle()
-                return bool
-            }
+            .map { !$0 }
             .withUnretained(self)
             .do { owner, bool in
                 UserDefaultsManager.shared.isRepeat = bool
+                owner.player.setRepeatMode(isRepeat: bool)
                 print(UserDefaultsManager.shared.isRepeat)
-                bool
-                ? owner.player.setRepeatMode(mode: .all)
-                : owner.player.setRepeatMode(mode: .none)
                 print(owner.player.player.state.repeatMode)
             }
             .flatMap { owner, bool in
@@ -107,22 +95,16 @@ final class MusicPlayerViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: true)
         
         let shuffleMode = input.shuffleButtonTapped
-            .map { bool in
-                var bool = bool
-                bool.toggle()
-                return bool
-            }
+            .map { !$0 }
             .withUnretained(self)
             .do { owner, bool in
                 UserDefaultsManager.shared.isShuffle = bool
+                owner.player.setShuffleMode(isShuffle: bool)
                 print(UserDefaultsManager.shared.isShuffle)
-                bool
-                ? owner.player.setRandomMode(mode: .songs)
-                : owner.player.setRandomMode(mode: .off)
                 print(owner.player.player.state.shuffleMode)
             }
             .flatMap { owner, bool in
-                owner.setRepeatButton(isSelected: bool)
+                owner.setShuffleButton(isSelected: bool)
             }.asDriver(onErrorJustReturn: true)
         
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
@@ -147,14 +129,6 @@ final class MusicPlayerViewModel: ViewModel {
         }
     }
     
-    func setShuffleButton(isSelected: Bool) -> Observable<Bool> {
-        return Observable.create { observer in
-            observer.onNext(isSelected)
-            observer.onCompleted()
-            return Disposables.create()
-        }
-    }
-    
     func setRepeatButton(isSelected: Bool) -> Observable<Bool> {
         return Observable.create { observer in
             observer.onNext(isSelected)
@@ -163,12 +137,22 @@ final class MusicPlayerViewModel: ViewModel {
         }
     }
     
+    func setShuffleButton(isSelected: Bool) -> Observable<Bool> {
+        return Observable.create { observer in
+            observer.onNext(isSelected)
+            observer.onCompleted()
+            return Disposables.create()
+        }
+    }
+    
+    //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
         player.getCurrentPlayer().queue.objectWillChange.sink { [weak self] _  in
             guard let self else { return }
-            let entry = player.getCurrentEntry()
             Task { [weak self] in
-                guard let self, let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                guard let self,
+                      let entry = player.getCurrentEntry(),
+                      let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
                 let track = Track.song(song)
                 trackSubject.onNext(track)
             }

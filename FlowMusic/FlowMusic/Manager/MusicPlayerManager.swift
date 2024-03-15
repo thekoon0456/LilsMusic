@@ -94,12 +94,12 @@ final class MusicPlayerManager {
         try await player.skipToPreviousEntry()
     }
     
-    func setRepeatMode(mode: MusicPlayer.RepeatMode) {
-        player.state.repeatMode = mode
+    func setRepeatMode(isRepeat: Bool) {
+        player.state.repeatMode = isRepeat ? .all : Optional.none
     }
     
-    func setRandomMode(mode: MusicPlayer.ShuffleMode?) {
-        player.state.shuffleMode = mode
+    func setShuffleMode(isShuffle: Bool) {
+        player.state.shuffleMode = isShuffle ? .songs : .off
     }
     
     // MARK: - Player Status
