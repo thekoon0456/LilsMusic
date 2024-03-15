@@ -245,6 +245,7 @@
 		7C7740172B9DB72400B2E6E7 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -411,7 +412,6 @@
 			isa = PBXGroup;
 			children = (
 				7C813DE02B9AE31C00CDFF1D /* MusicPlayerViewController.swift */,
-				7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

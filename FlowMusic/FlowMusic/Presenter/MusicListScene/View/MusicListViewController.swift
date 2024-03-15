@@ -17,7 +17,7 @@ final class MusicListViewController: BaseViewController {
     
     private let viewModel: MusicListViewModel
     
-    private let player = MusicPlayerManager.shared
+    private let MusicPlayer = MusicPlayerManager()
     private let request = MusicRequest.shared
     var tracks: MusicItemCollection<Track>?
     var item: MusicItem
@@ -191,7 +191,7 @@ extension MusicListViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let tracks else { return }
         Task {
-            try await player.setTrackQueue(item: tracks, startIndex: indexPath.item)
+            try await MusicPlayer.setTrackQueue(item: tracks, startIndex: indexPath.item)
             viewModel.coordinator?.present(track: tracks[indexPath.item])
         }
         

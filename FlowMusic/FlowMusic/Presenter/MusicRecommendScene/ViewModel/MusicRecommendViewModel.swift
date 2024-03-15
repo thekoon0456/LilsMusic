@@ -31,7 +31,7 @@ final class MusicRecommendViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicRecommendCoordinator?
-    private let musicPlayer = MusicPlayerManager.shared
+    private let musicPlayer = MusicPlayerManager()
     private let musicRepository = MusicRepository()
     let disposeBag = DisposeBag()
     
@@ -88,14 +88,13 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     func getCurrentPlaySong() -> Observable<Track?> {
-        return Observable.create { observer in
-            Task { [weak self] in
-                guard let self else { return }
+        return Observable.create { [weak self] observer in
+            guard let self, let entry = musicPlayer.getCurrentEntry() else { return Disposables.create() }
+            Task {
                 do {
-                    guard let entry = musicPlayer.getCurrentEntry(),
-                          let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+                    guard let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
+                    else { return }
                     let track = Track.song(song)
-                    print(track)
                     observer.onNext(track)
                     observer.onCompleted()
                 } catch {

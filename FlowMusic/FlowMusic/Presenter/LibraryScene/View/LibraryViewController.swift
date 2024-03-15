@@ -15,7 +15,7 @@ final class LibraryViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: LibraryViewModel
-    private let player = MusicPlayerManager.shared
+    private let musicPlayer = MusicPlayerManager()
     private let request = MusicRequest.shared
     private let layout = CollectionViewPagingLayout()
     

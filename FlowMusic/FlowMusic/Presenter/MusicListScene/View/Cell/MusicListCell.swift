@@ -16,6 +16,8 @@ final class MusicListCell: BaseCollectionViewCell {
     
     private lazy var iconImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
+        $0.layer.cornerRadius = 4
+        $0.clipsToBounds = true
     }
     
     private let titleLabel = UILabel().then {
@@ -25,6 +27,13 @@ final class MusicListCell: BaseCollectionViewCell {
     private let subtitleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .lightGray
+    }
+    
+    // MARK: - Lifecycles
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        iconImageView.image = UIImage()
     }
     
     // MARK: - Helpers
@@ -47,22 +56,23 @@ final class MusicListCell: BaseCollectionViewCell {
     override func configureLayout() {
         super.configureLayout()
         iconImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(40)
+            make.size.equalTo(44).priority(.high)
             make.top.equalToSuperview().offset(8)
             make.leading.equalToSuperview().offset(8)
-            make.bottom.lessThanOrEqualToSuperview().offset(-8)
+            make.bottom.equalToSuperview().offset(-8)
         }
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(8)
-            make.trailing.equalToSuperview().offset(-8)
             make.leading.equalTo(iconImageView.snp.trailing).offset(8)
+            make.trailing.equalToSuperview().offset(-8)
         }
         
         subtitleLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(4)
             make.leading.equalTo(titleLabel.snp.leading)
             make.trailing.equalToSuperview().offset(-8)
+            make.bottom.equalTo(iconImageView.snp.bottom)
         }
     }
     

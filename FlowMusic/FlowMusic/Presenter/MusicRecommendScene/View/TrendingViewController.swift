@@ -38,6 +38,7 @@ final class MusicRecommendViewController: BaseViewController {
     
     private let miniPlayerView = MiniPlayerView().then {
         $0.isHidden = true
+        $0.alpha = 0
     }
     
     // MARK: - Lifecycles
@@ -69,10 +70,14 @@ final class MusicRecommendViewController: BaseViewController {
         output.currentPlaySong.drive(with: self) { owner, track in
             guard let track else { 
                 owner.miniPlayerView.isHidden = true
+                owner.miniPlayerView.alpha = 0
                 return
             }
             owner.miniPlayerView.isHidden = false
             owner.miniPlayerView.configureView(track)
+            UIView.animate(withDuration: 0.5) {
+                owner.miniPlayerView.alpha = 1
+            }
         }.disposed(by: disposeBag)
         
         output.recommendSongs.drive(with: self) { owner, songs in

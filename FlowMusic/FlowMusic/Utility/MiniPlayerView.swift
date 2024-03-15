@@ -19,6 +19,8 @@ final class MiniPlayerView: BaseView {
     
     private lazy var iconImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
+        $0.layer.cornerRadius = 4
+        $0.clipsToBounds = true
     }
     
     private let titleLabel = UILabel().then {
@@ -78,10 +80,10 @@ final class MiniPlayerView: BaseView {
     
     override func configureLayout() {
         iconImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(40)
+            make.size.equalTo(44)
             make.top.equalToSuperview().offset(8)
             make.leading.equalToSuperview().offset(8)
-            make.bottom.lessThanOrEqualToSuperview().offset(-8)
+            make.bottom.equalToSuperview().offset(-8)
         }
         
         titleLabel.snp.makeConstraints { make in

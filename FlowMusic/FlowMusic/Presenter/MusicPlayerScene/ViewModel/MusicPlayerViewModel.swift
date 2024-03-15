@@ -22,7 +22,7 @@ final class MusicPlayerViewModel: ViewModel {
         let nextButtonTapped: ControlEvent<Void>
         let repeatButtonTapped: Observable<Bool>
         let shuffleButtonTapped: Observable<Bool>
-        let viewDidDisappear: Observable<Void>
+        let viewWillDisappear: Observable<Void>
     }
     
     struct Output {
@@ -35,7 +35,7 @@ final class MusicPlayerViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicPlayerCoordinator?
-    let player = MusicPlayerManager.shared
+    let musicPlayer = MusicPlayerManager()
     let musicRepository = MusicRepository()
     let disposeBag = DisposeBag()
     private var cancellables = Set<AnyCancellable>()
@@ -58,7 +58,7 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .do { owner, bool in
                 Task {
-                    try await bool ? owner.player.pause() : owner.player.play()
+                    try await bool ? owner.musicPlayer.pause() : owner.musicPlayer.play()
                 }
             }
             .flatMap { owner, bool in
@@ -66,18 +66,20 @@ final class MusicPlayerViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: true)
         
         input.previousButtonTapped
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
-                    try await owner.player.skipToPrevious()
+                    try await owner.musicPlayer.skipToPrevious()
                 }
             }.disposed(by: disposeBag)
         
         input.nextButtonTapped
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
-                    try await owner.player.skipToNext()
+                    try await owner.musicPlayer.skipToNext()
                 }
             }.disposed(by: disposeBag)
         
@@ -86,9 +88,9 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .do { owner, bool in
                 UserDefaultsManager.shared.isRepeat = bool
-                owner.player.setRepeatMode(isRepeat: bool)
+                owner.musicPlayer.setRepeatMode(isRepeat: bool)
                 print(UserDefaultsManager.shared.isRepeat)
-                print(owner.player.player.state.repeatMode)
+//                print(owner.musicPlayer.player.state.repeatMode)
             }
             .flatMap { owner, bool in
                 owner.setRepeatButton(isSelected: bool)
@@ -99,15 +101,15 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .do { owner, bool in
                 UserDefaultsManager.shared.isShuffle = bool
-                owner.player.setShuffleMode(isShuffle: bool)
+                owner.musicPlayer.setShuffleMode(isShuffle: bool)
                 print(UserDefaultsManager.shared.isShuffle)
-                print(owner.player.player.state.shuffleMode)
+//                print(owner.musicPlayer.player.state.shuffleMode)
             }
             .flatMap { owner, bool in
                 owner.setShuffleButton(isSelected: bool)
             }.asDriver(onErrorJustReturn: true)
         
-        input.viewDidDisappear
+        input.viewWillDisappear
             .withUnretained(self)
             .subscribe{ owner, _ in
                 owner.coordinator?.finish()
@@ -153,14 +155,12 @@ final class MusicPlayerViewModel: ViewModel {
     
     //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
-        player.getCurrentPlayer().queue.objectWillChange.sink { [weak self] _  in
-            guard let self else { return }
-            Task { [weak self] in
-                guard let self,
-                      let entry = player.getCurrentEntry(),
-                      let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { [weak self] _  in
+            guard let self, let entry = musicPlayer.getCurrentEntry() else { return }
+            Task {
+                guard let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
                 let track = Track.song(song)
-                trackSubject.onNext(track)
+                self.trackSubject.onNext(track)
             }
         }.store(in: &cancellables)
     }

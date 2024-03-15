@@ -121,15 +121,21 @@ final class MusicPlayerViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-        let playButtonTapped = playButton.rx.tap.map { [weak playButton] in
+        let playButtonTapped = playButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak playButton] in
             return playButton?.isSelected ?? true
         }
         
-        let repeatButtonTapped = repeatButton.rx.tap.map { [weak repeatButton] in
+        let repeatButtonTapped = repeatButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak repeatButton] in
             return repeatButton?.isSelected ?? true
         }
         
-        let shuffleButtonTapped = shuffleButton.rx.tap.map { [weak shuffleButton] in
+        let shuffleButtonTapped = shuffleButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak shuffleButton] in
             return shuffleButton?.isSelected ?? true
         }
         
@@ -139,7 +145,7 @@ final class MusicPlayerViewController: BaseViewController {
                                                nextButtonTapped: nextButton.rx.tap,
                                                repeatButtonTapped: repeatButtonTapped,
                                                shuffleButtonTapped: shuffleButtonTapped,
-                                               viewDidDisappear: self.rx.viewDidDisappear.map { _ in })
+                                               viewWillDisappear: self.rx.viewWillDisappear.map { _ in })
         let output = viewModel.transform(input)
         
         output.updateEntry.drive(with: self) { owner, track in
@@ -163,13 +169,13 @@ final class MusicPlayerViewController: BaseViewController {
     }
     
     @objc func updateProgressBar() {
-        let value = Float(viewModel.player.getPlayBackTime())
+        let value = Float(viewModel.musicPlayer.getPlayBackTime())
         progressSlider.setValue(value, animated: false)
     }
     
     @objc func sliderValueChanged(_ sender: UISlider) {
         let newValue = sender.value
-        viewModel.player.setPlayBackTime(value: Double(newValue))
+        viewModel.musicPlayer.setPlayBackTime(value: Double(newValue))
     }
     
     @objc func sliderTapped(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -178,7 +184,7 @@ final class MusicPlayerViewController: BaseViewController {
         let tapValue = tapPoint.x / sliderWidth
         let value = (progressSlider.maximumValue - progressSlider.minimumValue) * Float(tapValue)
         progressSlider.setValue(value, animated: true)
-        viewModel.player.setPlayBackTime(value: Double(value))
+        viewModel.musicPlayer.setPlayBackTime(value: Double(value))
     }
     
     // MARK: - UI

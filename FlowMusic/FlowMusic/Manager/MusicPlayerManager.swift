@@ -12,12 +12,9 @@ final class MusicPlayerManager {
     
     // MARK: - Properties
     
-    static let shared = MusicPlayerManager()
-    let player = ApplicationMusicPlayer.shared
+    private let player = ApplicationMusicPlayer.shared
     
     // MARK: - Lifecycles
-    
-    private init() { }
     
     func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
         return player.queue.currentEntry
@@ -30,24 +27,28 @@ final class MusicPlayerManager {
     }
     
     func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
+        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
     }
     
     func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
+        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
     }
     
     func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
+        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[0])
         player.queue = queue
         try await play()
     }
     
     func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
+        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
@@ -55,6 +56,7 @@ final class MusicPlayerManager {
     
     //한곡 재생
     func playSong(_ song: Song) async throws {
+        resetQueue()
         player.queue = [song]
         try await play()
     }
@@ -84,10 +86,6 @@ final class MusicPlayerManager {
     
     func skipToNext() async throws {
         try await player.skipToNextEntry()
-        
-//        if player.queue.entries.isEmpty {
-//            player.restartCurrentEntry()
-//        }
     }
     
     func skipToPrevious() async throws  {

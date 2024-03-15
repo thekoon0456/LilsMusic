@@ -38,12 +38,6 @@ final class MusicListCoordinator: Coordinator, CoordinatorDelegate {
     }
     
     func didFinish(childCoordinator: any Coordinator) {
-        childCoordinators.forEach { coordinator in
-            if let musicCoordinator = coordinator as? MusicPlayerCoordinator {
-                childCoordinators.removeAll { coordinator in
-                    musicCoordinator === coordinator
-                }
-            }
-        }
+        finish()
     }
 }
