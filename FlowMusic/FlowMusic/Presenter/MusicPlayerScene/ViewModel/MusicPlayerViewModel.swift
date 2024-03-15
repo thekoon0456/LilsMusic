@@ -20,23 +20,22 @@ final class MusicPlayerViewModel: ViewModel {
         let playButtonTapped: Observable<Bool>
         let previousButtonTapped: ControlEvent<Void>
         let nextButtonTapped: ControlEvent<Void>
-        let repeatButtonTapped: ControlEvent<Void>
-        let shuffleButtonTapped: ControlEvent<Void>
+        let repeatButtonTapped: Observable<Bool>
+        let shuffleButtonTapped: Observable<Bool>
         let viewDidDisappear: Observable<Void>
     }
     
     struct Output {
         let updateEntry: Driver<Track?>
         let playState:  Driver<Bool>
-//        let repeatMode: Driver<Bool>
-//        let shuffleMode: Driver<Bool>
+        let repeatMode: Driver<Bool>
+        let shuffleMode: Driver<Bool>
     }
     
     // MARK: - Properties
     
     weak var coordinator: MusicPlayerCoordinator?
     let player = MusicPlayerManager.shared
-    private let userDefaultManager = UserDefaultsManager.shared
     let musicRepository = MusicRepository()
     let disposeBag = DisposeBag()
     private var cancellables = Set<AnyCancellable>()
@@ -47,7 +46,9 @@ final class MusicPlayerViewModel: ViewModel {
     
     init(coordinator: MusicPlayerCoordinator?, track: Track) {
         self.coordinator = coordinator
+        //선택한 track 넣어서 뷰로
         trackSubject.onNext(track)
+        //음악플레이어 상태 추적(API기본제공 컴바인)
         playerUpdateSink()
     }
     
@@ -86,21 +87,48 @@ final class MusicPlayerViewModel: ViewModel {
                 }
             }.disposed(by: disposeBag)
         
-
-//        input.nextButtonTapped
-//            .withUnretained(self)
-//            .subscribe { owner in
-//                owner.player.skipToNext()
-//            }.disposed(by: disposeBag)
-//        
-//        let shuffleMode = input.shuffleButtonTapped
+        let repeatMode = input.repeatButtonTapped
+            .map { bool in
+                var bool = bool
+                bool.toggle()
+                return bool
+            }
+            .withUnretained(self)
+            .do { owner, bool in
+                UserDefaultsManager.shared.isRepeat = bool
+                print(UserDefaultsManager.shared.isRepeat)
+                bool
+                ? owner.player.setRepeatMode(mode: .all)
+                : owner.player.setRepeatMode(mode: .none)
+                print(owner.player.player.state.repeatMode)
+            }
+            .flatMap { owner, bool in
+                owner.setRepeatButton(isSelected: bool)
+            }.asDriver(onErrorJustReturn: true)
         
+        let shuffleMode = input.shuffleButtonTapped
+            .map { bool in
+                var bool = bool
+                bool.toggle()
+                return bool
+            }
+            .withUnretained(self)
+            .do { owner, bool in
+                UserDefaultsManager.shared.isShuffle = bool
+                print(UserDefaultsManager.shared.isShuffle)
+                bool
+                ? owner.player.setRandomMode(mode: .songs)
+                : owner.player.setRandomMode(mode: .off)
+                print(owner.player.player.state.shuffleMode)
+            }
+            .flatMap { owner, bool in
+                owner.setRepeatButton(isSelected: bool)
+            }.asDriver(onErrorJustReturn: true)
         
-       
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playState)
-//                      repeatMode: shuffleMode.asObservable(),
-//                      shuffleMode: shuffleMode)
+                      playState: playState,
+                      repeatMode: repeatMode,
+                      shuffleMode: shuffleMode)
     }
     
     func setTrack(track: Track) -> Observable<Track> {
@@ -118,38 +146,22 @@ final class MusicPlayerViewModel: ViewModel {
             return Disposables.create()
         }
     }
-//    
-//    func setPreviousButton() -> Observable<Bool> {
-//        return Observable.create { observer in
-//            observer.onNext(track)
-//            observer.onCompleted()
-//            return Disposables.create()
-//        }
-//    }
-//    
-//    func setNextButton() -> Observable<Bool> {
-//        return Observable.create { observer in
-//            observer.onNext(track)
-//            observer.onCompleted()
-//            return Disposables.create()
-//        }
-//    }
-//    
-//    func setShuffleButton() -> Observable<Bool> {
-//        return Observable.create { observer in
-//            observer.onNext(userDefaultManager.isShuffle)
-//            observer.onCompleted()
-//            return Disposables.create()
-//        }
-//    }
-//    
-//    func setRepeatButton() -> Observable<Bool> {
-//        return Observable.create { observer in
-//            observer.onNext(userDefaultManager.isRepeat)
-//            observer.onCompleted()
-//            return Disposables.create()
-//        }
-//    }
+    
+    func setShuffleButton(isSelected: Bool) -> Observable<Bool> {
+        return Observable.create { observer in
+            observer.onNext(isSelected)
+            observer.onCompleted()
+            return Disposables.create()
+        }
+    }
+    
+    func setRepeatButton(isSelected: Bool) -> Observable<Bool> {
+        return Observable.create { observer in
+            observer.onNext(isSelected)
+            observer.onCompleted()
+            return Disposables.create()
+        }
+    }
     
     func playerUpdateSink() {
         player.getCurrentPlayer().queue.objectWillChange.sink { [weak self] _  in

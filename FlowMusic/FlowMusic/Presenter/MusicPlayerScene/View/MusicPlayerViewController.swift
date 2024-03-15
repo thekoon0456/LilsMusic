@@ -88,8 +88,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: "repeat"), for: .normal)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .white
-        $0.isSelected = true
+        $0.tintColor = .systemGreen
         $0.addShadow()
     }
     
@@ -97,8 +96,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .white
-        $0.isSelected = true
+        $0.tintColor = .systemGreen
         $0.addShadow()
     }
     
@@ -120,72 +118,51 @@ final class MusicPlayerViewController: BaseViewController {
         setProgressBarTimer()
     }
     
+    // MARK: - Bind
+    
     override func bind() {
         super.bind()
-        /*
-         try await playButton.isSelected
-         ? viewModel.player.pause()
-         : viewModel.player.play()
-         */
         
         let playButtonTapped = playButton.rx.tap.map { [weak playButton] in
             return playButton?.isSelected ?? true
         }
         
-        let previousButtonTapped = playButton.rx.tap.map { [weak playButton] in
-            return playButton?.isSelected ?? true
+        let repeatButtonTapped = repeatButton.rx.tap.map { [weak repeatButton] in
+            return repeatButton?.isSelected ?? true
         }
         
-        let nextButtonTapped = playButton.rx.tap.map { [weak playButton] in
-            return playButton?.isSelected ?? true
-        }
-        
-        let repeatButtonTapped = playButton.rx.tap.map { [weak playButton] in
-            return playButton?.isSelected ?? true
-        }
-        
-        let shuffleButtonTapped = playButton.rx.tap.map { [weak playButton] in
-            return playButton?.isSelected ?? true
+        let shuffleButtonTapped = shuffleButton.rx.tap.map { [weak shuffleButton] in
+            return shuffleButton?.isSelected ?? true
         }
         
         let input = MusicPlayerViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                playButtonTapped: playButtonTapped,
                                                previousButtonTapped: previousButton.rx.tap,
                                                nextButtonTapped: nextButton.rx.tap,
-                                               repeatButtonTapped: repeatButton.rx.tap,
-                                               shuffleButtonTapped: shuffleButton.rx.tap,
+                                               repeatButtonTapped: repeatButtonTapped,
+                                               shuffleButtonTapped: shuffleButtonTapped,
                                                viewDidDisappear: self.rx.viewDidDisappear.map { _ in })
         let output = viewModel.transform(input)
         
         output.updateEntry.drive(with: self) { owner, track in
             guard let track else { return }
             owner.updateUI(track)
+            owner.setButtonAlpha()
         }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, bool in
             owner.playButton.isSelected.toggle()
         }.disposed(by: disposeBag)
-    }
-    
-    func updateUI(_ track: Track) {
-        artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
-        artistLabel.text = track.artistName
-        songLabel.text = track.title
-        //백그라운드
-        setGradient(startColor: track.artwork?.backgroundColor,
-                    endColor: track.artwork?.backgroundColor)
-        //현재 음악 끝 시간 설정
-        progressSlider.maximumValue = Float(track.duration ?? 0)
-    }
-    
-    // MARK: - SetProgress
-    
-    private func setProgressBarTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 1,
-                                     target: self,
-                                     selector: #selector(updateProgressBar),
-                                     userInfo: nil,
-                                     repeats: true)
+        
+        output.repeatMode.drive(with: self) { owner, bool in
+            owner.repeatButton.isSelected.toggle()
+            owner.setButtonAlpha()
+        }.disposed(by: disposeBag)
+        
+        output.shuffleMode.drive(with: self) { owner, bool in
+            owner.shuffleButton.isSelected.toggle()
+            owner.setButtonAlpha()
+        }.disposed(by: disposeBag)
     }
     
     @objc func updateProgressBar() {
@@ -207,43 +184,31 @@ final class MusicPlayerViewController: BaseViewController {
         viewModel.player.setPlayBackTime(value: Double(value))
     }
     
-    //    // MARK: - setStatus
+    // MARK: - UI
     
-    @objc private func repeatButtonTapped() {
-        repeatButton.isSelected.toggle()
-        
-        if repeatButton.isSelected {
-            repeatButton.alpha = 1
-            viewModel.player.setRepeatMode(mode: .all)
-        } else {
-            repeatButton.alpha = 0.5
-            viewModel.player.setRepeatMode(mode: .none)
-        }
+    func updateUI(_ track: Track) {
+        artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
+        artistLabel.text = track.artistName
+        songLabel.text = track.title
+        repeatButton.isSelected = UserDefaultsManager.shared.isRepeat
+        shuffleButton.isSelected = UserDefaultsManager.shared.isShuffle
+        //백그라운드
+        setGradient(startColor: track.artwork?.backgroundColor,
+                    endColor: track.artwork?.backgroundColor)
+        //현재 음악 끝 시간 설정
+        progressSlider.maximumValue = Float(track.duration ?? 0)
     }
     
-    @objc private func shuffleButtonTapped() {
-        shuffleButton.isSelected.toggle()
-        shuffleButton.isSelected
+    func setButtonAlpha() {
+        let isRepeat = UserDefaultsManager.shared.isRepeat
+        isRepeat
+        ? (repeatButton.alpha = 1)
+        : (repeatButton.alpha = 0.3)
+        let isShuffle = UserDefaultsManager.shared.isShuffle
+        isShuffle
         ? (shuffleButton.alpha = 1)
-        : (shuffleButton.alpha = 0.5)
-        shuffleButton.isSelected
-        ? viewModel.player.setRandomMode(mode: .songs)
-        : viewModel.player.setRandomMode(mode: .off)
+        : (shuffleButton.alpha = 0.3)
     }
-    
-    
-//    @objc private func playButtonTapped() {
-//        playButton.isSelected.toggle()
-//        Task {
-//            do {
-//                try await playButton.isSelected
-//                ? viewModel.player.pause()
-//                : viewModel.player.play()
-//            } catch {
-//                print(error.localizedDescription)
-//            }
-//        }
-//    }
     
     // MARK: - Configure
     
@@ -268,7 +233,13 @@ final class MusicPlayerViewController: BaseViewController {
 
 extension MusicPlayerViewController {
     
-    
+    private func setProgressBarTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 1,
+                                     target: self,
+                                     selector: #selector(updateProgressBar),
+                                     userInfo: nil,
+                                     repeats: true)
+    }
 }
 
 // MARK: - Configure
