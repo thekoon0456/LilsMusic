@@ -169,8 +169,11 @@ final class MusicPlayerViewController: BaseViewController {
     }
     
     @objc func updateProgressBar() {
+        let progress = viewModel.musicPlayer.getPlayBackTime() / Double(progressSlider.maximumValue)
+        //첫 애니메이션 시작지점 설정
+        guard progress > 0.05 else { return }
         let value = Float(viewModel.musicPlayer.getPlayBackTime())
-        progressSlider.setValue(value, animated: false)
+        progressSlider.setValue(value, animated: true)
     }
     
     @objc func sliderValueChanged(_ sender: UISlider) {
