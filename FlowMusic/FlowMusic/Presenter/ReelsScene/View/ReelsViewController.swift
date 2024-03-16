@@ -19,7 +19,7 @@ final class ReelsViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: ReelsViewModel
-    private let musicRequest = MusicRequest.shared
+    private let musicRequest = MusicRepository()
 
     private let titleView = UILabel().then {
         $0.text = "MV Reels"
@@ -56,7 +56,7 @@ final class ReelsViewController: BaseViewController {
         configureDataSource()
         
         Task {
-            musicVideos = try await musicRequest.requestCatalogMVCharts(index: 0)
+            musicVideos = try await musicRequest.requestCatalogMVCharts()
             updateSnapshot()
         }
     }

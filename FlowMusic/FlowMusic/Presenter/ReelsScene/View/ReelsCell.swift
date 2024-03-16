@@ -17,7 +17,9 @@ final class ReelsCell: BaseCollectionViewCell {
     // MARK: - Properties
     
     let musicPlayer = FMMusicPlayer()
-    private let musicRequest = MusicRequest.shared
+    private let musicRequest = MusicRepository()
+    
+    // MARK: - UI
     
     var musicVideoView = UIView().then {
         $0.backgroundColor = .tertiarySystemBackground

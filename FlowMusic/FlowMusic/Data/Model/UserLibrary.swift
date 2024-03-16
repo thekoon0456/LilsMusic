@@ -27,10 +27,10 @@ final class UserArtistList: Object {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var artistID: List<String>
     
-    convenience init(title: String, artistID: List<String>) {
-        self.init()
-        self.artistID = artistID
-    }
+//    convenience init(artistID: List<String>) {
+//        self.init()
+//        self.artistID = artistID
+//    }
 }
 
 //유저가 좋아요 누른 곡들
@@ -38,10 +38,10 @@ final class UserLikeList: Object {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var likeID: List<String>
     
-    convenience init(title: String, likeID: List<String>) {
-        self.init()
-        self.likeID = likeID
-    }
+//    convenience init(likeID: List<String>) {
+//        self.init()
+//        self.likeID = likeID
+//    }
 }
 
 //유저가 저장한 앨범 리스트
@@ -49,8 +49,8 @@ final class UserAlbumList: Object {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var albumID: List<String>
     
-    convenience init(title: String, albumID: List<String>) {
-        self.init()
-        self.albumID = albumID
-    }
+//    convenience init(albumID: List<String>) {
+//        self.init()
+//        self.albumID = albumID
+//    }
 }

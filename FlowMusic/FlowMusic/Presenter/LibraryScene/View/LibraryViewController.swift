@@ -16,7 +16,7 @@ final class LibraryViewController: BaseViewController {
     
     private let viewModel: LibraryViewModel
     private let musicPlayer = FMMusicPlayer()
-    private let request = MusicRequest.shared
+    private let request = MusicRepository()
     private let layout = CollectionViewPagingLayout()
     
     // MARK: - UI

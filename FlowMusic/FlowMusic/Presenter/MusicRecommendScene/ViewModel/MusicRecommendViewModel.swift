@@ -37,6 +37,9 @@ final class MusicRecommendViewModel: ViewModel {
     weak var coordinator: MusicRecommendCoordinator?
     private let musicPlayer = FMMusicPlayer()
     private let musicRepository = MusicRepository()
+    private let artistRepository = UserRepository<UserArtistList>()
+    private let likesRepository = UserRepository<UserLikeList>()
+    private let albumsRepository = UserRepository<UserAlbumList>()
     let disposeBag = DisposeBag()
     
     // MARK: - Lifecycles
@@ -46,6 +49,22 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
+        
+        //realm 없으면 처음에 한번 생성
+        input
+            .viewDidLoad
+            .withUnretained(self)
+            .subscribe{ owner, _ in
+                if owner.artistRepository.fetch().isEmpty {
+                    owner.artistRepository.createItem(UserArtistList())
+                }
+                if owner.likesRepository.fetch().isEmpty {
+                    owner.likesRepository.createItem(UserLikeList())
+                }
+                if owner.albumsRepository.fetch().isEmpty {
+                    owner.albumsRepository.createItem(UserAlbumList())
+                }
+            }.disposed(by: disposeBag)
 
         let currentPlaySong = input
             .viewWillAppear
