@@ -22,7 +22,7 @@ final class MusicPlayerViewModel: ViewModel {
         let nextButtonTapped: ControlEvent<Void>
         let repeatButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
-        let heartButtonTapped: Observable<Bool>
+        let heartButtonTapped: Observable<(Bool)>
         let playlistButtonTapped: Observable<String>
         let viewWillDisappear: Observable<Void>
     }
@@ -32,6 +32,7 @@ final class MusicPlayerViewModel: ViewModel {
         let playState:  Driver<Bool>
         let repeatMode: Driver<RepeatMode>
         let shuffleMode: Driver<ShuffleMode>
+        let isHeart: Driver<(Bool)>
     }
     
     // MARK: - Properties
@@ -39,6 +40,7 @@ final class MusicPlayerViewModel: ViewModel {
     weak var coordinator: MusicPlayerCoordinator?
     let musicPlayer = FMMusicPlayer()
     private let musicRepository = MusicRepository()
+    private let userLikeRepository = UserRepository<UserLikeList>()
     private let setting = UserDefaultsManager.shared
     let disposeBag = DisposeBag()
     private var cancellables = Set<AnyCancellable>()
@@ -56,13 +58,12 @@ final class MusicPlayerViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        
         input
             .chevronButtonTapped
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.coordinator?.dismissViewController()
-        }.disposed(by: disposeBag)
+            }.disposed(by: disposeBag)
         
         let playState = input.playButtonTapped
             .map { !$0 }
@@ -120,6 +121,21 @@ final class MusicPlayerViewModel: ViewModel {
                 return owner.setShuffleButton(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
+        let isHeart = input
+            .heartButtonTapped
+            .map {!$0 }
+            .do { [weak self] bool in
+                guard let self,
+                      let item =                 userLikeRepository.fetchArr().first,
+                      let id = try? trackSubject.value()?.id.rawValue
+                else { return }
+                bool
+                ? userLikeRepository.updateUserLikeList(item, id: id)
+                : userLikeRepository.deleteUserLikeList(item, id: id)
+                print(userLikeRepository.fetchArr())
+            }
+            .asDriver(onErrorJustReturn: false)
+        
         input.viewWillDisappear
             .withUnretained(self)
             .subscribe{ owner, _ in
@@ -129,7 +145,8 @@ final class MusicPlayerViewModel: ViewModel {
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: playState,
                       repeatMode: repeatMode,
-                      shuffleMode: shuffleMode)
+                      shuffleMode: shuffleMode,
+                      isHeart: isHeart)
     }
     
     func setTrack(track: Track) -> Observable<Track> {

@@ -193,6 +193,10 @@ final class MusicPlayerViewController: BaseViewController {
         output.shuffleMode.drive(with: self) { owner, mode in
             owner.setShuffleButton(mode)
         }.disposed(by: disposeBag)
+        
+        output.isHeart.drive(with: self) { owner, mode in
+            owner.heartButton.isSelected.toggle()
+        }.disposed(by: disposeBag)
     }
     
     @objc func updateProgressBar() {
@@ -395,6 +399,4 @@ extension MusicPlayerViewController {
             }
         }
     }
-    
-    
 }
