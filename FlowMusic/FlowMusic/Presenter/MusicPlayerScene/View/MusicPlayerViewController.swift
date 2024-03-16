@@ -198,11 +198,12 @@ final class MusicPlayerViewController: BaseViewController {
         songLabel.text = track.title
         repeatButton.isSelected = UserDefaultsManager.shared.isRepeat
         shuffleButton.isSelected = UserDefaultsManager.shared.isShuffle
-        //백그라운드
+        //백그라운드 설정
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
-        //현재 음악 끝 시간 설정
+        //progressSlider설정, 초기화
         progressSlider.maximumValue = Float(track.duration ?? 0)
+        progressSlider.setValue(0, animated: true)
     }
     
     func setButtonAlpha() {
