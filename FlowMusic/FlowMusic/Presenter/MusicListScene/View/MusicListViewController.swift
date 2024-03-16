@@ -8,126 +8,148 @@
 import UIKit
 import MusicKit
 
+import RxCocoa
+import RxSwift
 import SnapKit
 import Kingfisher
 
 final class MusicListViewController: BaseViewController {
     
+    enum Section: Int, CaseIterable {
+        case main
+    }
+    
     // MARK: - Properties
     
     private let viewModel: MusicListViewModel
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
+    private let itemSelected = PublishSubject<(index: Int, track: Track)>()
     
-    private let MusicPlayer = MusicPlayerManager()
-    private let request = MusicRequest.shared
-    var tracks: MusicItemCollection<Track>?
-    var item: MusicItem
+    // MARK: - UI
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
-        $0.delegate = self
         $0.backgroundColor = .clear
     }
-    private var dataSource: UICollectionViewDiffableDataSource<Int, Track>?
-    
+
     private let artworkImageView = UIImageView().then {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
     }
     
-    private let albumlabel = UILabel().then {
+    private let titleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
         $0.textAlignment = .center
     }
-    private let artistlabel = UILabel().then {
+    private let artistLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .lightGray
         $0.textAlignment = .center
     }
     
+    private lazy var playButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        $0.contentVerticalAlignment = .fill
+        $0.contentHorizontalAlignment = .fill
+        $0.tintColor = .systemGreen
+        $0.addShadow()
+    }
+    
+    private lazy var shuffleButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
+        $0.contentVerticalAlignment = .fill
+        $0.contentHorizontalAlignment = .fill
+        $0.tintColor = .systemGreen
+        $0.addShadow()
+    }
+    
+    private let miniPlayerView = MiniPlayerView().then {
+        $0.isHidden = true
+        $0.alpha = 0
+    }
+    
     // MARK: - Lifecycles
     
-    init(viewModel: MusicListViewModel, item: MusicItem) {
+    init(viewModel: MusicListViewModel) {
         self.viewModel = viewModel
-        self.item = item
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let item = item as? Playlist {
-            Task {
-                tracks = try await request.playlistToTracks(item)
-                loadDataAndUpdateUI()
-            }
-        }
-        
-        if let item = item as? Album {
-            Task {
-                tracks = try await request.albumToTracks(item)
-                loadDataAndUpdateUI()
-            }
-        }
-        
         readyFadeInAnimation()
-        loadDataAndUpdateUI()
-    }
-    
-    func loadDataAndUpdateUI() {
         configureDataSource()
-        
-        Task {
-//            album = try await album ?? []
-
-            guard let track = tracks?.first else { return }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                updateUI(with: track)
-                fadeInAnimation()
-                updateSnapshot()
-            }
-
-        }
     }
     
-    func updateUI(with track: Track) {
-        artworkImageView.kf.setImage(with: track.artwork?.url(width: 300, height: 300))
-        setGradient(startColor: track.artwork?.backgroundColor,
-                    endColor: track.artwork?.backgroundColor)
-        albumlabel.text = track.title
-        artistlabel.text = track.artistName
+    override func bind() {
+        super.bind()
+        
+        let input = MusicListViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
+                                             itemSelected: itemSelected.asObservable(),
+                                             miniPlayerTapped: miniPlayerView.tap)
+        let output = viewModel.transform(input)
+        
+        output.item.drive(with: self) { owner, item in
+            guard let item else { return }
+            owner.updateUI(item)
+        }.disposed(by: disposeBag)
+        
+        output.tracks.drive(with: self) { owner, tracks in
+            owner.updateSnapshot(tracks: tracks)
+            owner.fadeInAnimation()
+        }.disposed(by: disposeBag)
+
+        output.currentPlaySong.drive(with: self) { owner, track in
+            guard let track else {
+                owner.miniPlayerView.isHidden = true
+                owner.miniPlayerView.alpha = 0
+                return
+            }
+            owner.miniPlayerView.isHidden = false
+            owner.miniPlayerView.configureView(track)
+            UIView.animate(withDuration: 0.5) {
+                owner.miniPlayerView.alpha = 1
+            }
+        }.disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected
+            .withUnretained(self)
+            .subscribe { owner, indexPath in
+                guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                owner.itemSelected.onNext((index: indexPath.item, track: track))
+            }.disposed(by: disposeBag)
+
+    }
+    
+    func updateUI(_ item: MusicItem) {
+        switch item {
+        case let playlist as Playlist:
+            artworkImageView.kf.setImage(with: playlist.artwork?.url(width: 300, height: 300))
+            setGradient(startColor: playlist.artwork?.backgroundColor,
+                        endColor: playlist.artwork?.backgroundColor)
+            titleLabel.text = playlist.name
+            artistLabel.text = playlist.shortDescription
+        case let album as Album:
+            artworkImageView.kf.setImage(with: album.artwork?.url(width: 300, height: 300))
+            setGradient(startColor: album.artwork?.backgroundColor,
+                        endColor: album.artwork?.backgroundColor)
+            titleLabel.text = album.title
+            artistLabel.text = album.artistName
+        default:
+            return
+        }
     }
     
     
     // MARK: - Configure
     
     override func configureHierarchy() {
-        view.addSubviews(artworkImageView, albumlabel, artistlabel, collectionView)
+        view.addSubviews(artworkImageView, titleLabel, artistLabel, playButton, shuffleButton, collectionView, miniPlayerView)
     }
     
     override func configureLayout() {
-        artworkImageView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.centerX.equalToSuperview()
-            make.size.equalTo(200)
-        }
-        
-        albumlabel.snp.makeConstraints { make in
-            make.top.equalTo(artworkImageView.snp.bottom).offset(12)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-        }
-        
-        artistlabel.snp.makeConstraints { make in
-            make.top.equalTo(albumlabel.snp.bottom).offset(8)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-        }
-        
-        collectionView.snp.makeConstraints { make in
-            make.top.equalTo(artistlabel.snp.bottom).offset(8)
-            make.horizontalEdges.equalToSuperview()
-            make.bottom.equalTo(view.safeAreaLayoutGuide)
-        }
+        super.configureLayout()
+        setLayout()
     }
     
     override func configureView() {
@@ -142,16 +164,20 @@ extension MusicListViewController {
     
     func readyFadeInAnimation() {
         artworkImageView.alpha = 0
-        albumlabel.alpha = 0
-        artistlabel.alpha = 0
+//        artworkImageView.snp.makeConstraints { make in
+//            make.size.equalTo(300)
+//            make.centerX.equalToSuperview()
+//        }
+        titleLabel.alpha = 0
+        artistLabel.alpha = 0
     }
     
     func fadeInAnimation() {
         UIView.animate(withDuration: 0.5) { [weak self] in
             guard let self else { return }
             artworkImageView.alpha = 1
-            albumlabel.alpha = 1
-            artistlabel.alpha = 1
+            titleLabel.alpha = 1
+            artistLabel.alpha = 1
         }
     }
 }
@@ -171,12 +197,10 @@ extension MusicListViewController {
         }
     }
     
-    private func updateSnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<Int, Track>()
-        snapshot.appendSections([1])
-//        guard let track = (tracks.map { $0 }) else { return }
-        guard let tracks else { return }
-        snapshot.appendItems(Array(tracks), toSection: 1)
+    private func updateSnapshot(tracks: MusicItemCollection<Track>) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Track>()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(Array(tracks), toSection: .main)
         dataSource?.apply(snapshot)
     }
     
@@ -186,15 +210,39 @@ extension MusicListViewController {
     }
 }
 
-extension MusicListViewController: UICollectionViewDelegate {
+// MARK: - Layout
+
+extension MusicListViewController {
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let tracks else { return }
-        Task {
-            try await MusicPlayer.setTrackQueue(item: tracks, startIndex: indexPath.item)
-            viewModel.coordinator?.present(track: tracks[indexPath.item])
+    private func setLayout() {
+        artworkImageView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.centerX.equalToSuperview()
+            make.size.equalTo(200)
         }
         
-//        viewModel.input.listTapped.onNext(track)
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(artworkImageView.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+        }
+        
+        artistLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+        }
+        
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(artistLabel.snp.bottom).offset(8)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        miniPlayerView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(12)
+            make.trailing.equalToSuperview().offset(-12)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-12)
+        }
     }
 }

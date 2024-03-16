@@ -23,6 +23,7 @@ final class MusicRecommendViewController: BaseViewController {
     private var dataSource: DataSource?
     private let itemSelected = PublishSubject<MusicItem>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
+    
     // MARK: - UI
     
     private lazy var collectionView = {
@@ -130,9 +131,9 @@ final class MusicRecommendViewController: BaseViewController {
         }
         
         miniPlayerView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            make.leading.equalToSuperview().offset(12)
+            make.trailing.equalToSuperview().offset(-12)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-12)
         }
     }
     

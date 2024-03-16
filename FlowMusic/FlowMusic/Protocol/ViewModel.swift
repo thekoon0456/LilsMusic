@@ -8,11 +8,11 @@
 import RxSwift
 
 protocol ViewModel: AnyObject {
-//    
-//    associatedtype Input
-//    associatedtype Output
-//    
-//    var disposeBag: DisposeBag { get }
-//
-//    func transform(_ input: Input) -> Output
+    
+    associatedtype Input
+    associatedtype Output
+    
+    var disposeBag: DisposeBag { get }
+
+    func transform(_ input: Input) -> Output
 }

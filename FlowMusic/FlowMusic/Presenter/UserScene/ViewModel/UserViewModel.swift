@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class UserViewModel: ViewModel {
+final class UserViewModel {
     
     weak var coordinator: UserCoordinator?
     

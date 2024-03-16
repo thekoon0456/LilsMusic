@@ -24,12 +24,12 @@ final class MusicListCoordinator: Coordinator, CoordinatorDelegate {
     }
     
     func start() {
-        let vm = MusicListViewModel(coordinator: self)
-        let vc = MusicListViewController(viewModel: vm, item: item)
+        let vm = MusicListViewModel(coordinator: self, item: item)
+        let vc = MusicListViewController(viewModel: vm)
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    func present(track: Track) {
+    func presentMusicPlayer(track: Track) {
         let coordinator = MusicPlayerCoordinator(navigationController: navigationController,
                                                  track: track)
         coordinator.delegate = self
@@ -38,6 +38,6 @@ final class MusicListCoordinator: Coordinator, CoordinatorDelegate {
     }
     
     func didFinish(childCoordinator: any Coordinator) {
-        finish()
+        childCoordinators = []
     }
 }

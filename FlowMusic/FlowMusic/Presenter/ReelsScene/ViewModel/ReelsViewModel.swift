@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ReelsViewModel: ViewModel {
+final class ReelsViewModel {
     
     weak var coordinator: ReelsCoordinator?
     

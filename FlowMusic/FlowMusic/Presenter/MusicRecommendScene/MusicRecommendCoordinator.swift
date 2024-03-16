@@ -47,6 +47,6 @@ final class MusicRecommendCoordinator: Coordinator, CoordinatorDelegate {
     }
     
     func didFinish(childCoordinator: any Coordinator) {
-        finish()
+        childCoordinators = []
     }
 }

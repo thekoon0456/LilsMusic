@@ -8,7 +8,7 @@
 import Foundation
 import MusicKit
 
-final class LibraryViewModel: ViewModel {
+final class LibraryViewModel {
     
 //    struct Input {
 //        let push = Observable<Album?>(nil)

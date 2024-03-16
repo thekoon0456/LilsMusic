@@ -15,7 +15,6 @@
 		7C03F7CE2BA1792C00FB748C /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C03F7CD2BA1792C00FB748C /* Repository.swift */; };
 		7C03F7D02BA179D800FB748C /* Array+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C03F7CF2BA179D800FB748C /* Array+.swift */; };
 		7C131C542BA44387004B3FF2 /* MusicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C532BA44387004B3FF2 /* MusicRepository.swift */; };
-		7C131C572BA45D48004B3FF2 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C562BA45D48004B3FF2 /* RxRelay */; };
 		7C131C592BA4730A004B3FF2 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */; };
 		7C131C5B2BA4ADC1004B3FF2 /* MiniPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */; };
 		7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C5D2BA4B93F004B3FF2 /* RxGesture */; };
@@ -146,7 +145,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C131C572BA45D48004B3FF2 /* RxRelay in Frameworks */,
 				7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */,
 				7C03F7C62BA1765A00FB748C /* RxSwift in Frameworks */,
 				7C03F7C12BA1762500FB748C /* RealmSwift in Frameworks */,
@@ -540,7 +538,6 @@
 				7C03F7C32BA1765A00FB748C /* RxCocoa */,
 				7C03F7C52BA1765A00FB748C /* RxSwift */,
 				7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */,
-				7C131C562BA45D48004B3FF2 /* RxRelay */,
 				7C131C5D2BA4B93F004B3FF2 /* RxGesture */,
 			);
 			productName = FlowMusic;
@@ -958,11 +955,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C03F7C22BA1765A00FB748C /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
-		};
-		7C131C562BA45D48004B3FF2 /* RxRelay */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7C03F7C22BA1765A00FB748C /* XCRemoteSwiftPackageReference "RxSwift" */;
-			productName = RxRelay;
 		};
 		7C131C5D2BA4B93F004B3FF2 /* RxGesture */ = {
 			isa = XCSwiftPackageProductDependency;
