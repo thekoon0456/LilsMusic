@@ -14,6 +14,9 @@ enum FMDesign {
         case reels
         case library
         case user
+        case chevronDown
+        case plus
+        case heart
         
         var name: String {
             switch self {
@@ -25,6 +28,12 @@ enum FMDesign {
                 "list.bullet.rectangle.portrait"
             case .user:
                 "music.note.house"
+            case .chevronDown:
+                "chevron.compact.down"
+            case .plus:
+                "plus.circle"
+            case .heart:
+                "heart"
             }
         }
         
@@ -38,6 +47,12 @@ enum FMDesign {
                 "list.bullet.rectangle.portrait.fill"
             case .user:
                 "music.note.house.fill"
+            case .chevronDown:
+                ""
+            case .plus:
+                ""
+            case .heart:
+                "heart.fill"
             }
         }
     }

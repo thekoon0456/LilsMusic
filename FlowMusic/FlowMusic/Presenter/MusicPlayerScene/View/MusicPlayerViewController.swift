@@ -24,6 +24,10 @@ final class MusicPlayerViewController: BaseViewController {
     
     // MARK: - UI
     
+    private let chevronButton = UIButton().then {
+        $0.setImage(UIImage(systemName: FMDesign.Icon.chevronDown.name), for: .normal)
+    }
+    
     private let artistLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .white
@@ -95,6 +99,21 @@ final class MusicPlayerViewController: BaseViewController {
         $0.addShadow()
     }
     
+    //상태에 따라 아이콘 바뀜
+    private lazy var heartButton = UIButton().then {
+        $0.setImage(UIImage(systemName: FMDesign.Icon.heart.name), for: .normal)
+        $0.setImage(UIImage(systemName: FMDesign.Icon.heart.fill), for: .selected)
+        $0.tintColor = FMDesign.Color.tintColor.color
+        $0.addShadow()
+    }
+    
+    //알파값 바뀜
+    private lazy var playlistButton = FMPlaylistButton(menus: ["새 플레이리스트 만들기"]).then {
+        $0.setImage(UIImage(systemName: FMDesign.Icon.library.name), for: .normal)
+        $0.tintColor = FMDesign.Color.tintColor.color
+        $0.addShadow()
+    }
+    
     // MARK: - Lifecycle
     
     init(viewModel: MusicPlayerViewModel) {
@@ -121,8 +140,9 @@ final class MusicPlayerViewController: BaseViewController {
         
         let playButtonTapped = playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .map { [weak playButton] in
-                return playButton?.isSelected ?? true
+            .map { [weak self] in
+                guard let self else { return true}
+                return playButton.isSelected
             }
         
         let repeatButtonTapped = repeatButton.rx.tap
@@ -133,12 +153,26 @@ final class MusicPlayerViewController: BaseViewController {
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
-        let input = MusicPlayerViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
+        let heartButtonTapped = heartButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak self] _ -> Bool in
+                guard let self else { return false }
+                return heartButton.isSelected
+            }
+        
+        let playlistButtonTapped = playlistButton.menuSelectionSubject
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { $0 }
+        
+        let input = MusicPlayerViewModel.Input(chevronButtonTapped: chevronButton.rx.tap,
+                                               viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                playButtonTapped: playButtonTapped,
                                                previousButtonTapped: previousButton.rx.tap,
                                                nextButtonTapped: nextButton.rx.tap,
                                                repeatButtonTapped: repeatButtonTapped,
                                                shuffleButtonTapped: shuffleButtonTapped,
+                                               heartButtonTapped: heartButtonTapped,
+                                               playlistButtonTapped: playlistButtonTapped,
                                                viewWillDisappear: self.rx.viewWillDisappear.map { _ in })
         let output = viewModel.transform(input)
         
@@ -224,8 +258,9 @@ final class MusicPlayerViewController: BaseViewController {
     
     override func configureHierarchy() {
         super.configureHierarchy()
-        view.addSubviews(artworkImage, songLabel, artistLabel, playButton,
-                         previousButton, nextButton, progressSlider, shuffleButton, repeatButton)
+        view.addSubviews(chevronButton, artworkImage, songLabel, artistLabel, playButton,
+                         previousButton, nextButton, progressSlider,
+                         shuffleButton, repeatButton, heartButton, playlistButton)
     }
     
     override func configureLayout() {
@@ -257,10 +292,16 @@ extension MusicPlayerViewController {
 extension MusicPlayerViewController {
     
     func setLayout() {
-        artworkImage.snp.makeConstraints { make in
+        chevronButton.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+            make.size.equalTo(44)
             make.centerX.equalToSuperview()
+        }
+        
+        artworkImage.snp.makeConstraints { make in
             make.size.equalTo(300)
-            make.top.equalToSuperview().offset(100)
+            make.centerX.equalToSuperview()
+            make.top.equalTo(chevronButton.snp.bottom).offset(20)
         }
         
         songLabel.snp.makeConstraints { make in
@@ -293,8 +334,20 @@ extension MusicPlayerViewController {
             make.leading.equalTo(playButton.snp.trailing).offset(40)
         }
         
+        heartButton.snp.makeConstraints { make in
+            make.size.equalTo(44)
+            make.top.equalTo(previousButton.snp.bottom).offset(20)
+            make.leading.equalTo(progressSlider.snp.leading)
+        }
+        
+        playlistButton.snp.makeConstraints { make in
+            make.size.equalTo(44)
+            make.centerY.equalTo(heartButton.snp.centerY)
+            make.trailing.equalTo(progressSlider.snp.trailing)
+        }
+        
         progressSlider.snp.makeConstraints { make in
-            make.top.equalTo(playButton.snp.bottom).offset(52)
+            make.top.equalTo(heartButton.snp.bottom).offset(16)
             make.centerX.equalToSuperview()
             make.width.equalTo(300)
             make.height.equalTo(16)
@@ -303,13 +356,13 @@ extension MusicPlayerViewController {
         shuffleButton.snp.makeConstraints { make in
             make.size.equalTo(44)
             make.leading.equalTo(progressSlider.snp.leading)
-            make.bottom.equalToSuperview().offset(-80)
+            make.top.equalTo(progressSlider.snp.bottom).offset(16)
         }
         
         repeatButton.snp.makeConstraints { make in
             make.size.equalTo(44)
             make.trailing.equalTo(progressSlider.snp.trailing)
-            make.bottom.equalToSuperview().offset(-80)
+            make.top.equalTo(progressSlider.snp.bottom).offset(16)
         }
     }
 }

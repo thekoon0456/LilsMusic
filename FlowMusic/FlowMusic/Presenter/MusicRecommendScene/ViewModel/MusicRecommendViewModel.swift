@@ -64,6 +64,7 @@ final class MusicRecommendViewModel: ViewModel {
                 if owner.albumsRepository.fetch().isEmpty {
                     owner.albumsRepository.createItem(UserAlbumList())
                 }
+                print(owner.likesRepository.printURL())
             }.disposed(by: disposeBag)
 
         let currentPlaySong = input

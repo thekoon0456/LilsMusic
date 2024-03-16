@@ -15,12 +15,15 @@ import RxCocoa
 final class MusicPlayerViewModel: ViewModel {
     
     struct Input {
+        let chevronButtonTapped: ControlEvent<Void>
         let viewWillAppear: Observable<Void>
         let playButtonTapped: Observable<Bool>
         let previousButtonTapped: ControlEvent<Void>
         let nextButtonTapped: ControlEvent<Void>
         let repeatButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
+        let heartButtonTapped: Observable<Bool>
+        let playlistButtonTapped: Observable<String>
         let viewWillDisappear: Observable<Void>
     }
     
@@ -53,6 +56,14 @@ final class MusicPlayerViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
+        
+        input
+            .chevronButtonTapped
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                owner.coordinator?.dismissViewController()
+        }.disposed(by: disposeBag)
+        
         let playState = input.playButtonTapped
             .map { !$0 }
             .withUnretained(self)
