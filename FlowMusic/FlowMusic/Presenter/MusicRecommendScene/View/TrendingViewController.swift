@@ -104,7 +104,7 @@ final class MusicRecommendViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.miniPlayerPlayState.drive(with: self) { owner, bool in
-            owner.miniPlayerView.playButton.isSelected.toggle()
+            owner.miniPlayerView.playButton.isSelected = bool
         }.disposed(by: disposeBag)
         
         collectionView.rx.itemSelected

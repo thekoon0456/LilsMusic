@@ -54,16 +54,6 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.getCurrentPlaySong()
             }.asDriver(onErrorJustReturn: nil)
         
-        input.miniPlayerTapped
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.getCurrentPlaySong()
-            }.asDriver(onErrorJustReturn: nil)
-            .drive(with: self) { owner, track in
-                guard let track else { return }
-                owner.coordinator?.presentMusicPlayer(track: track)
-            }.disposed(by: disposeBag)
-        
         let songs = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
@@ -85,6 +75,16 @@ final class MusicRecommendViewModel: ViewModel {
         input.itemSelected.withUnretained(self).subscribe { owner, item in
             owner.coordinator?.pushToList(item: item)
         }.disposed(by: disposeBag)
+        
+        input.miniPlayerTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.getCurrentPlaySong()
+            }.asDriver(onErrorJustReturn: nil)
+            .drive(with: self) { owner, track in
+                guard let track else { return }
+                owner.coordinator?.presentMusicPlayer(track: track)
+            }.disposed(by: disposeBag)
         
         let miniPlayerPlayState = input.miniPlayerPlayButtonTapped
             .withUnretained(self)
@@ -121,15 +121,7 @@ final class MusicRecommendViewModel: ViewModel {
                       recommendAlbums: albums,
                       miniPlayerPlayState: miniPlayerPlayState)
     }
-    
-    func setPlayButton(isSelected: Bool) -> Observable<Bool> {
-        return Observable.create { observer in
-            observer.onNext(isSelected)
-            observer.onCompleted()
-            return Disposables.create()
-        }
-    }
-    
+
     func getCurrentPlaySong() -> Observable<Track?> {
         return Observable.create { observer in
             Task { [weak self] in
@@ -193,6 +185,14 @@ final class MusicRecommendViewModel: ViewModel {
                     observer.onError(error)
                 }
             }
+            return Disposables.create()
+        }
+    }
+    
+    func setPlayButton(isSelected: Bool) -> Observable<Bool> {
+        return Observable.create { observer in
+            observer.onNext(isSelected)
+            observer.onCompleted()
             return Disposables.create()
         }
     }

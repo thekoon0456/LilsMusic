@@ -30,7 +30,7 @@ final class MusicListViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
     }
-
+    
     private let artworkImageView = UIImageView().then {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
@@ -84,9 +84,19 @@ final class MusicListViewController: BaseViewController {
     override func bind() {
         super.bind()
         
+        let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak self] _ -> Bool in
+                guard let self else { return true }
+                return !miniPlayerView.playButton.isSelected
+            }
+        
         let input = MusicListViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                              itemSelected: itemSelected.asObservable(),
-                                             miniPlayerTapped: miniPlayerView.tap)
+                                             miniPlayerTapped: miniPlayerView.tap,
+                                             miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
+                                             miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
+                                             miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
         let output = viewModel.transform(input)
         
         output.item.drive(with: self) { owner, item in
@@ -98,7 +108,7 @@ final class MusicListViewController: BaseViewController {
             owner.updateSnapshot(tracks: tracks)
             owner.fadeInAnimation()
         }.disposed(by: disposeBag)
-
+        
         output.currentPlaySong.drive(with: self) { owner, track in
             guard let track else {
                 owner.miniPlayerView.isHidden = true
@@ -118,7 +128,11 @@ final class MusicListViewController: BaseViewController {
                 guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
                 owner.itemSelected.onNext((index: indexPath.item, track: track))
             }.disposed(by: disposeBag)
-
+        
+        output.miniPlayerPlayState.drive(with: self) { owner, bool in
+            owner.miniPlayerView.playButton.isSelected = bool
+        }.disposed(by: disposeBag)
+        
     }
     
     func updateUI(_ item: MusicItem) {
@@ -164,10 +178,10 @@ extension MusicListViewController {
     
     func readyFadeInAnimation() {
         artworkImageView.alpha = 0
-//        artworkImageView.snp.makeConstraints { make in
-//            make.size.equalTo(300)
-//            make.centerX.equalToSuperview()
-//        }
+        //        artworkImageView.snp.makeConstraints { make in
+        //            make.size.equalTo(300)
+        //            make.centerX.equalToSuperview()
+        //        }
         titleLabel.alpha = 0
         artistLabel.alpha = 0
     }
