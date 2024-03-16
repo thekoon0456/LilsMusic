@@ -86,7 +86,7 @@ final class MusicRecommendViewController: BaseViewController {
             }
             owner.miniPlayerView.isHidden = false
             owner.miniPlayerView.configureView(track)
-            UIView.animate(withDuration: 0.5) {
+            UIView.animate(withDuration: 0.3) {
                 owner.miniPlayerView.alpha = 1
             }
         }.disposed(by: disposeBag)

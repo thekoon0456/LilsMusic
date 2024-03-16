@@ -28,6 +28,7 @@ final class MusicListViewController: BaseViewController {
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
+        $0.contentInsetAdjustmentBehavior = .never
         $0.register(ArtworkHeaderReusableView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                     withReuseIdentifier: ArtworkHeaderReusableView.identifier)
@@ -88,7 +89,7 @@ final class MusicListViewController: BaseViewController {
             }
             owner.miniPlayerView.isHidden = false
             owner.miniPlayerView.configureView(track)
-            UIView.animate(withDuration: 0.5) {
+            UIView.animate(withDuration: 0.3) {
                 owner.miniPlayerView.alpha = 1
             }
         }.disposed(by: disposeBag)
@@ -190,7 +191,7 @@ extension MusicListViewController {
             let section = NSCollectionLayoutSection(group: group)
             
             let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                    heightDimension: .estimated(300))
+                                                    heightDimension: .estimated(400))
             let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
                                                                      elementKind: UICollectionView.elementKindSectionHeader,
                                                                      alignment: .top)
@@ -208,7 +209,8 @@ extension MusicListViewController {
     
     private func setLayout() {
         collectionView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalToSuperview()
+            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
         
         miniPlayerView.snp.makeConstraints { make in

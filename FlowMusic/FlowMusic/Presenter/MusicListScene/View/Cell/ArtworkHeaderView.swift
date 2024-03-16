@@ -36,17 +36,21 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     
     lazy var playButton = UIButton().then {
         $0.setImage(UIImage(systemName: "play.fill"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .systemGreen
+        $0.layer.borderColor = FMDesign.Color.tintColor.color.cgColor
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 16
+        $0.clipsToBounds = true
+        $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
     }
     
     lazy var shuffleButton = UIButton().then {
         $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .systemGreen
+        $0.layer.borderColor = FMDesign.Color.tintColor.color.cgColor
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 16
+        $0.clipsToBounds = true
+        $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
     }
     
@@ -64,10 +68,10 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     // MARK: - Configure
     
     private func setupLayout() {
-        addSubviews(artworkImageView, titleLabel, artistLabel)
+        addSubviews(artworkImageView, titleLabel, artistLabel, playButton, shuffleButton)
         
         artworkImageView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(20)
+            make.top.equalToSuperview().offset(60)
             make.centerX.equalToSuperview()
             make.size.equalTo(200)
         }
@@ -82,6 +86,22 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
+        }
+        
+        playButton.snp.makeConstraints { make in
+            make.width.equalTo(120)
+            make.height.equalTo(40)
+            make.centerX.equalToSuperview().offset(-(frame.width / 4))
+            make.top.equalTo(artistLabel.snp.bottom).offset(20)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-20)
+        }
+        
+        shuffleButton.snp.makeConstraints { make in
+            make.width.equalTo(120)
+            make.height.equalTo(40)
+            make.centerX.equalToSuperview().offset(frame.width / 4)
+            make.top.equalTo(artistLabel.snp.bottom).offset(20)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-20)
         }
     }
     

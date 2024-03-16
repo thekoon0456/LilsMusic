@@ -93,7 +93,9 @@ final class MusicRecommendViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
         input.itemSelected.withUnretained(self).subscribe { owner, item in
-            owner.coordinator?.pushToList(item: item)
+            DispatchQueue.main.async {
+                owner.coordinator?.pushToList(item: item)
+            }
         }.disposed(by: disposeBag)
         
         input.miniPlayerTapped

@@ -18,7 +18,7 @@ final class ReelsCoordinator: Coordinator {
         self.childCoordinators = []
         self.navigationController = navigationController
         self.type = .reels
-        setNavigationBar()
+        setClearNavigationBar()
     }
     
     func start() {
@@ -28,19 +28,5 @@ final class ReelsCoordinator: Coordinator {
                                      image: UIImage(systemName: FMDesign.Icon.reels.name),
                                      selectedImage: UIImage(systemName: FMDesign.Icon.reels.fill))
         navigationController?.pushViewController(vc, animated: false)
-    }
-}
-
-extension ReelsCoordinator {
-    //투명 네비게이션 바
-    private func setNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundImage = UIImage()
-        appearance.shadowImage = UIImage()
-        appearance.backgroundColor = .clear
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
 }

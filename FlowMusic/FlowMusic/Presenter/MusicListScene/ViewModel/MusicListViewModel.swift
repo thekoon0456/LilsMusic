@@ -51,7 +51,6 @@ final class MusicListViewModel: ViewModel {
     
     
     func transform(_ input: Input) -> Output {
-        
         let tracks = getTracks().asDriver(onErrorJustReturn: MusicItemCollection<Track>())
         
         let currentPlaySong = input
@@ -61,15 +60,46 @@ final class MusicListViewModel: ViewModel {
                 owner.getCurrentPlaySong()
             }.asDriver(onErrorJustReturn: nil)
         
+        input.playButtonTapped
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                Task {
+                    guard let tracks = try await owner.fetchTracks(),
+                          let firstItem = tracks.first else { return }
+                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    DispatchQueue.main.async {
+                        owner.coordinator?.presentMusicPlayer(track: firstItem)
+                    }
+                }
+
+            }.disposed(by: disposeBag)
+        
+        input.shuffleButtonTapped
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                Task {
+                    guard let tracks = try await owner.fetchTracks(),
+                          let firstItem = tracks.first else { return }
+                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    UserDefaultsManager.shared.userSetting.shuffleMode = .on
+                    owner.musicPlayer.setShuffleMode(mode: .on)
+                    DispatchQueue.main.async {
+                        owner.coordinator?.presentMusicPlayer(track: firstItem)
+                    }
+                }
+
+            }.disposed(by: disposeBag)
+        
         input.itemSelected
             .withUnretained(self)
             .subscribe { owner, item in
-                owner.coordinator?.presentMusicPlayer(track: item.track)
                 Task {
                     guard let tracks = try await owner.fetchTracks() else { return }
                     try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
+                    DispatchQueue.main.async {
+                        owner.coordinator?.presentMusicPlayer(track: item.track)
+                    }
                 }
-
             }.disposed(by: disposeBag)
         
         input.miniPlayerTapped
@@ -110,8 +140,6 @@ final class MusicListViewModel: ViewModel {
                     try await owner.musicPlayer.skipToNext()
                 }
             }.disposed(by: disposeBag)
-        
-
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
                       tracks: tracks,
