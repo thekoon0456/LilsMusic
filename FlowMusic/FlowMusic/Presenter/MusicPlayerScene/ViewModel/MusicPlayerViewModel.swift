@@ -19,27 +19,28 @@ final class MusicPlayerViewModel: ViewModel {
         let playButtonTapped: Observable<Bool>
         let previousButtonTapped: ControlEvent<Void>
         let nextButtonTapped: ControlEvent<Void>
-        let repeatButtonTapped: Observable<Bool>
-        let shuffleButtonTapped: Observable<Bool>
+        let repeatButtonTapped: Observable<Void>
+        let shuffleButtonTapped: Observable<Void>
         let viewWillDisappear: Observable<Void>
     }
     
     struct Output {
         let updateEntry: Driver<Track?>
         let playState:  Driver<Bool>
-        let repeatMode: Driver<Bool>
-        let shuffleMode: Driver<Bool>
+        let repeatMode: Driver<RepeatMode>
+        let shuffleMode: Driver<ShuffleMode>
     }
     
     // MARK: - Properties
     
     weak var coordinator: MusicPlayerCoordinator?
     let musicPlayer = MusicPlayerManager()
-    let musicRepository = MusicRepository()
+    private let musicRepository = MusicRepository()
+    private let setting = UserDefaultsManager.shared
     let disposeBag = DisposeBag()
     private var cancellables = Set<AnyCancellable>()
     //사용자가 선택한 track
-    let trackSubject = BehaviorSubject<Track?>(value: nil)
+    private let trackSubject = BehaviorSubject<Track?>(value: nil)
     
     // MARK: - Lifecycles
     
@@ -83,30 +84,30 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
-            .map { !$0 }
-            .withUnretained(self)
-            .do { owner, bool in
-                UserDefaultsManager.shared.isRepeat = bool
-                owner.musicPlayer.setRepeatMode(isRepeat: bool)
-                print(UserDefaultsManager.shared.isRepeat)
-                //                print(owner.musicPlayer.player.state.repeatMode)
+            .map { [weak self]  _ -> RepeatMode in
+                guard let self else { return .off }
+                setting.userSetting.repeatMode.toggle()
+                let mode = setting.userSetting.repeatMode
+                musicPlayer.setRepeatMode(mode: mode)
+                return mode
             }
-            .flatMap { owner, bool in
-                owner.setRepeatButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: true)
+            .withUnretained(self)
+            .flatMap { owner, mode in
+                return owner.setRepeatButton(mode: mode)
+            }.asDriver(onErrorJustReturn: .off)
         
         let shuffleMode = input.shuffleButtonTapped
-            .map { !$0 }
-            .withUnretained(self)
-            .do { owner, bool in
-                UserDefaultsManager.shared.isShuffle = bool
-                owner.musicPlayer.setShuffleMode(isShuffle: bool)
-                print(UserDefaultsManager.shared.isShuffle)
-                //                print(owner.musicPlayer.player.state.shuffleMode)
+            .map { [weak self]  _ -> ShuffleMode in
+                guard let self else { return .off }
+                setting.userSetting.shuffleMode.toggle()
+                let mode = setting.userSetting.shuffleMode
+                musicPlayer.setShuffleMode(mode: mode)
+                return mode
             }
-            .flatMap { owner, bool in
-                owner.setShuffleButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: true)
+            .withUnretained(self)
+            .flatMap { owner, mode in
+                return owner.setShuffleButton(mode: mode)
+            }.asDriver(onErrorJustReturn: .off)
         
         input.viewWillDisappear
             .withUnretained(self)
@@ -136,17 +137,17 @@ final class MusicPlayerViewModel: ViewModel {
         }
     }
     
-    func setRepeatButton(isSelected: Bool) -> Observable<Bool> {
+    func setRepeatButton(mode: RepeatMode) -> Observable<RepeatMode> {
         return Observable.create { observer in
-            observer.onNext(isSelected)
+            observer.onNext(mode)
             observer.onCompleted()
             return Disposables.create()
         }
     }
     
-    func setShuffleButton(isSelected: Bool) -> Observable<Bool> {
+    func setShuffleButton(mode: ShuffleMode) -> Observable<ShuffleMode> {
         return Observable.create { observer in
-            observer.onNext(isSelected)
+            observer.onNext(mode)
             observer.onCompleted()
             return Disposables.create()
         }

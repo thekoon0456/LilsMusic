@@ -15,7 +15,7 @@ final class UserDefaultsManager {
     
     private init() { }
     
-    @UserDefault(key: UserSetting.key, defaultValue: UserSetting(isShuffled: false,
+    @UserDefault(key: UserSetting.key, defaultValue: UserSetting(shuffleMode: .off,
                                                                  repeatMode: .all))
     var userSetting: UserSetting
 }

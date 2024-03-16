@@ -100,14 +100,26 @@ final class MusicPlayerManager {
         try await player.skipToPreviousEntry()
     }
     
-    func setRepeatMode(isRepeat: ) {
-        player.state.repeatMode = isRepeat ? .all : Optional.none
+    func setRepeatMode(mode: RepeatMode) {
+        switch mode {
+        case .all:
+            player.state.repeatMode = .all
+        case .one:
+            player.state.repeatMode = .one
+        case .off:
+            player.state.repeatMode = .none
+        }
     }
     
-    func setShuffleMode(isShuffle: Bool) {
-        player.state.shuffleMode = isShuffle ? .songs : .off
+    func setShuffleMode(mode: ShuffleMode) {
+        switch mode {
+        case .on:
+            player.state.shuffleMode = .songs
+        case .off:
+            player.state.shuffleMode = .off
+        }
     }
-    
+
     // MARK: - Player Status
     
     //현재 플레이타임

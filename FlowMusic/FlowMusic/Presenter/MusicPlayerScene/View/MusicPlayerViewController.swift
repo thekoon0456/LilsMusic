@@ -84,8 +84,6 @@ final class MusicPlayerViewController: BaseViewController {
     //상태에 따라 아이콘 바뀜
     private lazy var repeatButton = UIButton().then {
         $0.setImage(UIImage(systemName: "repeat"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
         $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
     }
@@ -93,10 +91,7 @@ final class MusicPlayerViewController: BaseViewController {
     //알파값 바뀜
     private lazy var shuffleButton = UIButton().then {
         $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
         $0.tintColor = FMDesign.Color.tintColor.color
-        $0.alpha = 0.4
         $0.addShadow()
     }
     
@@ -127,20 +122,16 @@ final class MusicPlayerViewController: BaseViewController {
         let playButtonTapped = playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .map { [weak playButton] in
-            return playButton?.isSelected ?? true
-        }
+                return playButton?.isSelected ?? true
+            }
         
         let repeatButtonTapped = repeatButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .map { [weak repeatButton] in
-            return repeatButton?.isSelected ?? true
-        }
+            .asObservable()
         
         let shuffleButtonTapped = shuffleButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .map { [weak shuffleButton] in
-            return shuffleButton?.isSelected ?? true
-        }
+            .asObservable()
         
         let input = MusicPlayerViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                playButtonTapped: playButtonTapped,
@@ -160,14 +151,13 @@ final class MusicPlayerViewController: BaseViewController {
             owner.playButton.isSelected.toggle()
         }.disposed(by: disposeBag)
         
-        output.repeatMode.drive(with: self) { owner, bool in
-            owner.repeatButton.isSelected = bool
-            owner.setButtonAlpha()
+        //버튼 UI 업데이트
+        output.repeatMode.drive(with: self) { owner, mode in
+            owner.setRepeatButton(mode)
         }.disposed(by: disposeBag)
         
-        output.shuffleMode.drive(with: self) { owner, bool in
-            owner.shuffleButton.isSelected = bool
-            owner.setButtonAlpha()
+        output.shuffleMode.drive(with: self) { owner, mode in
+            owner.setShuffleButton(mode)
         }.disposed(by: disposeBag)
     }
     
@@ -199,25 +189,35 @@ final class MusicPlayerViewController: BaseViewController {
         artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
         artistLabel.text = track.artistName
         songLabel.text = track.title
-        repeatButton.isSelected = UserDefaultsManager.shared.isRepeat
-        shuffleButton.isSelected = UserDefaultsManager.shared.isShuffle
         //백그라운드 설정
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
         //progressSlider설정, 초기화
         progressSlider.maximumValue = Float(track.duration ?? 0)
         progressSlider.setValue(0, animated: true)
+        let setting = UserDefaultsManager.shared
+        setRepeatButton(setting.userSetting.repeatMode)
+        setShuffleButton(setting.userSetting.shuffleMode)
     }
     
-    func setButtonAlpha() {
-        let isRepeat = UserDefaultsManager.shared.isRepeat
-        isRepeat
-        ? (repeatButton.alpha = 1)
-        : (repeatButton.alpha = 0.3)
-        let isShuffle = UserDefaultsManager.shared.isShuffle
-        isShuffle
-        ? (shuffleButton.alpha = 1)
-        : (shuffleButton.alpha = 0.3)
+    func setRepeatButton(_ mode: RepeatMode) {
+        switch mode {
+        case .all, .one:
+            repeatButton.setImage(UIImage(systemName: mode.iconName), for: .normal)
+            repeatButton.alpha = 1
+        case .off:
+            repeatButton.setImage(UIImage(systemName: mode.iconName), for: .normal)
+            repeatButton.alpha = 0.3
+        }
+    }
+    
+    func setShuffleButton(_ mode: ShuffleMode) {
+        switch mode {
+        case .on:
+            shuffleButton.alpha = 1
+        case .off:
+            shuffleButton.alpha = 0.3
+        }
     }
     
     // MARK: - Configure
@@ -301,15 +301,13 @@ extension MusicPlayerViewController {
         }
         
         shuffleButton.snp.makeConstraints { make in
-            make.height.equalTo(16)
-            make.width.equalTo(24)
+            make.size.equalTo(44)
             make.leading.equalTo(progressSlider.snp.leading)
             make.bottom.equalToSuperview().offset(-80)
         }
         
         repeatButton.snp.makeConstraints { make in
-            make.height.equalTo(16)
-            make.width.equalTo(24)
+            make.size.equalTo(44)
             make.trailing.equalTo(progressSlider.snp.trailing)
             make.bottom.equalToSuperview().offset(-80)
         }
@@ -346,11 +344,4 @@ extension MusicPlayerViewController {
     }
     
     
-}
-
-repeadMode
-
-extension MusicPlayerViewController {
-    
-
 }
