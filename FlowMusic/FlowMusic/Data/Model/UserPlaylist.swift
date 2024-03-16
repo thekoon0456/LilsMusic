@@ -32,3 +32,25 @@ final class likeList: Object {
         self.likeID = likeID
     }
 }
+
+//유저가 좋아요 누른 아티스트
+final class artistList: Object {
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var artistID: List<String>
+    
+    convenience init(title: String, artistID: List<String>) {
+        self.init()
+        self.artistID = artistID
+    }
+}
+
+//유저가 좋아요 누른 Station
+final class stationList: Object {
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var stationID: List<String>
+    
+    convenience init(title: String, stationID: List<String>) {
+        self.init()
+        self.stationID = stationID
+    }
+}

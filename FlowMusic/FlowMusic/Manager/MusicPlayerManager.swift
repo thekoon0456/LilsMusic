@@ -55,6 +55,13 @@ final class MusicPlayerManager {
         try await play()
     }
     
+    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
+        resetQueue()
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
     //한곡 재생
     func playSong(_ song: Song) async throws {
         resetQueue()
@@ -93,7 +100,7 @@ final class MusicPlayerManager {
         try await player.skipToPreviousEntry()
     }
     
-    func setRepeatMode(isRepeat: Bool) {
+    func setRepeatMode(isRepeat: ) {
         player.state.repeatMode = isRepeat ? .all : Optional.none
     }
     

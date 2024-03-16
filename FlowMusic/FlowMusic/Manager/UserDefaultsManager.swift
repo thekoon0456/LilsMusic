@@ -9,29 +9,45 @@ import Foundation
 
 //반복은 기본 설정, 셔플은 기본설정 아님
 
-@propertyWrapper
-struct UserDefault<T> {
-    let key: String
-    let defaultValue: T
-    var container: UserDefaults = .standard
+final class UserDefaultsManager {
+    
+    static let shared = UserDefaultsManager()
+    
+    private init() { }
+    
+    @UserDefault(key: UserSetting.key, defaultValue: UserSetting(isShuffled: false,
+                                                                 repeatMode: .all))
+    var userSetting: UserSetting
+}
 
+@propertyWrapper
+struct UserDefault<T: Codable> {
+    private var key: String
+    private var defaultValue: T
+    
+    init(key: String, defaultValue: T) {
+        self.key = key
+        self.defaultValue = defaultValue
+    }
+    
     var wrappedValue: T {
         get {
-            return container.object(forKey: key) as? T ?? defaultValue
+            if let savedData = UserDefaults.standard.object(forKey: key) as? Data {
+                let decoder = JSONDecoder()
+                if let loadedData = try? decoder.decode(T.self, from: savedData) {
+                    return loadedData
+                }
+            }
+            
+            return defaultValue
         }
         set {
-            container.set(newValue, forKey: key)
+            let encoder = JSONEncoder()
+            if let encodedData = try? encoder.encode(newValue) {
+                UserDefaults.standard.set(encodedData, forKey: key)
+            }
         }
     }
 }
 
-final class UserDefaultsManager {
-    static let shared = UserDefaultsManager()
-    private init() {}
 
-    @UserDefault(key: "isRepeat", defaultValue: true)
-    var isRepeat: Bool
-
-    @UserDefault(key: "isShuffle", defaultValue: false)
-    var isShuffle: Bool
-}

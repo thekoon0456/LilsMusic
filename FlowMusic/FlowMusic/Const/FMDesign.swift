@@ -5,7 +5,7 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
-import Foundation
+import UIKit
 
 enum FMDesign {
     
@@ -41,4 +41,16 @@ enum FMDesign {
             }
         }
     }
+    
+    enum Color {
+        case tintColor
+        
+        var color: UIColor {
+            switch self {
+            case .tintColor:
+                    .systemGreen
+            }
+        }
+    }
+    
 }

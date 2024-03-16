@@ -55,11 +55,31 @@ final class MusicRepository {
         guard let charts = response.albumCharts.first else { return [] }
         return charts.items
     }
-
     
+    //mvCharts
+    func requestCatalogMVCharts() async throws -> MusicItemCollection<MusicVideo> {
+        let response = try await MusicCatalogChartsRequest(types: [MusicVideo.self]).response()
+        guard let charts = response.musicVideoCharts.first else { return [] }
+        return charts.items
+    }
     
-    func requestCatalogMVCharts(index: Int) async throws -> MusicItemCollection<MusicVideo> {
-        try await MusicCatalogChartsRequest(types: [MusicVideo.self]).response().musicVideoCharts.map { $0.items }[index]
+    //
+    func requestRecommendationAlbums() async throws -> MusicItemCollection<Album> {
+        let response = try await MusicPersonalRecommendationsRequest().response()
+        guard let recommendation = response.recommendations.first?.albums else { return [] }
+        return recommendation
+    }
+    
+    func requestRecommendationPlaylist() async throws -> MusicItemCollection<Playlist> {
+        let response = try await MusicPersonalRecommendationsRequest().response()
+        guard let recommendation = response.recommendations.first?.playlists else { return [] }
+        return recommendation
+    }
+    
+    func requestRecommendationStation() async throws -> MusicItemCollection<Station> {
+        let response = try await MusicPersonalRecommendationsRequest().response()
+        guard let recommendation = response.recommendations.first?.stations else { return [] }
+        return recommendation
     }
     
     // MARK: - Search

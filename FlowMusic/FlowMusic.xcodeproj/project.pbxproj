@@ -26,6 +26,7 @@
 		7C3927732BA343B30074F87E /* ArtistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927722BA343B30074F87E /* ArtistCell.swift */; };
 		7C3927752BA34FF60074F87E /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927742BA34FF60074F87E /* PlaylistCell.swift */; };
 		7C3927772BA3526C0074F87E /* MusicItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927762BA3526C0074F87E /* MusicItem.swift */; };
+		7C446E622BA5B7D800AAC5CB /* UserSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E612BA5B7D800AAC5CB /* UserSetting.swift */; };
 		7C6B06DA2BA1FE8000726AD0 /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */; };
 		7C6B06DC2BA2012D00726AD0 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */; };
 		7C773FFD2B9DA13F00B2E6E7 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C773FFC2B9DA13F00B2E6E7 /* LibraryViewModel.swift */; };
@@ -59,7 +60,6 @@
 		7C813DEB2B9AE39300CDFF1D /* MusicListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DEA2B9AE39300CDFF1D /* MusicListViewController.swift */; };
 		7C813DED2B9AE3A500CDFF1D /* MusicListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DEC2B9AE3A500CDFF1D /* MusicListViewModel.swift */; };
 		7C813DEF2B9AE3B200CDFF1D /* MusicPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DEE2B9AE3B200CDFF1D /* MusicPlayerManager.swift */; };
-		7C813DF22B9AE40400CDFF1D /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DF12B9AE40400CDFF1D /* AuthManager.swift */; };
 		7C813DF42B9AE76200CDFF1D /* MusicRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DF32B9AE76200CDFF1D /* MusicRequest.swift */; };
 		7C813DF62B9AF6A300CDFF1D /* MusicChartsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */; };
 		7C813DFB2B9B05DB00CDFF1D /* albumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DFA2B9B05DB00CDFF1D /* albumViewController.swift */; };
@@ -91,6 +91,7 @@
 		7C3927722BA343B30074F87E /* ArtistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistCell.swift; sourceTree = "<group>"; };
 		7C3927742BA34FF60074F87E /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		7C3927762BA3526C0074F87E /* MusicItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicItem.swift; sourceTree = "<group>"; };
+		7C446E612BA5B7D800AAC5CB /* UserSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSetting.swift; sourceTree = "<group>"; };
 		7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		7C773FFC2B9DA13F00B2E6E7 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
 		7C773FFE2B9DA15100B2E6E7 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
@@ -123,7 +124,6 @@
 		7C813DEA2B9AE39300CDFF1D /* MusicListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicListViewController.swift; sourceTree = "<group>"; };
 		7C813DEC2B9AE3A500CDFF1D /* MusicListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicListViewModel.swift; sourceTree = "<group>"; };
 		7C813DEE2B9AE3B200CDFF1D /* MusicPlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerManager.swift; sourceTree = "<group>"; };
-		7C813DF12B9AE40400CDFF1D /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		7C813DF32B9AE76200CDFF1D /* MusicRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRequest.swift; sourceTree = "<group>"; };
 		7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicChartsCell.swift; sourceTree = "<group>"; };
 		7C813DFA2B9B05DB00CDFF1D /* albumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = albumViewController.swift; sourceTree = "<group>"; };
@@ -340,6 +340,7 @@
 			isa = PBXGroup;
 			children = (
 				7CF60D722B9EE60E001769BD /* UserPlaylist.swift */,
+				7C446E612BA5B7D800AAC5CB /* UserSetting.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -363,7 +364,6 @@
 			children = (
 				7C813DEE2B9AE3B200CDFF1D /* MusicPlayerManager.swift */,
 				7C813DF32B9AE76200CDFF1D /* MusicRequest.swift */,
-				7C813DF12B9AE40400CDFF1D /* AuthManager.swift */,
 				7CF60D742B9EE6B3001769BD /* MusicStorage.swift */,
 				7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */,
 			);
@@ -626,7 +626,6 @@
 				7C813DD32B9AE28D00CDFF1D /* BaseTableViewCell.swift in Sources */,
 				7C3927692BA341590074F87E /* TrendingViewController.swift in Sources */,
 				7C813DEF2B9AE3B200CDFF1D /* MusicPlayerManager.swift in Sources */,
-				7C813DF22B9AE40400CDFF1D /* AuthManager.swift in Sources */,
 				7C773FFF2B9DA15100B2E6E7 /* LibraryViewController.swift in Sources */,
 				7C39276F2BA341BA0074F87E /* TrendingHeaderView.swift in Sources */,
 				7C916E122B9DA00100C5F6C0 /* ReelsViewController.swift in Sources */,
@@ -655,6 +654,7 @@
 				7C3927752BA34FF60074F87E /* PlaylistCell.swift in Sources */,
 				7C7740122B9DA45B00B2E6E7 /* UserCoordinator.swift in Sources */,
 				7C7740012B9DA16F00B2E6E7 /* LibraryCoordinator.swift in Sources */,
+				7C446E622BA5B7D800AAC5CB /* UserSetting.swift in Sources */,
 				7C3927732BA343B30074F87E /* ArtistCell.swift in Sources */,
 				7C773FFD2B9DA13F00B2E6E7 /* LibraryViewModel.swift in Sources */,
 				7C813DD52B9AE29F00CDFF1D /* BaseCollectionViewCell.swift in Sources */,

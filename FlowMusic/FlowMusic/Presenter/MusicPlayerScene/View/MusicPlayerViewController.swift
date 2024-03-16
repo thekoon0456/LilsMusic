@@ -81,19 +81,22 @@ final class MusicPlayerViewController: BaseViewController {
         $0.addShadow()
     }
     
+    //상태에 따라 아이콘 바뀜
     private lazy var repeatButton = UIButton().then {
         $0.setImage(UIImage(systemName: "repeat"), for: .normal)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .systemGreen
+        $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
     }
     
+    //알파값 바뀜
     private lazy var shuffleButton = UIButton().then {
         $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .systemGreen
+        $0.tintColor = FMDesign.Color.tintColor.color
+        $0.alpha = 0.4
         $0.addShadow()
     }
     
@@ -341,4 +344,13 @@ extension MusicPlayerViewController {
             }
         }
     }
+    
+    
+}
+
+repeadMode
+
+extension MusicPlayerViewController {
+    
+
 }
