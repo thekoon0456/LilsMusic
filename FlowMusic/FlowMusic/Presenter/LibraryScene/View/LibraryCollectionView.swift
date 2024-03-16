@@ -1,43 +1,44 @@
 //
-//  MusicRecommendScene.swift
+//  LibraryCollectionView.swift
 //  FlowMusic
 //
 //  Created by Deokhun KIM on 3/8/24.
 //
 
-//import UIKit
-//import MusicKit
-//
-//final class MusicRecommendViewController: BaseViewController {
-//    
-//    // MARK: - Properties
-//    
+import UIKit
+import MusicKit
+
+//final class LibraryCollectionView: BaseCollectionView {
+    
+    // MARK: - Properties
+    
 //    private let viewModel: MusicRecommendViewModel
 //    private let player = MusicPlayerManager.shared
 //    private let request = MusicRequest.shared
-//    
+    
 //    private let titleView = UILabel().then {
-//        $0.text = "Recommend Albums"
+//        $0.text = "Your Albums"
 //        $0.font = .boldSystemFont(ofSize: 20)
 //    }
 //    
-//    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+//    private lazy var collectionView = UICollectionView(frame: .zero,
+//                                                       collectionViewLayout: createLayout())
 //    private var dataSource: UICollectionViewDiffableDataSource<Int, Album>?
 //    private var album: MusicItemCollection<Album>?
-//    
-//    // MARK: - Lifecycles
+    
+    // MARK: - Lifecycles
 //    
 //    init(viewModel: MusicRecommendViewModel) {
 //        self.viewModel = viewModel
 //        super.init()
 //    }
-//    
+    
 //    override func viewDidLoad() {
 //        super.viewDidLoad()
-//        
+        
 //        collectionView.delegate = self
 //        configureDataSource()
-//        
+        
 //        Task {
 //            do {
 //                album = try await request.requestCatalogAlbumCharts()
@@ -47,11 +48,11 @@
 //            }
 //        }
 //    }
-//    
+    
 //    private func configureDataSource() {
 //        //1. 타입어노테이션 선언 or 타입 추론이 될 수 있도록
 //        let cellRegistration = UICollectionView.CellRegistration<MusicChartsCell, Album> { cell, indexPath, itemIdentifier in
-//            cell.configureCell(itemIdentifier)
+////            cell.configureCell(itemIdentifier)
 //        }
 //        
 //        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
@@ -59,7 +60,7 @@
 //            return cell
 //        }
 //    }
-//    
+    
 //    private func updateSnapshot() {
 //        var snapshot = NSDiffableDataSourceSnapshot<Int, Album>()
 //        snapshot.appendSections([1])
@@ -80,11 +81,11 @@
 //        let layout = UICollectionViewCompositionalLayout(section: section)
 //        return layout
 //    }
-//    
+    
 //    // MARK: - Configure
 //    
 //    override func configureHierarchy() {
-//        view.addSubview(collectionView)
+//        addSubview(collectionView)
 //    }
 //    
 //    override func configureLayout() {
@@ -95,59 +96,19 @@
 //    
 //    override func configureView() {
 //        super.configureView()
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
 //    }
 //}
 //
 //extension MusicRecommendViewController: UICollectionViewDelegate {
 //    
 //    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard var album = album?[indexPath.item] else { return }
-////        viewModel.input.push.onNext(album)
-//        Task {
-//            try await album = album.with(.tracks)
-//            viewModel.coordinator?.push(album: album)
-//            
-//
-//        }
-//    }
-//}
-//
-//extension MusicRecommendViewController {
-//    
-//    func requestMusicAuthorization() async {
-//        let status = await MusicAuthorization.request()
-//        
-//        switch status {
-//        case .authorized:
-//            print("승인됨")
-//        default:
-//            moveToUserSetting()
-//            print("승인안됨. 재요청")
-//        }
-//    }
-//    
-//    private func moveToUserSetting() {
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self else { return }
-//            let alert = UIAlertController(title: "음악 접근 권한이 필요합니다.",
-//                                          message: "음악 라이브러리에 접근하기 위해서는 설정에서 권한을 허용해주세요",
-//                                          preferredStyle: .alert)
-//            
-//            let primaryButton = UIAlertAction(title: "설정으로 가기", style: .default) { _ in
-//                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-//                    return
-//                }
-//                if UIApplication.shared.canOpenURL(settingsUrl) {
-//                    UIApplication.shared.open(settingsUrl, completionHandler: nil)
-//                }
-//            }
-//            let cancelButton = UIAlertAction(title: "취소", style: .default)
-//            
-//            alert.addAction(primaryButton)
-//            alert.addAction(cancelButton)
-//            
-//            navigationController?.present(alert, animated: true)
-//        }
+////        guard var album = album?[indexPath.item] else { return }
+//////        viewModel.input.push.onNext(album)
+////        Task {
+////            try await album = album.with(.tracks)
+////            viewModel.coordinator?.push(album: album)
+////            
+////
+////        }
 //    }
 //}

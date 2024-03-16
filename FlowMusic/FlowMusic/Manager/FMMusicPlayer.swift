@@ -8,7 +8,7 @@
 import Foundation
 import MusicKit
 
-final class MusicPlayerManager {
+final class FMMusicPlayer {
     
     // MARK: - Properties
     

@@ -9,9 +9,19 @@ import Foundation
 
 import RealmSwift
 
-final class UserPlaylistRepository: Repository {
+final class UserRepository<T: Object>: Repository {
     
     private let realm = try! Realm()
+    
+    //생성할때마다 옵셔널이 조금 번거롭네용..
+//    init?() {
+//        do {
+//            self.realm = try Realm()
+//        } catch {
+//            print("realm 초기화 실패: \(error.localizedDescription)")
+//            return nil
+//        }
+//    }
     
     func printURL() {
         print(realm.configuration.fileURL ?? "")
@@ -19,7 +29,7 @@ final class UserPlaylistRepository: Repository {
     
     // MARK: - Create
     
-    func createItem(_ item: UserPlaylist) {
+    func createItem(_ item: T) {
         do {
             try realm.write {
                 realm.add(item)
@@ -32,17 +42,17 @@ final class UserPlaylistRepository: Repository {
     
     // MARK: - Read
     
-    func fetch() -> Results<UserPlaylist> {
-        return realm.objects(UserPlaylist.self)
+    func fetch() -> Results<T> {
+        return realm.objects(T.self)
     }
     
-    func fetchArr() -> [UserPlaylist] {
-        return Array(realm.objects(UserPlaylist.self))
+    func fetchArr() -> [T] {
+        return Array(realm.objects(T.self))
     }
     
     // MARK: - Update
     
-    func update(_ item: UserPlaylist) {
+    func update(_ item: T) {
         do {
             try realm.write {
                 realm.add(item, update: .modified)
@@ -52,10 +62,40 @@ final class UserPlaylistRepository: Repository {
         }
     }
     
-    func updatePlaylist(_ item: UserPlaylist, playlistID: String) {
+    func updatePlaylist(_ item: UserPlaylist, id: String) {
         do {
             try realm.write {
-                item.playlistID.append(playlistID)
+                item.playlistID.append(id)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func updateArtist(_ item: UserArtistList, id: String) {
+        do {
+            try realm.write {
+                item.artistID.append(id)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func updateUserLikeList(_ item: UserLikeList, id: String) {
+        do {
+            try realm.write {
+                item.likeID.append(id)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func updateUserAlbumList(_ item: UserAlbumList, id: String) {
+        do {
+            try realm.write {
+                item.albumID.append(id)
             }
         } catch {
             print(error.localizedDescription)
@@ -64,7 +104,7 @@ final class UserPlaylistRepository: Repository {
     
     // MARK: - Delete
     
-    func delete(_ item: UserPlaylist) {
+    func delete(_ item: T) {
         do {
             try realm.write {
                 realm.delete(item)
@@ -74,10 +114,58 @@ final class UserPlaylistRepository: Repository {
         }
     }
     
-    func deleteAll(_ item: UserPlaylist) {
+    func deleteAll(_ item: T) {
         do {
             try realm.write {
                 realm.deleteAll()
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func deletePlaylist(_ item: UserPlaylist, id: String) {
+        do {
+            try realm.write {
+                if let index = item.playlistID.firstIndex(of: id) {
+                    item.playlistID.remove(at: index)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func deleteArtist(_ item: UserArtistList, id: String) {
+        do {
+            try realm.write {
+                if let index = item.artistID.firstIndex(of: id) {
+                    item.artistID.remove(at: index)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func deleteUserLikeList(_ item: UserLikeList, id: String) {
+        do {
+            try realm.write {
+                if let index = item.likeID.firstIndex(of: id) {
+                    item.likeID.remove(at: index)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func deleteUserAlbumList(_ item: UserAlbumList, id: String) {
+        do {
+            try realm.write {
+                if let index = item.albumID.firstIndex(of: id) {
+                    item.albumID.remove(at: index)
+                }
             }
         } catch {
             print(error.localizedDescription)

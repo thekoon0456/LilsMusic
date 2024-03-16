@@ -1,5 +1,5 @@
 //
-//  Music.swift
+//  UserLibrary.swift
 //  FlowMusic
 //
 //  Created by Deokhun KIM on 3/11/24.
@@ -22,19 +22,8 @@ final class UserPlaylist: Object {
     }
 }
 
-//유저가 좋아요 누른 곡들
-final class likeList: Object {
-    @Persisted(primaryKey: true) var id: ObjectId
-    @Persisted var likeID: List<String>
-    
-    convenience init(title: String, likeID: List<String>) {
-        self.init()
-        self.likeID = likeID
-    }
-}
-
 //유저가 좋아요 누른 아티스트
-final class artistList: Object {
+final class UserArtistList: Object {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var artistID: List<String>
     
@@ -44,13 +33,24 @@ final class artistList: Object {
     }
 }
 
-//유저가 좋아요 누른 Station
-final class stationList: Object {
+//유저가 좋아요 누른 곡들
+final class UserLikeList: Object {
     @Persisted(primaryKey: true) var id: ObjectId
-    @Persisted var stationID: List<String>
+    @Persisted var likeID: List<String>
     
-    convenience init(title: String, stationID: List<String>) {
+    convenience init(title: String, likeID: List<String>) {
         self.init()
-        self.stationID = stationID
+        self.likeID = likeID
+    }
+}
+
+//유저가 저장한 앨범 리스트
+final class UserAlbumList: Object {
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var albumID: List<String>
+    
+    convenience init(title: String, albumID: List<String>) {
+        self.init()
+        self.albumID = albumID
     }
 }

@@ -16,7 +16,7 @@ final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Properties
     
-    let musicPlayer = MusicPlayerManager()
+    let musicPlayer = FMMusicPlayer()
     private let musicRequest = MusicRequest.shared
     
     var musicVideoView = UIView().then {

@@ -34,7 +34,7 @@ final class MusicPlayerViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicPlayerCoordinator?
-    let musicPlayer = MusicPlayerManager()
+    let musicPlayer = FMMusicPlayer()
     private let musicRepository = MusicRepository()
     private let setting = UserDefaultsManager.shared
     let disposeBag = DisposeBag()

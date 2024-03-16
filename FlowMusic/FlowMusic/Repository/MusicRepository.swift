@@ -63,6 +63,8 @@ final class MusicRepository {
         return charts.items
     }
     
+    // MARK: - Recommendation
+    
     //
     func requestRecommendationAlbums() async throws -> MusicItemCollection<Album> {
         let response = try await MusicPersonalRecommendationsRequest().response()
@@ -130,6 +132,41 @@ final class MusicRepository {
                                                                                     Playlist.self]).response().topResults
     }
     
+    // MARK: - RequestLibrary
+    
+    func requestPlaylist(ids: [String]) async throws -> MusicItemCollection<Track> {
+        let playlists = [MusicItemCollection<Track>]()
+        let response = try await MusicCatalogResourceRequest<Song>(matching: \.id, memberOf: setMusicItemID(ids)).response()
+        let tracks = response.items.map { Track.song($0) }
+        return MusicItemCollection(tracks)
+    }
+    
+    func requestArtistList(ids: [String]) async throws -> MusicItemCollection<Artist> {
+        let response = try await MusicCatalogResourceRequest<Artist>(matching: \.id, memberOf: setMusicItemID(ids)).response()
+        let artists = response.items
+        return artists
+    }
+    
+    func requestLikeList(ids: [String]) async throws -> MusicItemCollection<Track> {
+        let response = try await MusicCatalogResourceRequest<Song>(matching: \.id, memberOf: setMusicItemID(ids)).response()
+        let tracks = response.items.map { Track.song($0) }
+        return MusicItemCollection(tracks)
+    }
+    
+    func requestAlbumList(ids: [String]) async throws -> MusicItemCollection<Album> {
+        let response = try await MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: setMusicItemID(ids)).response()
+        let albums = response.items
+        return albums
+    }
+    
+    func requestRecentlyPlayed() async throws -> MusicItemCollection<Track> {
+        return try await MusicRecentlyPlayedRequest<Track>().response().items
+    }
+    
+    func setMusicItemID(_ ids: [String]) -> [MusicItemID] {
+        ids.map { MusicItemID($0) }
+    }
+    
     //    func requestSearchCuratorCatalog<T: MusicItem>(term: String) async throws -> MusicCatalogSearchResponse<T> {
     //        try await MusicCatalogSearchRequest(term: term, types: [T.self]).response()
     //    }
@@ -153,31 +190,31 @@ final class MusicRepository {
     //    }
 }
 
-// MARK: - Library Request
-
-extension MusicRepository {
-    
-    func requestLibraryAlbum() async throws -> MusicItemCollection<Album> {
-        try await MusicLibraryRequest<Album>().response().items
-    }
-    
-    func requestLibraryArtist() async throws -> MusicItemCollection<Artist> {
-        try await MusicLibraryRequest<Artist>().response().items
-    }
-    
-    func requestLibrarySong() async throws -> MusicItemCollection<Song> {
-        try await MusicLibraryRequest<Song>().response().items
-    }
-    
-    func requestLibraryTrack() async throws -> MusicItemCollection<Track> {
-        try await MusicLibraryRequest<Track>().response().items
-    }
-    
-    func requestLibraryGenre() async throws -> MusicItemCollection<Genre> {
-        try await MusicLibraryRequest<Genre>().response().items
-    }
-    
-    func requestLibraryMV() async throws -> MusicItemCollection<MusicVideo> {
-        try await MusicLibraryRequest<MusicVideo>().response().items
-    }
-}
+//// MARK: - Library Request
+//
+//extension MusicRepository {
+//    
+//    func requestLibraryAlbum() async throws -> MusicItemCollection<Album> {
+//        try await MusicLibraryRequest<Album>().response().items
+//    }
+//    
+//    func requestLibraryArtist() async throws -> MusicItemCollection<Artist> {
+//        try await MusicLibraryRequest<Artist>().response().items
+//    }
+//    
+//    func requestLibrarySong() async throws -> MusicItemCollection<Song> {
+//        try await MusicLibraryRequest<Song>().response().items
+//    }
+//    
+//    func requestLibraryTrack() async throws -> MusicItemCollection<Track> {
+//        try await MusicLibraryRequest<Track>().response().items
+//    }
+//    
+//    func requestLibraryGenre() async throws -> MusicItemCollection<Genre> {
+//        try await MusicLibraryRequest<Genre>().response().items
+//    }
+//    
+//    func requestLibraryMV() async throws -> MusicItemCollection<MusicVideo> {
+//        try await MusicLibraryRequest<MusicVideo>().response().items
+//    }
+//}
