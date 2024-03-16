@@ -19,6 +19,9 @@ final class MusicRecommendViewModel: ViewModel {
         let viewWillAppear: Observable<Void>
         let itemSelected: Observable<MusicItem>
         let miniPlayerTapped: Observable<Void>
+        let miniPlayerPlayButtonTapped: Observable<Bool>
+        let miniPlayerPreviousButtonTapped: ControlEvent<Void>
+        let miniPlayerNextButtonTapped: ControlEvent<Void>
     }
     
     struct Output {
@@ -26,6 +29,7 @@ final class MusicRecommendViewModel: ViewModel {
         let recommendSongs: Driver<MusicItemCollection<Song>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
+        let miniPlayerPlayState:  Driver<Bool>
     }
     
     // MARK: - Properties
@@ -42,6 +46,7 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
+
         let currentPlaySong = input
             .viewWillAppear
             .withUnretained(self)
@@ -81,10 +86,48 @@ final class MusicRecommendViewModel: ViewModel {
             owner.coordinator?.pushToList(item: item)
         }.disposed(by: disposeBag)
         
+        let miniPlayerPlayState = input.miniPlayerPlayButtonTapped
+            .withUnretained(self)
+            .do { owner, bool in
+                Task {
+                    try await bool ? owner.musicPlayer.pause() : owner.musicPlayer.play()
+                }
+            }
+            .flatMap { owner, bool in
+                owner.setPlayButton(isSelected: bool)
+            }.asDriver(onErrorJustReturn: true)
+        
+        input.miniPlayerPreviousButtonTapped
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                Task {
+                    try await owner.musicPlayer.skipToPrevious()
+                }
+            }.disposed(by: disposeBag)
+        
+        input.miniPlayerNextButtonTapped
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                Task {
+                    try await owner.musicPlayer.skipToNext()
+                }
+            }.disposed(by: disposeBag)
+        
         return Output(currentPlaySong: currentPlaySong,
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
-                      recommendAlbums: albums)
+                      recommendAlbums: albums,
+                      miniPlayerPlayState: miniPlayerPlayState)
+    }
+    
+    func setPlayButton(isSelected: Bool) -> Observable<Bool> {
+        return Observable.create { observer in
+            observer.onNext(isSelected)
+            observer.onCompleted()
+            return Disposables.create()
+        }
     }
     
     func getCurrentPlaySong() -> Observable<Track?> {

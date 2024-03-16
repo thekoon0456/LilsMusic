@@ -62,14 +62,24 @@ final class MusicRecommendViewController: BaseViewController {
     override func bind() {
         super.bind()
         
+        let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak self] _ -> Bool in
+                guard let self else { return true }
+                return !miniPlayerView.playButton.isSelected
+            }
+        
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
                                                   viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                   itemSelected: itemSelected.asObservable(),
-                                                  miniPlayerTapped: miniPlayerView.tap)
+                                                  miniPlayerTapped: miniPlayerView.tap,
+                                                  miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
+                                                  miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
+                                                  miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
         let output = viewModel.transform(input)
         
         output.currentPlaySong.drive(with: self) { owner, track in
-            guard let track else { 
+            guard let track else {
                 owner.miniPlayerView.isHidden = true
                 owner.miniPlayerView.alpha = 0
                 return
@@ -91,6 +101,10 @@ final class MusicRecommendViewController: BaseViewController {
         
         output.recommendAlbums.drive(with: self) { owner, albums in
             owner.updateSnapshot(withItems: albums, toSection: .album)
+        }.disposed(by: disposeBag)
+        
+        output.miniPlayerPlayState.drive(with: self) { owner, bool in
+            owner.miniPlayerView.playButton.isSelected.toggle()
         }.disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
