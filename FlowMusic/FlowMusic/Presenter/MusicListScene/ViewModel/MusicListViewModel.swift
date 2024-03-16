@@ -16,6 +16,8 @@ final class MusicListViewModel: ViewModel {
     struct Input {
         let viewWillAppear: Observable<Void>
         let itemSelected: Observable<(index: Int, track: Track)>
+        let playButtonTapped: Observable<Void>
+        let shuffleButtonTapped: Observable<Void>
         let miniPlayerTapped: Observable<Void>
         let miniPlayerPlayButtonTapped: Observable<Bool>
         let miniPlayerPreviousButtonTapped: ControlEvent<Void>
