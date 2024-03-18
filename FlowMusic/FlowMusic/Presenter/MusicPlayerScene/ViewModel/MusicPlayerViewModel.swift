@@ -65,17 +65,32 @@ final class MusicPlayerViewModel: ViewModel {
                 owner.coordinator?.dismissViewController()
             }.disposed(by: disposeBag)
         
+//        let playerState = input
+//            .viewWillAppear
+//            .withUnretained(self)
+//            .flatMap { owner, void in
+//                owner.getPlayerState()
+//            }.asDriver(onErrorJustReturn: .paused)
+        
         let playState = input.playButtonTapped
-            .map { !$0 }
             .withUnretained(self)
-            .do { owner, bool in
+            .do { owner, _ in
                 Task {
-                    try await bool ? owner.musicPlayer.pause() : owner.musicPlayer.play()
+                    switch owner.musicPlayer.getPlaybackState() {
+                    case .playing:
+                        owner.musicPlayer.pause()
+                    default:
+                        try await owner.musicPlayer.play()
+                    }
                 }
             }
+            .map { owner, _ in
+                return owner.musicPlayer.getPlaybackState() == .playing ? true : false
+            }
+            .withUnretained(self)
             .flatMap { owner, bool in
                 owner.setPlayButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: true)
+            }.asDriver(onErrorJustReturn: false)
         
         input.previousButtonTapped
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -126,7 +141,7 @@ final class MusicPlayerViewModel: ViewModel {
             .map {!$0 }
             .do { [weak self] bool in
                 guard let self,
-                      let item =                 userLikeRepository.fetchArr().first,
+                      let item = userLikeRepository.fetchArr().first,
                       let id = try? trackSubject.value()?.id.rawValue
                 else { return }
                 bool

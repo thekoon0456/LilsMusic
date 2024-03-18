@@ -64,10 +64,10 @@ final class MusicRecommendViewController: BaseViewController {
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .map { [weak self] _ -> Bool in
-                guard let self else { return true }
-                return !miniPlayerView.playButton.isSelected
-            }
+//            .map { [weak self] _ -> Bool in
+//                guard let self else { return true }
+//                return !miniPlayerView.playButton.isSelected
+//            }
         
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
                                                   viewWillAppear: self.rx.viewWillAppear.map { _ in },

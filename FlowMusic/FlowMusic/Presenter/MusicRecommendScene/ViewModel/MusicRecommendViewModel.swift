@@ -19,7 +19,7 @@ final class MusicRecommendViewModel: ViewModel {
         let viewWillAppear: Observable<Void>
         let itemSelected: Observable<MusicItem>
         let miniPlayerTapped: Observable<Void>
-        let miniPlayerPlayButtonTapped: Observable<Bool>
+        let miniPlayerPlayButtonTapped: Observable<Void>
         let miniPlayerPreviousButtonTapped: ControlEvent<Void>
         let miniPlayerNextButtonTapped: ControlEvent<Void>
     }
@@ -67,7 +67,7 @@ final class MusicRecommendViewModel: ViewModel {
                 }
                 print(owner.likesRepository.printURL())
             }.disposed(by: disposeBag)
-
+        
         let currentPlaySong = input
             .viewWillAppear
             .withUnretained(self)
@@ -117,14 +117,23 @@ final class MusicRecommendViewModel: ViewModel {
         
         let miniPlayerPlayState = input.miniPlayerPlayButtonTapped
             .withUnretained(self)
-            .do { owner, bool in
+            .do { owner, _ in
                 Task {
-                    try await bool ? owner.musicPlayer.pause() : owner.musicPlayer.play()
+                    switch owner.musicPlayer.getPlaybackState() {
+                    case .playing:
+                        owner.musicPlayer.pause()
+                    default:
+                        try await owner.musicPlayer.play()
+                    }
                 }
             }
+            .map { owner, _ in
+                return owner.musicPlayer.getPlaybackState() == .playing ? true : false
+            }
+            .withUnretained(self)
             .flatMap { owner, bool in
                 owner.setPlayButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: true)
+            }.asDriver(onErrorJustReturn: false)
         
         input.miniPlayerPreviousButtonTapped
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -151,7 +160,7 @@ final class MusicRecommendViewModel: ViewModel {
                       recommendMixList: mix,
                       miniPlayerPlayState: miniPlayerPlayState)
     }
-
+    
     func getCurrentPlaySong() -> Observable<Track?> {
         return Observable.create { observer in
             Task { [weak self] in
@@ -167,6 +176,16 @@ final class MusicRecommendViewModel: ViewModel {
                     observer.onError(error)
                 }
             }
+            return Disposables.create()
+        }
+    }
+    
+    func getPlayerState() -> Observable<ApplicationMusicPlayer.PlaybackStatus> {
+        return Observable.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            let entry = musicPlayer.getPlaybackState()
+            observer.onNext(entry)
+            observer.onCompleted()
             return Disposables.create()
         }
     }
