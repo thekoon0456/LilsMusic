@@ -26,7 +26,7 @@ final class MusicRecommendViewModel: ViewModel {
     
     struct Output {
         let currentPlaySong: Driver<Track?>
-        let recommendSongs: Driver<MusicItemCollection<Song>>
+        let recommendSongs: Driver<MusicItemCollection<Playlist>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
         let miniPlayerPlayState:  Driver<Bool>
@@ -78,7 +78,7 @@ final class MusicRecommendViewModel: ViewModel {
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendSongs()
-            }.asDriver(onErrorJustReturn: MusicItemCollection<Song>())
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         let playlists = input.viewDidLoad
             .withUnretained(self)
@@ -163,12 +163,13 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendSongs() -> Observable<MusicItemCollection<Song>> {
+    func fetchRecommendSongs() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let songs = try await musicRepository.requestCatalogSongCharts()
+                    let songs = try await musicRepository.requestCatalogTop100Charts()
+                    print(songs)
                     observer.onNext(songs)
                     observer.onCompleted()
                 } catch {

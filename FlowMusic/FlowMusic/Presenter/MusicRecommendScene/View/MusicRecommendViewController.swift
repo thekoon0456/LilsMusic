@@ -171,8 +171,8 @@ extension MusicRecommendViewController {
             guard let section = Section(rawValue: indexPath.section) else { return UICollectionViewCell() }
             switch section {
             case .trending:
-                if case let .song(song) = itemIdentifier {
-                    let cell = collectionView.dequeueConfiguredReusableCell(using: trendingCellRegistration, for: indexPath, item: song)
+                if case let .playlist(playlist) = itemIdentifier {
+                    let cell = collectionView.dequeueConfiguredReusableCell(using: trendingCellRegistration, for: indexPath, item: playlist)
                     return cell
                 }
             case .playlist:
@@ -258,7 +258,7 @@ extension MusicRecommendViewController {
     
     //CellRegistration
     
-    private func trendingCellRegistration() -> UICollectionView.CellRegistration<MusicChartsCell, Song> {
+    private func trendingCellRegistration() -> UICollectionView.CellRegistration<MusicChartsCell, Playlist> {
         UICollectionView.CellRegistration { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier)
         }

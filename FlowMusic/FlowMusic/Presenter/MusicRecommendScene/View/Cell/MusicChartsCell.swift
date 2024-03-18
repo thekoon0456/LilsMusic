@@ -35,10 +35,10 @@ final class MusicChartsCell: BaseCollectionViewCell {
         $0.textAlignment = .center
     }
     
-    func configureCell(_ data: Song) {
+    func configureCell(_ data: Playlist) {
         artworkImageView.kf.setImage(with: data.artwork?.url(width: 200, height: 200))
-        albumlabel.text = data.title
-        artistlabel.text = data.artistName
+        albumlabel.text = data.name
+        artistlabel.text = data.shortDescription
     }
     
     override func configureHierarchy() {
