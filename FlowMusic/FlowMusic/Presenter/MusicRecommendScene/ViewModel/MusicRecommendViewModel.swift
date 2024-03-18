@@ -29,6 +29,7 @@ final class MusicRecommendViewModel: ViewModel {
         let recommendSongs: Driver<MusicItemCollection<Playlist>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
+        let recommendMostPlayed: Driver<MusicItemCollection<Playlist>>
         let miniPlayerPlayState:  Driver<Bool>
     }
     
@@ -92,6 +93,12 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.fetchRecommendAlbums()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
+        let mostPlayed = input.viewDidLoad
+            .withUnretained(self)
+            .flatMapLatest { owner, void in
+                owner.fetchRecommendMostPlayed()
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
+        
         input.itemSelected.withUnretained(self).subscribe { owner, item in
             DispatchQueue.main.async {
                 owner.coordinator?.pushToList(item: item)
@@ -141,6 +148,7 @@ final class MusicRecommendViewModel: ViewModel {
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
+                      recommendMostPlayed: mostPlayed,
                       miniPlayerPlayState: miniPlayerPlayState)
     }
 
@@ -203,6 +211,23 @@ final class MusicRecommendViewModel: ViewModel {
                 do {
                     let albums = try await musicRepository.requestCatalogAlbumCharts()
                     observer.onNext(albums)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func fetchRecommendMostPlayed() -> Observable<MusicItemCollection<Playlist>> {
+        return Observable.create { observer in
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    let stations = try await musicRepository.requestCatalogMostPlayedCharts()
+                    print(stations)
+                    observer.onNext(stations)
                     observer.onCompleted()
                 } catch {
                     observer.onError(error)

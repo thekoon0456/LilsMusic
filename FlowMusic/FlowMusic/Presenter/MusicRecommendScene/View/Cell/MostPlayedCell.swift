@@ -1,54 +1,49 @@
 //
-//  AlbumArtCell.swift
+//  MostPlayedCell.swift
 //  FlowMusic
 //
-//  Created by Deokhun KIM on 3/14/24.
+//  Created by Deokhun KIM on 3/18/24.
 //
 
-import MusicKit
 import UIKit
+import MusicKit
 
 import Kingfisher
 import SnapKit
 
-final class AlbumArtCell: BaseCollectionViewCell {
-    
-    // MARK: - Properties
+final class MostPlayedCell: BaseCollectionViewCell {
     
     private let backView = UIView().then {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
     }
     
-    private let artworkImageView = UIImageView().then {
-        $0.layer.cornerRadius = 10
-        $0.clipsToBounds = true
+    private let artworkImageView = UIImageView()
+    
+    private let infoBGView = UIView().then {
+        $0.backgroundColor = .systemGray6
     }
     
-    private let titleLabel = UILabel().then {
+    private let nameLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.textAlignment = .center
     }
     
-    private let artistLabel = UILabel().then {
+    private let descriptionLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .lightGray
         $0.textAlignment = .center
     }
     
-    // MARK: - Helpers
-    
-    func configureCell(_ data: Album) {
+    func configureCell(_ data: Playlist) {
         artworkImageView.kf.setImage(with: data.artwork?.url(width: 200, height: 200))
-        titleLabel.text = data.title
-        artistLabel.text = data.artistName
+        nameLabel.text = data.name
+        descriptionLabel.text = data.shortDescription
     }
-    
-    // MARK: - Configure
     
     override func configureHierarchy() {
         contentView.addSubview(backView)
-        backView.addSubviews(artworkImageView, titleLabel, artistLabel)
+        backView.addSubviews(artworkImageView, infoBGView, nameLabel, descriptionLabel)
     }
     
     override func configureLayout() {
@@ -61,17 +56,22 @@ final class AlbumArtCell: BaseCollectionViewCell {
             make.height.equalTo(contentView.snp.width)
         }
         
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(artworkImageView.snp.bottom).offset(8)
-            make.leading.equalToSuperview().offset(4)
-            make.trailing.equalToSuperview().offset(-4)
-            make.bottom.equalTo(artistLabel.snp.top).offset(-4)
+        infoBGView.snp.makeConstraints { make in
+            make.top.equalTo(artworkImageView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
-        artistLabel.snp.makeConstraints { make in
+        nameLabel.snp.makeConstraints { make in
+            make.top.equalTo(infoBGView.snp.top).offset(4)
             make.leading.equalToSuperview().offset(4)
             make.trailing.equalToSuperview().offset(-4)
-            make.bottom.lessThanOrEqualToSuperview()
+            make.bottom.equalTo(descriptionLabel.snp.top).offset(-4)
+        }
+        
+        descriptionLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(4)
+            make.trailing.equalToSuperview().offset(-4)
+            make.bottom.lessThanOrEqualToSuperview().offset(-8)
         }
     }
     

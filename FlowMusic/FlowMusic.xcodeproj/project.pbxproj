@@ -18,6 +18,7 @@
 		7C131C592BA4730A004B3FF2 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */; };
 		7C131C5B2BA4ADC1004B3FF2 /* MiniPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */; };
 		7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C5D2BA4B93F004B3FF2 /* RxGesture */; };
+		7C286FD92BA88B1700244559 /* MostPlayedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C286FD82BA88B1700244559 /* MostPlayedCell.swift */; };
 		7C3927672BA32B150074F87E /* FMSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927662BA32B150074F87E /* FMSlider.swift */; };
 		7C3927692BA341590074F87E /* MusicRecommendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927682BA341590074F87E /* MusicRecommendViewController.swift */; };
 		7C39276F2BA341BA0074F87E /* TrendingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C39276E2BA341BA0074F87E /* TrendingHeaderView.swift */; };
@@ -84,6 +85,7 @@
 		7C131C532BA44387004B3FF2 /* MusicRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRepository.swift; sourceTree = "<group>"; };
 		7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
+		7C286FD82BA88B1700244559 /* MostPlayedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPlayedCell.swift; sourceTree = "<group>"; };
 		7C3927662BA32B150074F87E /* FMSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMSlider.swift; sourceTree = "<group>"; };
 		7C3927682BA341590074F87E /* MusicRecommendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecommendViewController.swift; sourceTree = "<group>"; };
 		7C39276E2BA341BA0074F87E /* TrendingHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingHeaderView.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 				7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */,
 				7C3927742BA34FF60074F87E /* PlaylistCell.swift */,
 				7C3927702BA3420C0074F87E /* AlbumArtCell.swift */,
+				7C286FD82BA88B1700244559 /* MostPlayedCell.swift */,
 				7C3927722BA343B30074F87E /* ArtistCell.swift */,
 			);
 			path = Cell;
@@ -661,6 +664,7 @@
 				7C446E622BA5B7D800AAC5CB /* UserSetting.swift in Sources */,
 				7C3927732BA343B30074F87E /* ArtistCell.swift in Sources */,
 				7C773FFD2B9DA13F00B2E6E7 /* LibraryViewModel.swift in Sources */,
+				7C286FD92BA88B1700244559 /* MostPlayedCell.swift in Sources */,
 				7C813DD52B9AE29F00CDFF1D /* BaseCollectionViewCell.swift in Sources */,
 				7C446E662BA6150E00AAC5CB /* PlaylistMenuButton.swift in Sources */,
 			);
