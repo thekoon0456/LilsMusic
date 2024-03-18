@@ -29,7 +29,7 @@ final class MusicRecommendViewModel: ViewModel {
         let recommendSongs: Driver<MusicItemCollection<Playlist>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
-        let recommendMostPlayed: Driver<MusicItemCollection<Playlist>>
+        let recommendMixList: Driver<MusicItemCollection<Playlist>>
         let miniPlayerPlayState:  Driver<Bool>
     }
     
@@ -93,10 +93,10 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.fetchRecommendAlbums()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
-        let mostPlayed = input.viewDidLoad
+        let mix = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
-                owner.fetchRecommendMostPlayed()
+                owner.fetchRecommendMix()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         input.itemSelected.withUnretained(self).subscribe { owner, item in
@@ -148,7 +148,7 @@ final class MusicRecommendViewModel: ViewModel {
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
-                      recommendMostPlayed: mostPlayed,
+                      recommendMixList: mix,
                       miniPlayerPlayState: miniPlayerPlayState)
     }
 
@@ -220,7 +220,7 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendMostPlayed() -> Observable<MusicItemCollection<Playlist>> {
+    func fetchRecommendMix() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }

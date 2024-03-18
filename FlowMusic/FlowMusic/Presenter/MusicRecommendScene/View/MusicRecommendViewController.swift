@@ -103,8 +103,8 @@ final class MusicRecommendViewController: BaseViewController {
             owner.updateSnapshot(withItems: albums, toSection: .album)
         }.disposed(by: disposeBag)
         
-        output.recommendMostPlayed.drive(with: self) { owner, mostPlayed in
-              owner.updateSnapshot(withItems: mostPlayed, toSection: .mostPlayed)
+        output.recommendMixList.drive(with: self) { owner, mostPlayed in
+              owner.updateSnapshot(withItems: mostPlayed, toSection: .mix)
           }.disposed(by: disposeBag)
         
         output.miniPlayerPlayState.drive(with: self) { owner, bool in
@@ -131,7 +131,7 @@ final class MusicRecommendViewController: BaseViewController {
                     if case let .album(album) = item {
                         owner.itemSelected.onNext(album)
                     }
-                case .mostPlayed:
+                case .mix:
                     guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
                     if case let .playlist(playlist) = item {
                         owner.itemSelected.onNext(playlist)
@@ -175,7 +175,7 @@ extension MusicRecommendViewController {
         let top100CellRegistration = top100CellRegistration()
         let playlistCellRegistration = playlistCellRegistration()
         let albumCellRegistration = albumCellRegistration()
-        let mostPlayedRegistration = mostPlayedRegistration()
+        let mixRegistration = mixRegistration()
         
         dataSource = DataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
             guard let section = Section(rawValue: indexPath.section) else { return UICollectionViewCell() }
@@ -195,9 +195,9 @@ extension MusicRecommendViewController {
                     let cell = collectionView.dequeueConfiguredReusableCell(using: albumCellRegistration, for: indexPath, item: album)
                     return cell
                 }
-            case .mostPlayed:
+            case .mix:
                 if case let .playlist(playlist) = itemIdentifier {
-                    let cell = collectionView.dequeueConfiguredReusableCell(using: mostPlayedRegistration, for: indexPath, item: playlist)
+                    let cell = collectionView.dequeueConfiguredReusableCell(using: mixRegistration, for: indexPath, item: playlist)
                     return cell
                 }
             }
@@ -250,7 +250,7 @@ extension MusicRecommendViewController {
         case top100
         case playlist
         case album
-        case mostPlayed
+        case mix
         
         var title: String {
             switch self {
@@ -260,14 +260,13 @@ extension MusicRecommendViewController {
                 "Popular Playlist"
             case .album:
                 "Best Albums"
-            case .mostPlayed:
-                "Most Played"
+            case .mix:
+                "For you"
             }
         }
     }
     
     enum Item: Hashable {
-//        case song(Song)
         case playlist(Playlist)
         case album(Album)
     }
@@ -292,7 +291,7 @@ extension MusicRecommendViewController {
         }
     }
     
-    private func mostPlayedRegistration() -> UICollectionView.CellRegistration<MostPlayedCell, Playlist> {
+    private func mixRegistration() -> UICollectionView.CellRegistration<MixCell, Playlist> {
         UICollectionView.CellRegistration { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier)
         }
@@ -320,17 +319,17 @@ extension MusicRecommendViewController {
                                                                               heightDimension: .absolute(50)),
                                                             elementKind:  UICollectionView.elementKindSectionHeader,
                                                             alignment: .topLeading)]
-                section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+                section.orthogonalScrollingBehavior = .groupPagingCentered
                 return section
-            case .playlist, .mostPlayed:
+            case .playlist, .mix:
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.45),
-                                                       heightDimension: .fractionalHeight(0.32))
+                                                       heightDimension: .fractionalHeight(0.3))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
-                                                              leading: 0,
+                                                              leading: 12,
                                                               bottom: 0,
                                                               trailing: 12)
                 let section = NSCollectionLayoutSection(group: group)
@@ -338,18 +337,18 @@ extension MusicRecommendViewController {
                                                                               heightDimension: .absolute(50)),
                                                             elementKind:  UICollectionView.elementKindSectionHeader,
                                                             alignment: .topLeading)]
-                section.orthogonalScrollingBehavior = .groupPagingCentered
+                section.orthogonalScrollingBehavior = .groupPaging
                 return section
             case .album:
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.6),
-                                                       heightDimension: .fractionalHeight(0.41))
+                                                       heightDimension: .fractionalHeight(0.4))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
-                                                              bottom: 12,
+                                                              bottom: 0,
                                                               trailing: 0)
                 let section = NSCollectionLayoutSection(group: group)
                 section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),

@@ -11,7 +11,7 @@ import MusicKit
 import Kingfisher
 import SnapKit
 
-final class MostPlayedCell: BaseCollectionViewCell {
+final class MixCell: BaseCollectionViewCell {
     
     private let backView = UIView().then {
         $0.layer.cornerRadius = 10
