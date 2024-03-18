@@ -191,7 +191,7 @@ extension MusicListViewController {
             let section = NSCollectionLayoutSection(group: group)
             
             let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                    heightDimension: .estimated(400))
+                                                    heightDimension: .estimated(450))
             let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
                                                                      elementKind: UICollectionView.elementKindSectionHeader,
                                                                      alignment: .top)

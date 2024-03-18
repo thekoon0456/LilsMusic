@@ -71,21 +71,22 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
         addSubviews(artworkImageView, titleLabel, artistLabel, playButton, shuffleButton)
         
         artworkImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(60)
             make.centerX.equalToSuperview()
             make.size.equalTo(200)
+            make.bottom.equalTo(titleLabel.snp.top).offset(-20)
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(artworkImageView.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(artistLabel.snp.top).offset(-8)
         }
         
         artistLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(playButton.snp.top).offset(-20)
         }
         
         playButton.snp.makeConstraints { make in

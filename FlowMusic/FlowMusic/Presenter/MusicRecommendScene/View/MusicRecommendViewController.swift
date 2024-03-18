@@ -92,7 +92,7 @@ final class MusicRecommendViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.recommendSongs.drive(with: self) { owner, songs in
-            owner.updateSnapshot(withItems: songs, toSection: .trending)
+            owner.updateSnapshot(withItems: songs, toSection: .top100)
         }.disposed(by: disposeBag)
         
         output.recommendPlaylists.drive(with: self) { owner, playlist in
@@ -112,10 +112,10 @@ final class MusicRecommendViewController: BaseViewController {
             .subscribe { owner, indexPath in
                 guard let section = Section(rawValue: indexPath.section) else { return }
                 switch section {
-                case .trending:
+                case .top100:
                     guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
-                    if case let .song(song) = item {
-                        owner.itemSelected.onNext(song)
+                    if case let .playlist(playlist) = item {
+                        owner.itemSelected.onNext(playlist)
                     }
                 case .playlist:
                     guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
@@ -163,16 +163,16 @@ final class MusicRecommendViewController: BaseViewController {
 extension MusicRecommendViewController {
     
     private func configureDataSource() {
-        let trendingCellRegistration = trendingCellRegistration()
+        let top100CellRegistration = top100CellRegistration()
         let playlistCellRegistration = playlistCellRegistration()
         let albumCellRegistration = albumCellRegistration()
         
         dataSource = DataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
             guard let section = Section(rawValue: indexPath.section) else { return UICollectionViewCell() }
             switch section {
-            case .trending:
+            case .top100:
                 if case let .playlist(playlist) = itemIdentifier {
-                    let cell = collectionView.dequeueConfiguredReusableCell(using: trendingCellRegistration, for: indexPath, item: playlist)
+                    let cell = collectionView.dequeueConfiguredReusableCell(using: top100CellRegistration, for: indexPath, item: playlist)
                     return cell
                 }
             case .playlist:
@@ -234,14 +234,14 @@ extension MusicRecommendViewController {
 extension MusicRecommendViewController {
     
     enum Section: Int, CaseIterable {
-        case trending
+        case top100
         case playlist
         case album
         
         var title: String {
             switch self {
-            case .trending:
-                "Trending Music"
+            case .top100:
+                "Top 100"
             case .playlist:
                 "Popular Playlist"
             case .album:
@@ -258,7 +258,7 @@ extension MusicRecommendViewController {
     
     //CellRegistration
     
-    private func trendingCellRegistration() -> UICollectionView.CellRegistration<MusicChartsCell, Playlist> {
+    private func top100CellRegistration() -> UICollectionView.CellRegistration<MusicChartsCell, Playlist> {
         UICollectionView.CellRegistration { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier)
         }
@@ -282,7 +282,7 @@ extension MusicRecommendViewController {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in
             guard let section = Section(rawValue: sectionIndex) else { return nil }
             switch section {
-            case .trending:
+            case .top100:
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
