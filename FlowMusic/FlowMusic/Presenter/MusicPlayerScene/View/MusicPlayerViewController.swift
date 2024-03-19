@@ -376,27 +376,36 @@ extension MusicPlayerViewController {
 extension MusicPlayerViewController {
     
     func setDismissGesture() {
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(didPanModalView))
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(dismissGesture))
         view.addGestureRecognizer(panGesture)
     }
     
-    @objc func didPanModalView(sender: UIPanGestureRecognizer) {
-        let touchPoint = sender.location(in: self.view?.window)
+    // 팬 제스처를 처리하는 메소드
+    @objc func dismissGesture(sender: UIPanGestureRecognizer) {
+        let translation = sender.translation(in: view)
         
-        if sender.state == .began {
-            initialTouchPoint = touchPoint
-        } else if sender.state == .changed {
-            if touchPoint.y - initialTouchPoint.y > 0 {
-                self.view.frame = CGRect(x: 0, y: touchPoint.y - initialTouchPoint.y, width: self.view.frame.size.width, height: self.view.frame.size.height)
+        switch sender.state {
+        case .changed:
+            if translation.y > 0 {
+                view.transform = CGAffineTransform(translationX: 0, y: translation.y)
             }
-        } else if sender.state == .ended || sender.state == .cancelled {
-            if touchPoint.y - initialTouchPoint.y > 100 {
-                self.dismiss(animated: true, completion: nil)
-            } else {
+            break
+        case .ended:
+            if translation.y > 100 {
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.view.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
-                })
+                    self.view.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
+                }) { [weak self] _ in
+                    guard let self else { return }
+                    dismiss(animated: true)
+                }
+            } else {
+                UIView.animate(withDuration: 0.3) { [weak self] in
+                    guard let self else { return }
+                    view.transform = .identity
+                }
             }
+        default:
+            break
         }
     }
 }

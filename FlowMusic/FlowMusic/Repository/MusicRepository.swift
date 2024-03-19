@@ -43,10 +43,15 @@ final class MusicRepository {
     }
     
     func requestCatalogMostPlayedCharts() async throws -> MusicItemCollection<Playlist> {
-//        let response = try await MusicCatalogChartsRequest(kinds: [MusicCatalogChartKind.cityTop], types: [Playlist.self]).response()
         guard let response = try await MusicPersonalRecommendationsRequest().response().recommendations.first else { return [] }
         let charts = response.playlists
         return charts
+    }
+    
+    func requestCatalogCityTop25Charts() async throws -> MusicItemCollection<Playlist> {
+        let response = try await MusicCatalogChartsRequest(kinds: [MusicCatalogChartKind.cityTop], types: [Playlist.self]).response()
+        guard let charts = response.playlistCharts.first else { return [] }
+        return charts.items
     }
 
     func requestCatalogSongCharts() async throws -> MusicItemCollection<Song> {
