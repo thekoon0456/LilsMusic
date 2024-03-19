@@ -37,8 +37,9 @@ final class LibraryViewController: BaseViewController {
         $0.refreshControl = refreshControl
     }
     
-    let refreshControl = UIRefreshControl().then {
+    private lazy var refreshControl = UIRefreshControl().then {
         $0.tintColor = .white
+        $0.addTarget(self, action: #selector(refreshData), for: .valueChanged)
     }
     
     private let contentView = UIView()
@@ -99,11 +100,18 @@ final class LibraryViewController: BaseViewController {
         
         configureDataSource()
         
-//        Task {
-//            self.playlist = try await request.requestCatalogPlaylistCharts()
-//        }
+        //        Task {
+        //            self.playlist = try await request.requestCatalogPlaylistCharts()
+        //        }
     }
-//    
+    
+    @objc func refreshData() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self else { return }
+            scrollView.refreshControl?.endRefreshing()
+        }
+    }
+    
     override func bind() {
         super.bind()
         
@@ -121,19 +129,19 @@ final class LibraryViewController: BaseViewController {
                                            miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
         let output = viewModel.transform(input)
         
-//        output.playlist.drive(with: self) { owner, playlists in
-//            DispatchQueue.global().async {
-////                owner.playlist = playlists
-//            }
-//        }.disposed(by: disposeBag)
-//        
-//        output.likes.drive(with: self) { owner, likes in
-//            
-//        }.disposed(by: disposeBag)
-//        
-//        output.recentlyPlaylist.drive(with: self) { owner, likes in
-//            
-//        }.disposed(by: disposeBag)
+        //        output.playlist.drive(with: self) { owner, playlists in
+        //            DispatchQueue.global().async {
+        ////                owner.playlist = playlists
+        //            }
+        //        }.disposed(by: disposeBag)
+        //        
+        //        output.likes.drive(with: self) { owner, likes in
+        //            
+        //        }.disposed(by: disposeBag)
+        //        
+        //        output.recentlyPlaylist.drive(with: self) { owner, likes in
+        //            
+        //        }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
             guard let track else {
@@ -219,13 +227,12 @@ final class LibraryViewController: BaseViewController {
         
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: profileButton)
     }
 }
 
 extension LibraryViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        viewModel.input.searchText.onNext(searchBar.text)
+        //        viewModel.input.searchText.onNext(searchBar.text)
         view.endEditing(true)
     }
     
@@ -257,9 +264,9 @@ extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath.item)
-//        Task {
-            viewModel.coordinator?.pushToList(track: playlist[indexPath.item].item)
-//        }
+        //        Task {
+        viewModel.coordinator?.pushToList(track: playlist[indexPath.item].item)
+        //        }
     }
 }
 

@@ -236,7 +236,6 @@ extension MusicRecommendViewController {
     
     //섹션 세개만 먼저 세팅
     private func configureSnapshot() {
-        print(#function)
         let snapshot = Snapshot().then {
             $0.appendSections(Section.allCases)
         }
