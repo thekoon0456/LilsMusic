@@ -149,6 +149,32 @@ final class FMMusicPlayer {
 //            <#code#>
 //        }
     }
+    
+    //현재 재생 여부
+    func setPaused() {
+        player.pause()
+//        switch state {
+//        case .stopped:
+//            <#code#>
+//        case .playing:
+//            <#code#>
+//        case .paused:
+//            <#code#>
+//        case .interrupted:
+//            <#code#>
+//        case .seekingForward:
+//            <#code#>
+//        case .seekingBackward:
+//            <#code#>
+//        }
+    }
+    
+    //현재 재생 여부
+    func setPlaying() async throws {
+        Task {
+            try await player.play()
+        }
+    }
      
     //재생준비 상태
     func isPreparedToPlay() -> Bool {

@@ -50,7 +50,6 @@ final class MusicPlayerViewController: BaseViewController {
     
     private lazy var playButton = UIButton().then {
         $0.setImage(UIImage(systemName: "pause"), for: .normal)
-        $0.setImage(UIImage(systemName: "play.fill"), for: .selected)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
@@ -140,10 +139,7 @@ final class MusicPlayerViewController: BaseViewController {
         
         let playButtonTapped = playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .map { [weak self] in
-                guard let self else { return true}
-                return playButton.isSelected
-            }
+            .asObservable()
         
         let repeatButtonTapped = repeatButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -181,8 +177,13 @@ final class MusicPlayerViewController: BaseViewController {
             owner.updateUI(track)
         }.disposed(by: disposeBag)
         
-        output.playState.drive(with: self) { owner, bool in
-            owner.playButton.isSelected.toggle()
+        output.playState.drive(with: self) { owner, state in
+            print(state)
+            if state == .playing {
+                owner.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+            } else {
+                owner.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            }
         }.disposed(by: disposeBag)
         
         //버튼 UI 업데이트

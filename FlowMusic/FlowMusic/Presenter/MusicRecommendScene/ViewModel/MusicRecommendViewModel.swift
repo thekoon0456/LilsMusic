@@ -5,6 +5,7 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
+import Combine
 import Foundation
 import MusicKit
 
@@ -30,7 +31,7 @@ final class MusicRecommendViewModel: ViewModel {
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
         let recommendMixList: Driver<MusicItemCollection<Playlist>>
-        let miniPlayerPlayState:  Driver<Bool>
+        let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
     }
     
     // MARK: - Properties
@@ -42,11 +43,16 @@ final class MusicRecommendViewModel: ViewModel {
     private let likesRepository = UserRepository<UserLikeList>()
     private let albumsRepository = UserRepository<UserAlbumList>()
     let disposeBag = DisposeBag()
+    private var cancellables = Set<AnyCancellable>()
+    private let trackSubject = BehaviorSubject<Track?>(value: nil)
+    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
     init(coordinator: MusicRecommendCoordinator?) {
         self.coordinator = coordinator
+        playerUpdateSink()
+        playerStateUpdateSink()
     }
     
     func transform(_ input: Input) -> Output {
@@ -67,13 +73,6 @@ final class MusicRecommendViewModel: ViewModel {
                 }
                 print(owner.likesRepository.printURL())
             }.disposed(by: disposeBag)
-        
-        let currentPlaySong = input
-            .viewWillAppear
-            .withUnretained(self)
-            .flatMap { owner, void in
-                owner.getCurrentPlaySong()
-            }.asDriver(onErrorJustReturn: nil)
         
         let songs = input.viewDidLoad
             .withUnretained(self)
@@ -115,25 +114,18 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.coordinator?.presentMusicPlayer(track: track)
             }.disposed(by: disposeBag)
         
-        let miniPlayerPlayState = input.miniPlayerPlayButtonTapped
+        input.miniPlayerPlayButtonTapped
             .withUnretained(self)
-            .do { owner, _ in
-                Task {
-                    switch owner.musicPlayer.getPlaybackState() {
-                    case .playing:
-                        owner.musicPlayer.pause()
-                    default:
-                        try await owner.musicPlayer.play()
+            .subscribe { owner, _ in
+                let state = owner.musicPlayer.getPlaybackState()
+                if state == .playing {
+                    owner.musicPlayer.setPaused()
+                } else {
+                    Task {
+                        try await owner.musicPlayer.setPlaying()
                     }
                 }
-            }
-            .map { owner, _ in
-                return owner.musicPlayer.getPlaybackState() == .playing ? true : false
-            }
-            .withUnretained(self)
-            .flatMap { owner, bool in
-                owner.setPlayButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: false)
+            }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -153,12 +145,12 @@ final class MusicRecommendViewModel: ViewModel {
                 }
             }.disposed(by: disposeBag)
         
-        return Output(currentPlaySong: currentPlaySong,
+        return Output(currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
                       recommendMixList: mix,
-                      miniPlayerPlayState: miniPlayerPlayState)
+                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }
     
     func getCurrentPlaySong() -> Observable<Track?> {
@@ -262,5 +254,31 @@ final class MusicRecommendViewModel: ViewModel {
             observer.onCompleted()
             return Disposables.create()
         }
+    }
+}
+
+// MARK: - 플레이어 상태 추적, 업데이트
+
+extension MusicRecommendViewModel {
+    
+    func playerUpdateSink() {
+        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _  in
+            Task { [weak self] in
+                guard let self,
+                      let entry = try await musicPlayer.getCurrentEntry(),
+                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+                let track = Track.song(song)
+                trackSubject.onNext(track)
+            }
+        }.store(in: &cancellables)
+    }
+    
+    //음악 재생상태 추적, 업데이트
+    func playerStateUpdateSink() {
+        musicPlayer.getCurrentPlayer().state.objectWillChange.sink { [weak self] _ in
+            guard let self else { return }
+            let state = musicPlayer.getPlaybackState()
+            playStateSubject.onNext(state)
+        }.store(in: &cancellables)
     }
 }

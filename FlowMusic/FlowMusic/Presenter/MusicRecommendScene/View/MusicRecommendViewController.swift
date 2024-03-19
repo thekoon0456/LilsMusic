@@ -64,10 +64,7 @@ final class MusicRecommendViewController: BaseViewController {
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
-//            .map { [weak self] _ -> Bool in
-//                guard let self else { return true }
-//                return !miniPlayerView.playButton.isSelected
-//            }
+            .asObservable()
         
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
                                                   viewWillAppear: self.rx.viewWillAppear.map { _ in },
@@ -107,8 +104,13 @@ final class MusicRecommendViewController: BaseViewController {
               owner.updateSnapshot(withItems: mostPlayed, toSection: .mix)
           }.disposed(by: disposeBag)
         
-        output.miniPlayerPlayState.drive(with: self) { owner, bool in
-            owner.miniPlayerView.playButton.isSelected = bool
+        output.playState.drive(with: self) { owner, state in
+            print(state)
+            if state == .playing {
+                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+            } else {
+                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            }
         }.disposed(by: disposeBag)
         
         collectionView.rx.itemSelected

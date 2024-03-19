@@ -17,7 +17,7 @@ final class MusicPlayerViewModel: ViewModel {
     struct Input {
         let chevronButtonTapped: ControlEvent<Void>
         let viewWillAppear: Observable<Void>
-        let playButtonTapped: Observable<Bool>
+        let playButtonTapped: Observable<Void>
         let previousButtonTapped: ControlEvent<Void>
         let nextButtonTapped: ControlEvent<Void>
         let repeatButtonTapped: Observable<Void>
@@ -29,7 +29,7 @@ final class MusicPlayerViewModel: ViewModel {
     
     struct Output {
         let updateEntry: Driver<Track?>
-        let playState:  Driver<Bool>
+        let playState:  Driver<ApplicationMusicPlayer.PlaybackStatus>
         let repeatMode: Driver<RepeatMode>
         let shuffleMode: Driver<ShuffleMode>
         let isHeart: Driver<(Bool)>
@@ -46,6 +46,7 @@ final class MusicPlayerViewModel: ViewModel {
     private var cancellables = Set<AnyCancellable>()
     //사용자가 선택한 track
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
+    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
@@ -55,6 +56,7 @@ final class MusicPlayerViewModel: ViewModel {
         trackSubject.onNext(track)
         //음악플레이어 상태 추적(API기본제공 컴바인)
         playerUpdateSink()
+        playerStateUpdateSink()
     }
     
     func transform(_ input: Input) -> Output {
@@ -65,32 +67,18 @@ final class MusicPlayerViewModel: ViewModel {
                 owner.coordinator?.dismissViewController()
             }.disposed(by: disposeBag)
         
-//        let playerState = input
-//            .viewWillAppear
-//            .withUnretained(self)
-//            .flatMap { owner, void in
-//                owner.getPlayerState()
-//            }.asDriver(onErrorJustReturn: .paused)
-        
-        let playState = input.playButtonTapped
+        input.playButtonTapped
             .withUnretained(self)
-            .do { owner, _ in
-                Task {
-                    switch owner.musicPlayer.getPlaybackState() {
-                    case .playing:
-                        owner.musicPlayer.pause()
-                    default:
-                        try await owner.musicPlayer.play()
+            .subscribe { owner, _ in
+                let state = owner.musicPlayer.getPlaybackState()
+                if state == .playing {
+                    owner.musicPlayer.setPaused()
+                } else {
+                    Task {
+                        try await owner.musicPlayer.setPlaying()
                     }
                 }
-            }
-            .map { owner, _ in
-                return owner.musicPlayer.getPlaybackState() == .playing ? true : false
-            }
-            .withUnretained(self)
-            .flatMap { owner, bool in
-                owner.setPlayButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: false)
+            }.disposed(by: disposeBag)
         
         input.previousButtonTapped
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -158,7 +146,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playState,
+                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
                       isHeart: isHeart)
@@ -167,14 +155,6 @@ final class MusicPlayerViewModel: ViewModel {
     func setTrack(track: Track) -> Observable<Track> {
         return Observable.create { observer in
             observer.onNext(track)
-            observer.onCompleted()
-            return Disposables.create()
-        }
-    }
-    
-    func setPlayButton(isSelected: Bool) -> Observable<Bool> {
-        return Observable.create { observer in
-            observer.onNext(isSelected)
             observer.onCompleted()
             return Disposables.create()
         }
@@ -204,8 +184,17 @@ final class MusicPlayerViewModel: ViewModel {
                       let entry = try await musicPlayer.getCurrentEntry(),
                       let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
                 let track = Track.song(song)
-                self.trackSubject.onNext(track)
+                trackSubject.onNext(track)
             }
+        }.store(in: &cancellables)
+    }
+    
+    //음악 재생상태 추적, 업데이트
+    func playerStateUpdateSink() {
+        musicPlayer.getCurrentPlayer().state.objectWillChange.sink { [weak self] _ in
+            guard let self else { return }
+            let state = musicPlayer.getPlaybackState()
+            playStateSubject.onNext(state)
         }.store(in: &cancellables)
     }
 }
