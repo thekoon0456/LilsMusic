@@ -77,10 +77,6 @@ final class ArtistCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-        layer.masksToBounds = false
-        layer.shadowOpacity = 0.8
-        layer.shadowOffset = .init(width: 0, height: 0)
-        layer.shadowColor = UIColor.lightGray.cgColor
-        layer.shadowRadius = 5
+        addShadow()
     }
 }

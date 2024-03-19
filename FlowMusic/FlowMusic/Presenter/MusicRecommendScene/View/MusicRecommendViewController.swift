@@ -328,12 +328,12 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.45),
-                                                       heightDimension: .fractionalHeight(0.3))
+                                                       heightDimension: .fractionalHeight(0.31))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
                                                               bottom: 0,
-                                                              trailing: 12)
+                                                              trailing: 0)
                 let section = NSCollectionLayoutSection(group: group)
                 section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),
                                                                               heightDimension: .absolute(50)),
