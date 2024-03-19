@@ -77,6 +77,6 @@ final class AlbumArtCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-        backView.addShadow()
+        contentView.addShadow()
     }
 }

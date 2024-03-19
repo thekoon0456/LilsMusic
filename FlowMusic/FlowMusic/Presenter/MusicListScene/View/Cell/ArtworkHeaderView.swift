@@ -125,19 +125,3 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
         }
     }
 }
-
-extension ArtworkHeaderReusableView {
-    
-    func setGradient(startColor: CGColor?, endColor: CGColor?) {
-        let gradientLayer = CAGradientLayer()
-        let startColor = startColor?.copy(alpha: 1.0) ?? CGColor(gray: 0, alpha: 0)
-        let endColor = endColor?.copy(alpha: 0.5) ?? CGColor(gray: 0, alpha: 0)
-        gradientLayer.frame = bounds
-        gradientLayer.colors = [startColor, endColor]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        //기존에 추가된 레이어 삭제
-        layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
-        layer.insertSublayer(gradientLayer, at: 0)
-    }
-}

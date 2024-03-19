@@ -81,7 +81,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped))
         $0.addGestureRecognizer(tapGesture)
-        $0.addShadow()
+//        $0.addShadow()
     }
     
     //상태에 따라 아이콘 바뀜

@@ -33,6 +33,21 @@ final class LibraryViewController: BaseViewController {
     
     private let contentView = UIView()
     
+    private let likedSongsButton = LibraryButtonView(imageName: "heart.fill",
+                                                     title: "Liked Songs",
+                                                     subTitle: "",
+                                                     bgColor: .systemPink)
+    
+    private let recentlyPlayedButton = LibraryButtonView(imageName: "play.circle",
+                                                         title: "Recently\nPlayed Songs",
+                                                         subTitle: "",
+                                                         bgColor: FMDesign.Color.tintColor.color)
+    
+    private let miniPlayerView = MiniPlayerView().then {
+        $0.isHidden = true
+        $0.alpha = 0
+    }
+    
     private let titleView = UILabel().then {
         $0.text = "Library"
         $0.font = .boldSystemFont(ofSize: 20)
@@ -49,9 +64,9 @@ final class LibraryViewController: BaseViewController {
     }()
     
     private lazy var albumCollectionView = UICollectionView(frame: .zero,
-                                                           collectionViewLayout: createLayout())
-        private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
-//        private var album: MusicItemCollection<Album>?
+                                                            collectionViewLayout: createLayout())
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
+    //        private var album: MusicItemCollection<Album>?
     
     var playlist: MusicItemCollection<Playlist>? {
         didSet {
@@ -79,28 +94,47 @@ final class LibraryViewController: BaseViewController {
     }
     override func configureHierarchy() {
         view.addSubview(scrollView)
-        contentView.addSubviews(playlistCollectionView, albumCollectionView)
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(playlistCollectionView,
+                                likedSongsButton,
+                                recentlyPlayedButton,
+                                albumCollectionView)
     }
     
     override func configureLayout() {
         
         scrollView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.bottom.equalTo(view.safeAreaLayoutGuide)
-            make.horizontalEdges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
         
         contentView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.verticalEdges.equalTo(scrollView)
             make.width.equalToSuperview()
         }
         
         playlistCollectionView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.height.equalTo(250)
+            make.height.equalTo(200)
+        }
+        
+        likedSongsButton.snp.makeConstraints { make in
+            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalTo(recentlyPlayedButton.snp.leading).offset(-10)
+            make.height.equalTo(likedSongsButton.snp.width)
+            make.width.equalTo(recentlyPlayedButton.snp.width)
+        }
+        
+        recentlyPlayedButton.snp.makeConstraints { make in
+            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
+            make.leading.equalTo(likedSongsButton.snp.trailing).offset(-10)
+            make.trailing.equalToSuperview().offset(-20)
+            make.height.equalTo(recentlyPlayedButton.snp.width)
         }
         
         albumCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(likedSongsButton.snp.bottom).offset(20)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }

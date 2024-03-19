@@ -13,16 +13,6 @@ final class UserRepository<T: Object>: Repository {
     
     private let realm = try! Realm()
     
-    //생성할때마다 옵셔널이 조금 번거롭네용..
-//    init?() {
-//        do {
-//            self.realm = try Realm()
-//        } catch {
-//            print("realm 초기화 실패: \(error.localizedDescription)")
-//            return nil
-//        }
-//    }
-    
     func printURL() {
         print(realm.configuration.fileURL ?? "")
     }

@@ -44,12 +44,12 @@ final class LibraryCoordinator: Coordinator {
         coordinator.start()
     }
     
-    func pushToList(station: Station) {
-        let coordinator = MusicListCoordinator(navigationController: navigationController,
-                                              item: station)
-        childCoordinators.append(coordinator)
-        coordinator.start()
-    }
+//    func pushToList(station: Station) {
+//        let coordinator = MusicListCoordinator(navigationController: navigationController,
+//                                              item: station)
+//        childCoordinators.append(coordinator)
+//        coordinator.start()
+//    }
     
     
     
