@@ -43,7 +43,7 @@ final class MusicRecommendViewModel: ViewModel {
     private let likesRepository = UserRepository<UserLikeList>()
     private let albumsRepository = UserRepository<UserAlbumList>()
     let disposeBag = DisposeBag()
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellable = Set<AnyCancellable>()
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
@@ -270,7 +270,7 @@ extension MusicRecommendViewModel {
                 let track = Track.song(song)
                 trackSubject.onNext(track)
             }
-        }.store(in: &cancellables)
+        }.store(in: &cancellable)
     }
     
     //음악 재생상태 추적, 업데이트
@@ -279,6 +279,6 @@ extension MusicRecommendViewModel {
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()
             playStateSubject.onNext(state)
-        }.store(in: &cancellables)
+        }.store(in: &cancellable)
     }
 }

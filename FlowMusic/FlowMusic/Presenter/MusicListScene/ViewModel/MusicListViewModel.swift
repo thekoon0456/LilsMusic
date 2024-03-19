@@ -5,6 +5,7 @@
 //  Created by Deokhun KIM on 3/8/24.
 //
 
+import Combine
 import Foundation
 import MusicKit
 
@@ -28,23 +29,27 @@ final class MusicListViewModel: ViewModel {
         let item: Driver<MusicItem?>
         let tracks: Driver<MusicItemCollection<Track>>
         let currentPlaySong: Driver<Track?>
-        let miniPlayerPlayState:  Driver<Bool>
+        let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
     }
     
     // MARK: - Properties
     
     weak var coordinator: MusicListCoordinator?
-    
     private let musicPlayer = FMMusicPlayer()
     private let musicRepository = MusicRepository()
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
     let disposeBag = DisposeBag()
+    private var cancellable = Set<AnyCancellable>()
+    private let trackSubject = BehaviorSubject<Track?>(value: nil)
+    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
     init(coordinator: MusicListCoordinator?, item: MusicItem) {
         self.coordinator = coordinator
         musicItem.onNext(item)
+        playerUpdateSink()
+        playerStateUpdateSink()
     }
     
     // MARK: - Helpers
@@ -52,13 +57,6 @@ final class MusicListViewModel: ViewModel {
     
     func transform(_ input: Input) -> Output {
         let tracks = getTracks().asDriver(onErrorJustReturn: MusicItemCollection<Track>())
-        
-        let currentPlaySong = input
-            .viewWillAppear
-            .withUnretained(self)
-            .flatMap { owner, void in
-                owner.getCurrentPlaySong()
-            }.asDriver(onErrorJustReturn: nil)
         
         input.playButtonTapped
             .withUnretained(self)
@@ -112,16 +110,18 @@ final class MusicListViewModel: ViewModel {
                 owner.coordinator?.presentMusicPlayer(track: track)
             }.disposed(by: disposeBag)
         
-        let miniPlayerPlayState = input.miniPlayerPlayButtonTapped
+        input.miniPlayerPlayButtonTapped
             .withUnretained(self)
-            .do { owner, bool in
-                Task {
-                    try await bool ? owner.musicPlayer.pause() : owner.musicPlayer.play()
+            .subscribe { owner, _ in
+                let state = owner.musicPlayer.getPlaybackState()
+                if state == .playing {
+                    owner.musicPlayer.setPaused()
+                } else {
+                    Task {
+                        try await owner.musicPlayer.setPlaying()
+                    }
                 }
-            }
-            .flatMap { owner, bool in
-                owner.setPlayButton(isSelected: bool)
-            }.asDriver(onErrorJustReturn: true)
+            }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -143,8 +143,8 @@ final class MusicListViewModel: ViewModel {
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
                       tracks: tracks,
-                      currentPlaySong: currentPlaySong,
-                      miniPlayerPlayState: miniPlayerPlayState)
+                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
+                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }
     
     func getTracks() -> Observable<MusicItemCollection<Track>> {
@@ -207,5 +207,31 @@ final class MusicListViewModel: ViewModel {
             observer.onCompleted()
             return Disposables.create()
         }
+    }
+}
+
+// MARK: - 플레이어 상태 추적, 업데이트
+
+extension MusicListViewModel {
+    
+    func playerUpdateSink() {
+        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _  in
+            Task { [weak self] in
+                guard let self,
+                      let entry = try await musicPlayer.getCurrentEntry(),
+                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+                let track = Track.song(song)
+                trackSubject.onNext(track)
+            }
+        }.store(in: &cancellable)
+    }
+    
+    //음악 재생상태 추적, 업데이트
+    func playerStateUpdateSink() {
+        musicPlayer.getCurrentPlayer().state.objectWillChange.sink { [weak self] _ in
+            guard let self else { return }
+            let state = musicPlayer.getPlaybackState()
+            playStateSubject.onNext(state)
+        }.store(in: &cancellable)
     }
 }

@@ -23,6 +23,7 @@ final class MusicListViewController: BaseViewController {
     private var headerItem: MusicItem?
     private let playButtonTapped = PublishSubject<Void>()
     private let shuffleButtonTapped = PublishSubject<Void>()
+    private let viewDidLoadTrigger = PublishSubject<Void>()
     
     // MARK: - UI
     
@@ -50,6 +51,7 @@ final class MusicListViewController: BaseViewController {
         super.viewDidLoad()
         
         configureDataSource()
+        viewDidLoadTrigger.onNext(())
     }
     
     override func bind() {
@@ -101,8 +103,13 @@ final class MusicListViewController: BaseViewController {
                 owner.itemSelected.onNext((index: indexPath.item, track: track))
             }.disposed(by: disposeBag)
         
-        output.miniPlayerPlayState.drive(with: self) { owner, bool in
-            owner.miniPlayerView.playButton.isSelected = bool
+        output.playState.drive(with: self) { owner, state in
+            print(state)
+            if state == .playing {
+                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+            } else {
+                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            }
         }.disposed(by: disposeBag)
         
     }
