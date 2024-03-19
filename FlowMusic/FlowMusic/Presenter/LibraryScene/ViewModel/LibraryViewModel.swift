@@ -15,6 +15,8 @@ final class LibraryViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let likedSongTapped: Observable<Void>
+        let recentlyPlayedSongTapped: Observable<Void>
         let itemSelected: Observable<MusicItem>
     }
     
@@ -30,7 +32,7 @@ final class LibraryViewModel: ViewModel {
     
     weak var coordinator: LibraryCoordinator?
     let disposeBag = DisposeBag()
-    private let musicPlayer = FMMusicPlayer()
+//    private let musicPlayer = FMMusicPlayer()
     private let musicRepository = MusicRepository()
     private let playlistRepository = UserRepository<UserPlaylist>()
     private let artistRepository = UserRepository<UserArtistList>()

@@ -40,10 +40,10 @@ final class LibraryCell: BaseCollectionViewCell {
         super.init(frame: frame)
     }
     
-    func configureCell(_ data: Playlist) {
-        artworkImageView.kf.setImage(with: data.artwork?.url(width: 200, height: 200))
-        nameLabel.text = data.name
-        descriptionLabel.text = data.shortDescription
+    func configureCell(title: String, track: Track?) {
+        artworkImageView.kf.setImage(with: track?.artwork?.url(width: 200, height: 200))
+        nameLabel.text = title
+        descriptionLabel.text = ""
     }
     
     override func configureHierarchy() {
