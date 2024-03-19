@@ -8,7 +8,7 @@
 import MusicKit
 import UIKit
 
-final class LibraryCoordinator: Coordinator {
+final class LibraryCoordinator: Coordinator, CoordinatorDelegate {
     
     weak var delegate: CoordinatorDelegate?
     var childCoordinators: [Coordinator]
@@ -51,13 +51,15 @@ final class LibraryCoordinator: Coordinator {
         coordinator.start()
     }
     
-//    func pushToList(station: Station) {
-//        let coordinator = MusicListCoordinator(navigationController: navigationController,
-//                                              item: station)
-//        childCoordinators.append(coordinator)
-//        coordinator.start()
-//    }
+    func presentMusicPlayer(track: Track) {
+        let coordinator = MusicPlayerCoordinator(navigationController: navigationController,
+                                                 track: track)
+        coordinator.delegate = self
+        childCoordinators.append(coordinator)
+        coordinator.start()
+    }
     
-    
-    
+    func didFinish(childCoordinator: any Coordinator) {
+        childCoordinators = []
+    }
 }

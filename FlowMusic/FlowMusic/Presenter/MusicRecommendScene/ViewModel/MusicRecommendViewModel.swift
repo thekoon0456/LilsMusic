@@ -172,16 +172,6 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-//    func getPlayerState() -> Observable<ApplicationMusicPlayer.PlaybackStatus> {
-//        return Observable.create { [weak self] observer in
-//            guard let self else { return Disposables.create() }
-//            let entry = musicPlayer.getPlaybackState()
-//            observer.onNext(entry)
-//            observer.onCompleted()
-//            return Disposables.create()
-//        }
-//    }
-    
     func fetchRecommendSongs() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in

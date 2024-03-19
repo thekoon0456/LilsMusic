@@ -10,6 +10,7 @@ import UIKit
 
 import CollectionViewPagingLayout
 import RxCocoa
+import RxGesture
 import RxSwift
 
 final class LibraryViewController: BaseViewController {
@@ -19,6 +20,7 @@ final class LibraryViewController: BaseViewController {
     private let viewModel: LibraryViewModel
     private let layout = CollectionViewPagingLayout()
     private let itemSelected = PublishSubject<MusicItem>()
+    private let viewDidLoadTrigger = PublishSubject<Void>()
     
     // MARK: - UI
     
@@ -100,9 +102,10 @@ final class LibraryViewController: BaseViewController {
         
         configureDataSource()
         
-        //        Task {
-        //            self.playlist = try await request.requestCatalogPlaylistCharts()
-        //        }
+        //                Task {
+        //                    self.playlist = try await request.requestCatalogPlaylistCharts()
+        //                }
+        viewDidLoadTrigger.onNext(())
     }
     
     @objc func refreshData() {
@@ -115,15 +118,20 @@ final class LibraryViewController: BaseViewController {
     override func bind() {
         super.bind()
         
+        let searchButtonTapped = searchController.searchBar.rx.searchButtonClicked
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withLatestFrom(searchController.searchBar.rx.text) { $1 ?? "" } //$0은 이벤트, $1은 text
+        
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
-        let input = LibraryViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
-                                           searchText: searchController.searchBar.rx.text.asObservable(),
+        let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
+                                           searchText: searchButtonTapped,
                                            likedSongTapped: likedSongsButton.tap,
                                            recentlyPlayedSongTapped: recentlyPlayedButton.tap,
-                                           itemSelected: itemSelected,                                                  miniPlayerTapped: miniPlayerView.tap,
+                                           itemSelected: itemSelected,  
+                                           miniPlayerTapped: miniPlayerView.tap,
                                            miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                            miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
                                            miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
@@ -134,13 +142,13 @@ final class LibraryViewController: BaseViewController {
         ////                owner.playlist = playlists
         //            }
         //        }.disposed(by: disposeBag)
-        //        
+        //
         //        output.likes.drive(with: self) { owner, likes in
-        //            
+        //
         //        }.disposed(by: disposeBag)
-        //        
+        //
         //        output.recentlyPlaylist.drive(with: self) { owner, likes in
-        //            
+        //
         //        }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
@@ -167,13 +175,12 @@ final class LibraryViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        view.addSubview(scrollView)
+        view.addSubviews(scrollView, miniPlayerView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(playlistCollectionView,
                                 likedSongsButton,
                                 recentlyPlayedButton,
-                                albumCollectionView,
-                                miniPlayerView)
+                                albumCollectionView)
     }
     
     override func configureLayout() {

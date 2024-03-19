@@ -15,8 +15,8 @@ import RxSwift
 final class LibraryViewModel: ViewModel {
     
     struct Input {
-        let viewWillAppear: Observable<Void>
-        let searchText: Observable<String?>
+        let viewDidLoad: Observable<Void>
+        let searchText: Observable<String>
         let likedSongTapped: Observable<Void>
         let recentlyPlayedSongTapped: Observable<Void>
         let itemSelected: Observable<MusicItem>
@@ -61,36 +61,40 @@ final class LibraryViewModel: ViewModel {
     
     func transform(_ input: Input) -> Output {
         
+        input.searchText.subscribe { text in
+            print(text)
+        }.disposed(by: disposeBag)
+        
         let playlist = input
-            .viewWillAppear
+            .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchPlaylist()
             }.asDriver(onErrorJustReturn: [])
         
         let artist = input
-            .viewWillAppear
+            .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchArtistList()
             }.asDriver(onErrorJustReturn: [])
         
         let likes = input
-            .viewWillAppear
+            .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchLikeList()
             }.asDriver(onErrorJustReturn: [])
         
         let recentlyPlaylist = input
-            .viewWillAppear
+            .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchRecentlyPlayList()
             }.asDriver(onErrorJustReturn: [])
         
         let albums = input
-            .viewWillAppear
+            .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchAlbumList()
@@ -107,7 +111,7 @@ final class LibraryViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, track in
                 guard let track else { return }
-//                owner.coordinator?.presentMusicPlayer(track: track)
+                owner.coordinator?.presentMusicPlayer(track: track)
             }.disposed(by: disposeBag)
         
         input.miniPlayerPlayButtonTapped
@@ -149,6 +153,29 @@ final class LibraryViewModel: ViewModel {
                       currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }
+    
+//    private func fetchSearchResult() -> Observable<MusicItemCollection<Track>> {
+//        return Observable.create { [weak self] observer in
+//            guard let self else { return Disposables.create() }
+//            let playlists = playlistRepository.fetchArr()
+//            
+//            Task {
+//                do {
+//                    var result = [(title: String, item: MusicItemCollection<Track>)]()
+//                    for list in playlists {
+//                        let title = list.title
+//                        let track = try await self.musicRepository.requestPlaylist(ids: Array(list.playlistID))
+//                        result.append((title: title, item: track))
+//                    }
+//                    observer.onNext(result)
+//                    observer.onCompleted()
+//                } catch {
+//                    observer.onError(error)
+//                }
+//            }
+//            return Disposables.create()
+//        }
+//    }
     
     private func fetchPlaylist() -> Observable<[(title: String, item: MusicItemCollection<Track>)]> {
         return Observable.create { [weak self] observer in
