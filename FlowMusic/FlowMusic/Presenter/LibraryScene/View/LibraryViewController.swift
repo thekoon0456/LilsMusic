@@ -104,15 +104,23 @@ final class LibraryViewController: BaseViewController {
 //        }
     }
 //    
-//    override func bind() {
-//        super.bind()
-//        
-//        let input = LibraryViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
-//                                           likedSongTapped: likedSongsButton.tap,
-//                                           recentlyPlayedSongTapped: recentlyPlayedButton.tap,
-//                                           itemSelected: itemSelected)
-//        let output = viewModel.transform(input)
-//        
+    override func bind() {
+        super.bind()
+        
+        let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .asObservable()
+        
+        let input = LibraryViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
+                                           searchText: searchController.searchBar.rx.text.asObservable(),
+                                           likedSongTapped: likedSongsButton.tap,
+                                           recentlyPlayedSongTapped: recentlyPlayedButton.tap,
+                                           itemSelected: itemSelected,                                                  miniPlayerTapped: miniPlayerView.tap,
+                                           miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
+                                           miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
+                                           miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
+        let output = viewModel.transform(input)
+        
 //        output.playlist.drive(with: self) { owner, playlists in
 //            DispatchQueue.global().async {
 ////                owner.playlist = playlists
@@ -126,7 +134,29 @@ final class LibraryViewController: BaseViewController {
 //        output.recentlyPlaylist.drive(with: self) { owner, likes in
 //            
 //        }.disposed(by: disposeBag)
-//    }
+        
+        output.currentPlaySong.drive(with: self) { owner, track in
+            guard let track else {
+                owner.miniPlayerView.isHidden = true
+                owner.miniPlayerView.alpha = 0
+                return
+            }
+            owner.miniPlayerView.isHidden = false
+            owner.miniPlayerView.configureView(track)
+            UIView.animate(withDuration: 0.3) {
+                owner.miniPlayerView.alpha = 1
+            }
+        }.disposed(by: disposeBag)
+        
+        output.playState.drive(with: self) { owner, state in
+            print(state)
+            if state == .playing {
+                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+            } else {
+                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            }
+        }.disposed(by: disposeBag)
+    }
     
     override func configureHierarchy() {
         view.addSubview(scrollView)
@@ -134,7 +164,8 @@ final class LibraryViewController: BaseViewController {
         contentView.addSubviews(playlistCollectionView,
                                 likedSongsButton,
                                 recentlyPlayedButton,
-                                albumCollectionView)
+                                albumCollectionView,
+                                miniPlayerView)
     }
     
     override func configureLayout() {
@@ -172,6 +203,12 @@ final class LibraryViewController: BaseViewController {
             make.top.equalTo(likedSongsButton.snp.bottom).offset(20)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+        
+        miniPlayerView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(12)
+            make.trailing.equalToSuperview().offset(-12)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-12)
         }
     }
     

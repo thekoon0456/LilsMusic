@@ -175,7 +175,9 @@ final class MusicPlayerViewModel: ViewModel {
             return Disposables.create()
         }
     }
-    
+}
+ 
+extension MusicPlayerViewModel {
     //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
         musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _  in
