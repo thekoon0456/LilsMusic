@@ -47,6 +47,7 @@ final class MusicPlayerViewModel: ViewModel {
     //사용자가 선택한 track
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
+    private let heartSubject = BehaviorSubject<Bool>(value: false)
     
     // MARK: - Lifecycles
     
@@ -60,8 +61,21 @@ final class MusicPlayerViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        input
-            .chevronButtonTapped
+        
+        input.viewWillAppear
+            .map { [weak self] _ in
+                guard let self,
+                      let item = userLikeRepository.fetchArr().first,
+                      let id = try? trackSubject.value()?.id.rawValue
+                else { return false }
+                return item.likeID.contains { $0 == id }
+            }
+            .withUnretained(self)
+            .subscribe{ owner, bool in
+                owner.heartSubject.onNext(bool)
+            }.disposed(by: disposeBag)
+        
+        input.chevronButtonTapped
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.coordinator?.dismissViewController()
@@ -124,7 +138,7 @@ final class MusicPlayerViewModel: ViewModel {
                 return owner.setShuffleButton(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
-        let isHeart = input
+        input
             .heartButtonTapped
             .map {!$0 }
             .do { [weak self] bool in
@@ -135,9 +149,11 @@ final class MusicPlayerViewModel: ViewModel {
                 bool
                 ? userLikeRepository.updateUserLikeList(item, id: id)
                 : userLikeRepository.deleteUserLikeList(item, id: id)
-                print(userLikeRepository.fetchArr())
             }
-            .asDriver(onErrorJustReturn: false)
+            .withUnretained(self)
+            .subscribe { owner, bool in
+                owner.heartSubject.onNext(bool)
+            }.disposed(by: disposeBag)
         
         input.viewWillDisappear
             .withUnretained(self)
@@ -149,7 +165,7 @@ final class MusicPlayerViewModel: ViewModel {
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
-                      isHeart: isHeart)
+                      isHeart: heartSubject.asDriver(onErrorJustReturn: false))
     }
     
     func setTrack(track: Track) -> Observable<Track> {

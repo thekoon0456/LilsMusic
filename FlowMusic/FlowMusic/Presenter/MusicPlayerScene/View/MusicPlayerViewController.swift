@@ -195,8 +195,8 @@ final class MusicPlayerViewController: BaseViewController {
             owner.setShuffleButton(mode)
         }.disposed(by: disposeBag)
         
-        output.isHeart.drive(with: self) { owner, mode in
-            owner.heartButton.isSelected.toggle()
+        output.isHeart.drive(with: self) { owner, bool in
+            owner.heartButton.isSelected = bool
         }.disposed(by: disposeBag)
     }
     
