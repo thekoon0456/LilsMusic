@@ -102,9 +102,9 @@ final class LibraryViewController: BaseViewController {
         
         configureDataSource()
         
-        //                Task {
-        //                    self.playlist = try await request.requestCatalogPlaylistCharts()
-        //                }
+//                        Task {
+//                            self.playlist = try await viewModel.musicRepository.requestCatalogPlaylistCharts()
+//                        }
         viewDidLoadTrigger.onNext(())
     }
     
@@ -195,13 +195,8 @@ final class LibraryViewController: BaseViewController {
             make.width.equalToSuperview()
         }
         
-        playlistCollectionView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
-            make.height.equalTo(200)
-        }
-        
         likedSongsButton.snp.makeConstraints { make in
-            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
+            make.top.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalTo(recentlyPlayedButton.snp.leading).offset(-20)
             make.height.equalTo(likedSongsButton.snp.width)
@@ -209,13 +204,18 @@ final class LibraryViewController: BaseViewController {
         }
         
         recentlyPlayedButton.snp.makeConstraints { make in
-            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
+            make.top.equalToSuperview()
             make.trailing.equalToSuperview().offset(-20)
             make.height.equalTo(recentlyPlayedButton.snp.width)
         }
         
-        albumCollectionView.snp.makeConstraints { make in
+        playlistCollectionView.snp.makeConstraints { make in
             make.top.equalTo(likedSongsButton.snp.bottom).offset(20)
+            make.height.equalTo(200)
+        }
+        
+        albumCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
@@ -271,9 +271,9 @@ extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath.item)
-        //        Task {
+                Task {
         viewModel.coordinator?.pushToList(track: playlist[indexPath.item].item)
-        //        }
+                }
     }
 }
 

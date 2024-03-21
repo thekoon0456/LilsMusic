@@ -17,7 +17,6 @@ final class MusicRecommendViewModel: ViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
-        let viewWillAppear: Observable<Void>
         let itemSelected: Observable<MusicItem>
         let miniPlayerTapped: Observable<Void>
         let miniPlayerPlayButtonTapped: Observable<Void>

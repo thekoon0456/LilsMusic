@@ -28,7 +28,9 @@ final class MusicRecommendViewController: BaseViewController {
     
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createSectionLayout())
-        cv.register(TrendingHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TrendingHeaderView.identifier)
+        cv.register(TrendingHeaderView.self,
+                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                    withReuseIdentifier: TrendingHeaderView.identifier)
         return cv
     }()
     
@@ -67,7 +69,6 @@ final class MusicRecommendViewController: BaseViewController {
             .asObservable()
         
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
-                                                  viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                   itemSelected: itemSelected.asObservable(),
                                                   miniPlayerTapped: miniPlayerView.tap,
                                                   miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,

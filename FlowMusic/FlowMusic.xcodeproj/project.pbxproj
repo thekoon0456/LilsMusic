@@ -190,8 +190,8 @@
 				7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */,
 				7C3927742BA34FF60074F87E /* PlaylistCell.swift */,
 				7C3927702BA3420C0074F87E /* AlbumArtCell.swift */,
-				7C3927722BA343B30074F87E /* ArtistCell.swift */,
 				7C286FD82BA88B1700244559 /* MixCell.swift */,
+				7C3927722BA343B30074F87E /* ArtistCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";

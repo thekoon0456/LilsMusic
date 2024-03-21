@@ -25,6 +25,7 @@ final class MusicListCoordinator: Coordinator, CoordinatorDelegate {
     
     func start() {
         let vm = MusicListViewModel(coordinator: self, item: item)
+        
         let vc = MusicListViewController(viewModel: vm)
         navigationController?.pushViewController(vc, animated: true)
     }
