@@ -77,16 +77,7 @@ final class MusicRecommendViewController: BaseViewController {
         let output = viewModel.transform(input)
         
         output.currentPlaySong.drive(with: self) { owner, track in
-            guard let track else {
-                owner.miniPlayerView.isHidden = true
-                owner.miniPlayerView.alpha = 0
-                return
-            }
-            owner.miniPlayerView.isHidden = false
-            owner.miniPlayerView.configureView(track)
-            UIView.animate(withDuration: 0.3) {
-                owner.miniPlayerView.alpha = 1
-            }
+            owner.updateMiniPlayer(track: track)
         }.disposed(by: disposeBag)
         
         output.recommendSongs.drive(with: self) { owner, songs in
@@ -144,6 +135,20 @@ final class MusicRecommendViewController: BaseViewController {
     }
     
     // MARK: - Configure
+    
+    private func updateMiniPlayer(track: Track?) {
+        guard let track else {
+            miniPlayerView.isHidden = true
+            miniPlayerView.alpha = 0
+            return
+        }
+        miniPlayerView.isHidden = false
+        miniPlayerView.configureView(track)
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self else { return }
+            miniPlayerView.alpha = 1
+        }
+    }
     
     override func configureHierarchy() {
         super.configureHierarchy()

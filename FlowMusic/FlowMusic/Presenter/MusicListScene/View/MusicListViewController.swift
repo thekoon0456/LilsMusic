@@ -84,16 +84,7 @@ final class MusicListViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
-            guard let track else {
-                owner.miniPlayerView.isHidden = true
-                owner.miniPlayerView.alpha = 0
-                return
-            }
-            owner.miniPlayerView.isHidden = false
-            owner.miniPlayerView.configureView(track)
-            UIView.animate(withDuration: 0.3) {
-                owner.miniPlayerView.alpha = 1
-            }
+            owner.updateMiniPlayer(track: track)
         }.disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
@@ -115,6 +106,20 @@ final class MusicListViewController: BaseViewController {
     }
     
     // MARK: - Configure
+    
+    private func updateMiniPlayer(track: Track?) {
+        guard let track else {
+            miniPlayerView.isHidden = true
+            miniPlayerView.alpha = 0
+            return
+        }
+        miniPlayerView.isHidden = false
+        miniPlayerView.configureView(track)
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self else { return }
+            miniPlayerView.alpha = 1
+        }
+    }
     
     override func configureHierarchy() {
         view.addSubviews(collectionView, miniPlayerView)

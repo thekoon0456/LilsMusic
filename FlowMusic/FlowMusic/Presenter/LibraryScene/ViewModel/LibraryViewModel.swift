@@ -33,6 +33,7 @@ final class LibraryViewModel: ViewModel {
         let albums: Driver<MusicItemCollection<Album>>
         let currentPlaySong: Driver<Track?>
         let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
+        let searchResult: Driver<[Track]>
     }
     
     // MARK: - Properties
@@ -49,6 +50,7 @@ final class LibraryViewModel: ViewModel {
     //사용자가 선택한 track
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
+    private let requestTrackSubject = BehaviorSubject<[Track]>(value: [])
     
     // MARK: - Lifecycles
     
@@ -86,8 +88,16 @@ final class LibraryViewModel: ViewModel {
 //                owner.coordinator?.pushToList(track: )
 //        }.disposed(by: disposeBag)
         
-        input.searchText.withUnretained(self).subscribe { text in
+        input.searchText.withUnretained(self).subscribe { owner, text in
             print(text)
+            guard !text.isEmpty else { return }
+            Task {
+                let result = try await owner.musicRepository.requestSearchSongCatalog(term: text)
+                print(result)
+                let tracks = result.map { Track.song($0) }
+                owner.requestTrackSubject.onNext(tracks)
+            }
+
         }.disposed(by: disposeBag)
         
         let playlist = input
@@ -175,7 +185,8 @@ final class LibraryViewModel: ViewModel {
                       recentlyPlaylist: recentlyPlaylist,
                       albums: albums,
                       currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
+                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing),
+                      searchResult: requestTrackSubject.asDriver(onErrorJustReturn: []))
     }
     
 //    private func fetchSearchResult() -> Observable<MusicItemCollection<Track>> {

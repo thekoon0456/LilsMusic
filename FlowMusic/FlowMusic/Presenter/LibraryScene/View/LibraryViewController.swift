@@ -21,17 +21,27 @@ final class LibraryViewController: BaseViewController {
     private let layout = CollectionViewPagingLayout()
     private let itemSelected = PublishSubject<MusicItem>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
+    private let searchTrackSubject = BehaviorSubject<[Track]>(value: [])
     
     // MARK: - UI
     
-    private lazy var searchController = UISearchController().then {
+    private lazy var searchController = UISearchController(searchResultsController: libraryCollectionViewController).then {
         $0.searchBar.placeholder = "Find Your Music"
         $0.searchBar.backgroundColor = .clear
         $0.searchBar.searchBarStyle = .minimal
         $0.searchBar.tintColor = FMDesign.Color.tintColor.color
         $0.searchBar.delegate = self
         $0.definesPresentationContext = true
+        $0.searchResultsUpdater = self
     }
+    
+    private lazy var libraryCollectionViewController = {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = .init(width: UIScreen.main.bounds.width, height: 60)
+        let cv = LibraryCollectionViewController(collectionViewLayout: layout)
+        cv.collectionView.register(MusicListCell.self, forCellWithReuseIdentifier: MusicListCell.identifier)
+        return cv
+    }()
     
     private lazy var scrollView = UIScrollView().then {
         $0.showsVerticalScrollIndicator = false
@@ -118,9 +128,14 @@ final class LibraryViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-        let searchButtonTapped = searchController.searchBar.rx.searchButtonClicked
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .withLatestFrom(searchController.searchBar.rx.text) { $1 ?? "" } //$0은 이벤트, $1은 text
+//        let searchButtonTapped = searchController.searchBar.rx.searchButtonClicked
+//            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+//            .withLatestFrom(searchController.searchBar.rx.text) { $1 ?? "" } //$0은 이벤트, $1은 text
+        
+        let searchButtonTapped = searchController.searchBar.rx.text
+             .orEmpty // nil을 방지하기 위해 빈 문자열로 변환
+             .distinctUntilChanged() // 연속적인 중복 값 방지
+             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -151,17 +166,13 @@ final class LibraryViewController: BaseViewController {
         //
         //        }.disposed(by: disposeBag)
         
+        output.searchResult.drive(with: self) { owner, tracks in
+            owner.searchTrackSubject.onNext(tracks)
+            owner.libraryCollectionViewController.collectionView.reloadData()
+        }.disposed(by: disposeBag)
+        
         output.currentPlaySong.drive(with: self) { owner, track in
-            guard let track else {
-                owner.miniPlayerView.isHidden = true
-                owner.miniPlayerView.alpha = 0
-                return
-            }
-            owner.miniPlayerView.isHidden = false
-            owner.miniPlayerView.configureView(track)
-            UIView.animate(withDuration: 0.3) {
-                owner.miniPlayerView.alpha = 1
-            }
+            owner.updateMiniPlayer(track: track)
         }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, state in
@@ -172,6 +183,20 @@ final class LibraryViewController: BaseViewController {
                 owner.miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
             }
         }.disposed(by: disposeBag)
+    }
+    
+    private func updateMiniPlayer(track: Track?) {
+        guard let track else {
+            miniPlayerView.isHidden = true
+            miniPlayerView.alpha = 0
+            return
+        }
+        miniPlayerView.isHidden = false
+        miniPlayerView.configureView(track)
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self else { return }
+            miniPlayerView.alpha = 1
+        }
     }
     
     override func configureHierarchy() {
@@ -195,8 +220,13 @@ final class LibraryViewController: BaseViewController {
             make.width.equalToSuperview()
         }
         
-        likedSongsButton.snp.makeConstraints { make in
+        playlistCollectionView.snp.makeConstraints { make in
             make.top.equalToSuperview()
+            make.height.equalTo(200)
+        }
+        
+        likedSongsButton.snp.makeConstraints { make in
+            make.top.equalTo(playlistCollectionView.snp.bottom)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalTo(recentlyPlayedButton.snp.leading).offset(-20)
             make.height.equalTo(likedSongsButton.snp.width)
@@ -204,21 +234,16 @@ final class LibraryViewController: BaseViewController {
         }
         
         recentlyPlayedButton.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.top.equalTo(playlistCollectionView.snp.bottom)
             make.trailing.equalToSuperview().offset(-20)
             make.height.equalTo(recentlyPlayedButton.snp.width)
         }
         
-        playlistCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(likedSongsButton.snp.bottom).offset(20)
-            make.height.equalTo(200)
-        }
-        
-        albumCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
-            make.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview()
-        }
+//        albumCollectionView.snp.makeConstraints { make in
+//            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
+//            make.horizontalEdges.equalToSuperview()
+//            make.bottom.equalToSuperview()
+//        }
         
         miniPlayerView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
@@ -237,6 +262,26 @@ final class LibraryViewController: BaseViewController {
     }
 }
 
+// MARK: - SearchResultsUpdater
+
+extension LibraryViewController: UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchBarText = searchController.searchBar.text,
+              let resultController = searchController.searchResultsController as? LibraryCollectionViewController
+        else { return }
+
+        // 데이터 필터링 로직
+//        resultController.filteredData = [] // 여기에 필터링된 데이터를 할당
+        guard let result = try? searchTrackSubject.value() else { return }
+        
+        resultController.results = result
+        resultController.collectionView.reloadData()
+    }
+}
+
+// MARK: - SearchBar
+
 extension LibraryViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         //        viewModel.input.searchText.onNext(searchBar.text)
@@ -253,6 +298,8 @@ extension LibraryViewController: UISearchBarDelegate {
         return !hasWhiteSpace
     }
 }
+
+// MARK: - CoverFlowCollectionView
 
 extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
