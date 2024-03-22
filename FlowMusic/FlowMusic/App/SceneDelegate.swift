@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import StoreKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -18,9 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: scene)
         window?.makeKeyAndVisible()
         window?.tintColor = .systemGreen
-    
         let nav = UINavigationController()
         nav.isNavigationBarHidden = true
+        
         appCoordinator = AppCoordinator(navigationController: nav)
         appCoordinator?.start()
         window?.rootViewController = nav

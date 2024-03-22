@@ -17,6 +17,7 @@
 		7C044BF42BADA71F007E910E /* LibraryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C044BF32BADA71F007E910E /* LibraryListViewController.swift */; };
 		7C044BF62BADA74D007E910E /* LibraryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C044BF52BADA74D007E910E /* LibraryListViewModel.swift */; };
 		7C044BF82BADA7B5007E910E /* LibraryListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C044BF72BADA7B5007E910E /* LibraryListCoordinator.swift */; };
+		7C044BFD2BADE312007E910E /* MusicSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C044BFC2BADE312007E910E /* MusicSubscriptionManager.swift */; };
 		7C0B94352BA991E600F6E2C0 /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0B94342BA991E600F6E2C0 /* MarqueeLabel.swift */; };
 		7C0B94372BA9C05700F6E2C0 /* LibraryButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0B94362BA9C05700F6E2C0 /* LibraryButtonView.swift */; };
 		7C0B943B2BAC765900F6E2C0 /* LibraryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0B943A2BAC765900F6E2C0 /* LibraryCollectionViewController.swift */; };
@@ -91,6 +92,7 @@
 		7C044BF32BADA71F007E910E /* LibraryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryListViewController.swift; sourceTree = "<group>"; };
 		7C044BF52BADA74D007E910E /* LibraryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryListViewModel.swift; sourceTree = "<group>"; };
 		7C044BF72BADA7B5007E910E /* LibraryListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryListCoordinator.swift; sourceTree = "<group>"; };
+		7C044BFC2BADE312007E910E /* MusicSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSubscriptionManager.swift; sourceTree = "<group>"; };
 		7C0B94342BA991E600F6E2C0 /* MarqueeLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeLabel.swift; sourceTree = "<group>"; };
 		7C0B94362BA9C05700F6E2C0 /* LibraryButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryButtonView.swift; sourceTree = "<group>"; };
 		7C0B943A2BAC765900F6E2C0 /* LibraryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCollectionViewController.swift; sourceTree = "<group>"; };
@@ -414,6 +416,7 @@
 				7C813DEE2B9AE3B200CDFF1D /* FMMusicPlayer.swift */,
 				7CF60D742B9EE6B3001769BD /* MusicStorage.swift */,
 				7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */,
+				7C044BFC2BADE312007E910E /* MusicSubscriptionManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -666,6 +669,7 @@
 				7C044BF82BADA7B5007E910E /* LibraryListCoordinator.swift in Sources */,
 				7CF60D732B9EE60E001769BD /* UserLibrary.swift in Sources */,
 				7C813DFD2B9B13AB00CDFF1D /* UIVIewController+.swift in Sources */,
+				7C044BFD2BADE312007E910E /* MusicSubscriptionManager.swift in Sources */,
 				7C916E092B9D9BC000C5F6C0 /* Coordinator.swift in Sources */,
 				7C131C542BA44387004B3FF2 /* MusicRepository.swift in Sources */,
 				7C03F7CC2BA177FA00FB748C /* UserPlaylistRepository.swift in Sources */,
@@ -863,6 +867,7 @@
 				INFOPLIST_FILE = FlowMusic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FlowMusic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Permission is required to use the app service with AppleMusic. Please allow access to continue.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -896,6 +901,7 @@
 				INFOPLIST_FILE = FlowMusic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FlowMusic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Permission is required to use the app service with AppleMusic. Please allow access to continue.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import MusicKit
 
 protocol CoordinatorDelegate: AnyObject {
     
@@ -86,19 +85,7 @@ extension Coordinator {
 
 extension Coordinator {
     
-    func requestMusicAuthorization() async {
-        let status = await MusicAuthorization.request()
-        
-        switch status {
-        case .authorized:
-            print("승인됨")
-        default:
-            moveToUserSetting()
-            print("승인안됨. 재요청")
-        }
-    }
-    
-    private func moveToUserSetting() {
+    func moveToUserSetting() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             let alert = UIAlertController(title: "음악 접근 권한이 필요합니다.",

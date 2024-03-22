@@ -11,6 +11,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 import SnapKit
+import StoreKit
 
 final class MusicRecommendViewController: BaseViewController {
     
@@ -43,7 +44,7 @@ final class MusicRecommendViewController: BaseViewController {
         $0.isHidden = true
         $0.alpha = 0
     }
-    
+
     // MARK: - Lifecycles
     
     init(viewModel: MusicRecommendViewModel) {
