@@ -136,8 +136,11 @@ final class LibraryViewController: BaseViewController {
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
+        let modelSelected = libraryCollectionViewController.collectionView.rx.modelSelected(Track.self)
+        
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
                                            searchText: searchText,
+                                           searchModelSelected: modelSelected,
                                            likedSongTapped: likedSongsButton.tap,
                                            recentlyPlayedSongTapped: recentlyPlayedButton.tap,
                                            itemSelected: itemSelected,  

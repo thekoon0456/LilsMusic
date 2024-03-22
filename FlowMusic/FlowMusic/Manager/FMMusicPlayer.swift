@@ -69,6 +69,12 @@ final class FMMusicPlayer {
         try await play()
     }
     
+    func playTrack(_ track: Track) async throws {
+        resetQueue()
+        player.queue = [track]
+        try await play()
+    }
+    
     func resetQueue() {
         player.queue = []
     }

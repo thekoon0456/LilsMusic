@@ -17,6 +17,7 @@ final class LibraryViewModel: ViewModel {
     struct Input {
         let viewDidLoad: Observable<Void>
         let searchText: Observable<String>
+        let searchModelSelected: ControlEvent<Track>
         let likedSongTapped: Observable<Void>
         let recentlyPlayedSongTapped: Observable<Void>
         let itemSelected: Observable<MusicItem>
@@ -78,6 +79,15 @@ final class LibraryViewModel: ViewModel {
                         print(error)
                     }
                 }
+        }.disposed(by: disposeBag)
+        
+        input.searchModelSelected
+            .withUnretained(self)
+            .subscribe { owner, track in
+                Task {
+                    try await owner.musicPlayer.playTrack(track)
+                }
+                owner.coordinator?.presentMusicPlayer(track: track)
         }.disposed(by: disposeBag)
         
 //        input
