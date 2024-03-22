@@ -162,15 +162,6 @@ final class LibraryViewController: BaseViewController {
                 cell.configureCell(model)
             }.disposed(by: disposeBag)
         
-        //        output.mix.drive(with: self) { owner, playlist in
-        //            print(playlist)
-        //            owner.playlistSubject.onNext(playlist)
-        //            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-        //                owner.playlistCollectionView.reloadData()
-        //            }
-        //        }.disposed(by: disposeBag)
-        
-        
         output.mix
             .drive(playlistCollectionView.rx.items(cellIdentifier: LibraryCell.identifier, cellType: LibraryCell.self)) { [weak self] item, model, cell in
                 guard let self else { return }

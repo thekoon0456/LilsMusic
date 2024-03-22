@@ -69,7 +69,6 @@ final class MusicListViewModel: ViewModel {
                         owner.coordinator?.presentMusicPlayer(track: firstItem)
                     }
                 }
-
             }.disposed(by: disposeBag)
         
         input.shuffleButtonTapped

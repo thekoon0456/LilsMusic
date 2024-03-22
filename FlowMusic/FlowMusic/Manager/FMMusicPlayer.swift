@@ -28,35 +28,30 @@ final class FMMusicPlayer {
     }
     
     func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
-        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
     }
     
     func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
-        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
     }
     
     func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
-        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[0])
         player.queue = queue
         try await play()
     }
     
     func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
-        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
     }
     
     func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
-        resetQueue()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
@@ -64,13 +59,11 @@ final class FMMusicPlayer {
     
     //한곡 재생
     func playSong(_ song: Song) async throws {
-        resetQueue()
         player.queue = [song]
         try await play()
     }
     
     func playTrack(_ track: Track) async throws {
-        resetQueue()
         player.queue = [track]
         try await play()
     }
