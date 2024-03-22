@@ -53,6 +53,7 @@ final class LibraryListViewController: BaseViewController {
 
         configureDataSource()
         updateSnapshot(tracks: [])
+        viewDidLoadTrigger.onNext(())
     }
     
     override func bind() {
@@ -65,7 +66,8 @@ final class LibraryListViewController: BaseViewController {
                 return !miniPlayerView.playButton.isSelected
             }
         
-        let input = LibraryListViewModel.Input(itemSelected: itemSelected.asObservable(),
+        let input = LibraryListViewModel.Input(viewDidLoad: viewDidLoadTrigger.asObservable(),
+                                               itemSelected: itemSelected.asObservable(),
                                              playButtonTapped: playButtonTapped.asObservable(),
                                              shuffleButtonTapped: shuffleButtonTapped.asObservable(),
                                              miniPlayerTapped: miniPlayerView.tap,
@@ -225,7 +227,8 @@ extension LibraryListViewController {
     
     private func setLayout() {
         collectionView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalToSuperview()
+            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
         
         miniPlayerView.snp.makeConstraints { make in

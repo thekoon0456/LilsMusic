@@ -64,7 +64,8 @@ final class MusicListViewController: BaseViewController {
                 return !miniPlayerView.playButton.isSelected
             }
         
-        let input = MusicListViewModel.Input(itemSelected: itemSelected.asObservable(),
+        let input = MusicListViewModel.Input(viewDidLoad: viewDidLoadTrigger.asObservable(),
+                                            itemSelected: itemSelected.asObservable(),
                                              playButtonTapped: playButtonTapped.asObservable(),
                                              shuffleButtonTapped: shuffleButtonTapped.asObservable(),
                                              miniPlayerTapped: miniPlayerView.tap,

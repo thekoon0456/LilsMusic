@@ -15,6 +15,7 @@ import RxSwift
 final class LibraryListViewModel: ViewModel {
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let itemSelected: Observable<(index: Int, track: Track)>
         let playButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
@@ -40,14 +41,14 @@ final class LibraryListViewModel: ViewModel {
     let disposeBag = DisposeBag()
     private var cancellable = Set<AnyCancellable>()
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
-    private let trackListSubject = BehaviorSubject<MusicItemCollection<Track>>(value: [])
     private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
+    private let tracks: MusicItemCollection<Track>
     
     // MARK: - Lifecycles
     
     init(coordinator: LibraryListCoordinator?, tracks: MusicItemCollection<Track>) {
         self.coordinator = coordinator
-        trackListSubject.onNext(tracks)
+        self.tracks = tracks
         musicItem.onNext(tracks.first)
         playerUpdateSink()
         playerStateUpdateSink()
@@ -57,14 +58,23 @@ final class LibraryListViewModel: ViewModel {
     
     
     func transform(_ input: Input) -> Output {
+        
+        let tracks = input.viewDidLoad
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return Observable.create { observer in
+                    observer.onNext(owner.tracks)
+                    observer.onCompleted()
+                    return Disposables.create()
+                }
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
 
         input.playButtonTapped
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
-                    guard let tracks = try? owner.trackListSubject.value(),
-                          let firstItem = tracks.first else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    guard let firstItem = owner.tracks.first else { return }
+                    try await owner.musicPlayer.setTrackQueue(item: owner.tracks, startIndex: 0)
                     DispatchQueue.main.async {
                         owner.coordinator?.presentMusicPlayer(track: firstItem)
                     }
@@ -75,9 +85,8 @@ final class LibraryListViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
-                    guard let tracks = try? owner.trackListSubject.value(),
-                          let firstItem = tracks.first else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    guard let firstItem = owner.tracks.first else { return }
+                    try await owner.musicPlayer.setTrackQueue(item: owner.tracks, startIndex: 0)
                     UserDefaultsManager.shared.userSetting.shuffleMode = .on
                     owner.musicPlayer.setShuffleMode(mode: .on)
                     DispatchQueue.main.async {
@@ -91,8 +100,7 @@ final class LibraryListViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, item in
                 Task {
-                    guard let tracks = try? owner.trackListSubject.value() else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
+                    try await owner.musicPlayer.setTrackQueue(item: owner.tracks, startIndex:item.index)
                     DispatchQueue.main.async {
                         owner.coordinator?.presentMusicPlayer(track: item.track)
                     }
@@ -142,7 +150,7 @@ final class LibraryListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
-                      tracks: trackListSubject.asDriver(onErrorJustReturn: []),
+                      tracks: tracks,
                       currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }

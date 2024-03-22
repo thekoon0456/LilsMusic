@@ -15,6 +15,7 @@ import RxSwift
 final class MusicListViewModel: ViewModel {
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let itemSelected: Observable<(index: Int, track: Track)>
         let playButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
@@ -54,7 +55,13 @@ final class MusicListViewModel: ViewModel {
     // MARK: - Helpers
     
     func transform(_ input: Input) -> Output {
-        let tracks = getTracks().asDriver(onErrorJustReturn: MusicItemCollection<Track>())
+//        let tracks = getTracks().asDriver(onErrorJustReturn: MusicItemCollection<Track>())
+        
+        let tracks = input.viewDidLoad
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.getTracks()
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
         
         input.playButtonTapped
             .withUnretained(self)
