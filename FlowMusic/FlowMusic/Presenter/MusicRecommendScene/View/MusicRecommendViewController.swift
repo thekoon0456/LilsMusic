@@ -97,12 +97,7 @@ final class MusicRecommendViewController: BaseViewController {
           }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, state in
-            print(state)
-            if state == .playing {
-                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
-            } else {
-                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-            }
+            owner.setPlayButton(state: state)
         }.disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
@@ -135,6 +130,14 @@ final class MusicRecommendViewController: BaseViewController {
     }
     
     // MARK: - Configure
+    
+    private func setPlayButton(state: MusicPlayer.PlaybackStatus) {
+        if state == .playing {
+            miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+        } else {
+            miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        }
+    }
     
     private func updateMiniPlayer(track: Track?) {
         guard let track else {

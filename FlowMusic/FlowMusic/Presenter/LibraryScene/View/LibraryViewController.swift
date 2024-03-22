@@ -59,6 +59,20 @@ final class LibraryViewController: BaseViewController {
         $0.isUserInteractionEnabled = true
     }
     
+    private let titleView = UILabel().then {
+        $0.text = "Library"
+        $0.font = .boldSystemFont(ofSize: 20)
+    }
+    
+    private lazy var playlistCollectionView: UICollectionView = {
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.isPagingEnabled = true
+        cv.register(LibraryCell.self, forCellWithReuseIdentifier: LibraryCell.identifier)
+        cv.showsHorizontalScrollIndicator = false
+        return cv
+    }()
+    
+    
     private let likedSongsButton = LibraryButtonView(imageName: "heart.fill",
                                                      title: "Liked Songs",
                                                      subTitle: "",
@@ -74,35 +88,11 @@ final class LibraryViewController: BaseViewController {
         $0.alpha = 0
     }
     
-    private let titleView = UILabel().then {
-        $0.text = "Library"
-        $0.font = .boldSystemFont(ofSize: 20)
-    }
-    
-    private lazy var playlistCollectionView: UICollectionView = {
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.isPagingEnabled = true
-        cv.register(LibraryCell.self, forCellWithReuseIdentifier: LibraryCell.identifier)
-        //        cv.dataSource = self
-        //        cv.delegate = self
-        cv.showsHorizontalScrollIndicator = false
-        return cv
-    }()
-    
     //    private lazy var albumCollectionView = UICollectionView(frame: .zero,
     //                                                            collectionViewLayout: createLayout())
     //    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
     //        private var album: MusicItemCollection<Album>?
-    //
-    //    //예전 컬렉션뷰 방식 사용
-    //    var playlist: [(title: String, item: MusicItemCollection<Track>?)] = [] {
-    //        didSet {
-    //            playlistCollectionView.reloadData()
-    //            //커버플로우 1번 인덱스부터 시작
-    //            layout.setCurrentPage(1)
-    //        }
-    //    }
-    
+
     // MARK: - Lifecycles
     
     init(viewModel: LibraryViewModel) {
@@ -116,10 +106,6 @@ final class LibraryViewController: BaseViewController {
         viewDidLoadTrigger.onNext(())
         
         //        configureDataSource()
-        //                        Task {
-        //                            self.playlist = try await viewModel.musicRepository.requestCatalogPlaylistCharts()
-        //                        }
-        
     }
     
     @objc func refreshData() {
@@ -133,7 +119,7 @@ final class LibraryViewController: BaseViewController {
         super.bind()
         
         let searchText = searchController.searchBar.rx.text
-            .orEmpty // nil을 방지하기 위해 빈 문자열로 변환
+            .orEmpty
             .distinctUntilChanged() // 연속적인 중복 값 방지
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
         
@@ -168,7 +154,6 @@ final class LibraryViewController: BaseViewController {
                 cell.configureCell(model)
                 //collectionView1번부터
                 layout.setCurrentPage(1)
-                layout.scrollDirection = .horizontal
             }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
@@ -176,13 +161,16 @@ final class LibraryViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, state in
-            print(state)
-            if state == .playing {
-                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
-            } else {
-                owner.miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-            }
+            owner.setPlayButton(state: state)
         }.disposed(by: disposeBag)
+    }
+    
+    private func setPlayButton(state: MusicPlayer.PlaybackStatus) {
+        if state == .playing {
+            miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+        } else {
+            miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        }
     }
     
     private func updateMiniPlayer(track: Track?) {
@@ -216,7 +204,6 @@ final class LibraryViewController: BaseViewController {
         contentView.snp.makeConstraints { make in
             make.verticalEdges.equalTo(scrollView)
             make.width.equalToSuperview()
-//            make.height.equalToSuperview()
         }
         
         playlistCollectionView.snp.makeConstraints { make in
@@ -281,37 +268,6 @@ extension LibraryViewController: UISearchBarDelegate {
         return !hasWhiteSpace
     }
 }
-
-//// MARK: - CoverFlowCollectionView
-//
-//extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDelegate {
-//
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        print(#function)
-//        guard let count = try? playlistSubject.value().count else { return 0 }
-//        print(count)
-//        return count
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LibraryCell.identifier, for: indexPath) as? LibraryCell,
-//              let playlists = try? playlistSubject.value()
-//        else {
-//            return UICollectionViewCell()
-//        }
-//        print(cell)
-//        print(playlists[indexPath.item])
-//        cell.configureCell(playlists[indexPath.item])
-//        return cell
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard let playlists = try? playlistSubject.value() else { return }
-//        Task {
-//            viewModel.coordinator?.pushToList(playlist: playlists[indexPath.item])
-//        }
-//    }
-//}
 
 // MARK: - AlbumCollectionView
 

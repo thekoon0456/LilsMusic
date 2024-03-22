@@ -44,10 +44,10 @@ final class LibraryCoordinator: Coordinator, CoordinatorDelegate {
         coordinator.start()
     }
     
-    func pushToList(track: MusicItemCollection<Track>?) {
-        guard let track = track as? MusicItem else { return }
-        let coordinator = MusicListCoordinator(navigationController: navigationController,
-                                               item: track)
+    func pushToLibraryList(tracks: MusicItemCollection<Track>?) {
+        guard let tracks else { return }
+        let coordinator = LibraryListCoordinator(navigationController: navigationController,
+                                               tracks: tracks)
         childCoordinators.append(coordinator)
         coordinator.start()
     }

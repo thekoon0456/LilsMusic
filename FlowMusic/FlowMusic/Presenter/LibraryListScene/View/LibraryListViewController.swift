@@ -1,8 +1,8 @@
 //
-//  MusicListViewController.swift
+//  LibraryListViewController.swift
 //  FlowMusic
 //
-//  Created by Deokhun KIM on 3/8/24.
+//  Created by Deokhun KIM on 3/22/24.
 //
 
 import UIKit
@@ -13,11 +13,11 @@ import RxSwift
 import SnapKit
 import Kingfisher
 
-final class MusicListViewController: BaseViewController {
+final class LibraryListViewController: BaseViewController {
     
     // MARK: - Properties
     
-    private let viewModel: MusicListViewModel
+    private let viewModel: LibraryListViewModel
     private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
     private let itemSelected = PublishSubject<(index: Int, track: Track)>()
     private var headerItem: MusicItem?
@@ -27,7 +27,8 @@ final class MusicListViewController: BaseViewController {
     
     // MARK: - UI
     
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
+    private lazy var collectionView = UICollectionView(frame: .zero,
+                                                       collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
         $0.contentInsetAdjustmentBehavior = .never
         $0.register(ArtworkHeaderReusableView.self,
@@ -42,7 +43,7 @@ final class MusicListViewController: BaseViewController {
     
     // MARK: - Lifecycles
     
-    init(viewModel: MusicListViewModel) {
+    init(viewModel: LibraryListViewModel) {
         self.viewModel = viewModel
         super.init()
     }
@@ -64,7 +65,7 @@ final class MusicListViewController: BaseViewController {
                 return !miniPlayerView.playButton.isSelected
             }
         
-        let input = MusicListViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
+        let input = LibraryListViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                              itemSelected: itemSelected.asObservable(),
                                              playButtonTapped: playButtonTapped.asObservable(),
                                              shuffleButtonTapped: shuffleButtonTapped.asObservable(),
@@ -80,6 +81,7 @@ final class MusicListViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.tracks.drive(with: self) { owner, tracks in
+            print(tracks)
             owner.updateSnapshot(tracks: tracks)
         }.disposed(by: disposeBag)
         
@@ -97,7 +99,6 @@ final class MusicListViewController: BaseViewController {
         output.playState.drive(with: self) { owner, state in
             owner.setPlayButton(state: state)
         }.disposed(by: disposeBag)
-        
     }
     
     // MARK: - Configure
@@ -141,7 +142,7 @@ final class MusicListViewController: BaseViewController {
 
 // MARK: - CollectionView
 
-extension MusicListViewController {
+extension LibraryListViewController {
     
     enum Section: Int, CaseIterable {
         case main
@@ -149,6 +150,7 @@ extension MusicListViewController {
     
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
+            print(itemIdentifier)
             cell.configureCell(itemIdentifier)
         }
         
@@ -220,7 +222,7 @@ extension MusicListViewController {
 
 // MARK: - Layout
 
-extension MusicListViewController {
+extension LibraryListViewController {
     
     private func setLayout() {
         collectionView.snp.makeConstraints { make in
@@ -235,3 +237,4 @@ extension MusicListViewController {
         }
     }
 }
+
