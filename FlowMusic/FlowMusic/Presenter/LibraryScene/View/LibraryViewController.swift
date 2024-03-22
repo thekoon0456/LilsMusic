@@ -21,6 +21,7 @@ final class LibraryViewController: BaseViewController {
     private let layout = CollectionViewPagingLayout()
     private let itemSelected = PublishSubject<MusicItem>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
+    private let playlistSubject = BehaviorSubject< MusicItemCollection<Playlist>>(value: [])
     
     // MARK: - UI
     
@@ -54,7 +55,9 @@ final class LibraryViewController: BaseViewController {
         $0.addTarget(self, action: #selector(refreshData), for: .valueChanged)
     }
     
-    private let contentView = UIView()
+    private let contentView = UIView().then {
+        $0.isUserInteractionEnabled = true
+    }
     
     private let likedSongsButton = LibraryButtonView(imageName: "heart.fill",
                                                      title: "Liked Songs",
@@ -80,25 +83,25 @@ final class LibraryViewController: BaseViewController {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.isPagingEnabled = true
         cv.register(LibraryCell.self, forCellWithReuseIdentifier: LibraryCell.identifier)
-        cv.dataSource = self
-        cv.delegate = self
+        //        cv.dataSource = self
+        //        cv.delegate = self
         cv.showsHorizontalScrollIndicator = false
         return cv
     }()
     
-    private lazy var albumCollectionView = UICollectionView(frame: .zero,
-                                                            collectionViewLayout: createLayout())
-    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
+    //    private lazy var albumCollectionView = UICollectionView(frame: .zero,
+    //                                                            collectionViewLayout: createLayout())
+    //    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
     //        private var album: MusicItemCollection<Album>?
-    
-    //예전 컬렉션뷰 방식 사용
-    var playlist: [(title: String, item: MusicItemCollection<Track>?)] = [] {
-        didSet {
-            playlistCollectionView.reloadData()
-            //커버플로우 1번 인덱스부터 시작
-            layout.setCurrentPage(1)
-        }
-    }
+    //
+    //    //예전 컬렉션뷰 방식 사용
+    //    var playlist: [(title: String, item: MusicItemCollection<Track>?)] = [] {
+    //        didSet {
+    //            playlistCollectionView.reloadData()
+    //            //커버플로우 1번 인덱스부터 시작
+    //            layout.setCurrentPage(1)
+    //        }
+    //    }
     
     // MARK: - Lifecycles
     
@@ -110,11 +113,13 @@ final class LibraryViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureDataSource()
-//                        Task {
-//                            self.playlist = try await viewModel.musicRepository.requestCatalogPlaylistCharts()
-//                        }
         viewDidLoadTrigger.onNext(())
+        
+        //        configureDataSource()
+        //                        Task {
+        //                            self.playlist = try await viewModel.musicRepository.requestCatalogPlaylistCharts()
+        //                        }
+        
     }
     
     @objc func refreshData() {
@@ -128,22 +133,24 @@ final class LibraryViewController: BaseViewController {
         super.bind()
         
         let searchText = searchController.searchBar.rx.text
-             .orEmpty // nil을 방지하기 위해 빈 문자열로 변환
-             .distinctUntilChanged() // 연속적인 중복 값 방지
-             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .orEmpty // nil을 방지하기 위해 빈 문자열로 변환
+            .distinctUntilChanged() // 연속적인 중복 값 방지
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
         let modelSelected = libraryCollectionViewController.collectionView.rx.modelSelected(Track.self)
+        let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
                                            searchText: searchText,
                                            searchModelSelected: modelSelected,
                                            likedSongTapped: likedSongsButton.tap,
                                            recentlyPlayedSongTapped: recentlyPlayedButton.tap,
-                                           itemSelected: itemSelected,  
+                                           itemSelected: itemSelected,
+                                           mixSelected: mixSelected,
                                            miniPlayerTapped: miniPlayerView.tap,
                                            miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                            miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
@@ -152,8 +159,26 @@ final class LibraryViewController: BaseViewController {
         
         output.searchResult
             .drive(libraryCollectionViewController.collectionView.rx.items(cellIdentifier: MusicListCell.identifier, cellType: MusicListCell.self)) { item, model, cell in
-            cell.configureCell(model)
-        }.disposed(by: disposeBag)
+                cell.configureCell(model)
+            }.disposed(by: disposeBag)
+        
+        //        output.mix.drive(with: self) { owner, playlist in
+        //            print(playlist)
+        //            owner.playlistSubject.onNext(playlist)
+        //            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        //                owner.playlistCollectionView.reloadData()
+        //            }
+        //        }.disposed(by: disposeBag)
+        
+        
+        output.mix
+            .drive(playlistCollectionView.rx.items(cellIdentifier: LibraryCell.identifier, cellType: LibraryCell.self)) { [weak self] item, model, cell in
+                guard let self else { return }
+                cell.configureCell(model)
+                //collectionView1번부터
+                layout.setCurrentPage(1)
+                layout.scrollDirection = .horizontal
+            }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
             owner.updateMiniPlayer(track: track)
@@ -188,25 +213,25 @@ final class LibraryViewController: BaseViewController {
         scrollView.addSubview(contentView)
         contentView.addSubviews(playlistCollectionView,
                                 likedSongsButton,
-                                recentlyPlayedButton,
-                                albumCollectionView)
+                                recentlyPlayedButton)
     }
     
     override func configureLayout() {
         super.configureLayout()
         scrollView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.size.equalTo(view.safeAreaLayoutGuide)
         }
         
         contentView.snp.makeConstraints { make in
             make.verticalEdges.equalTo(scrollView)
             make.width.equalToSuperview()
+//            make.height.equalToSuperview()
         }
         
         playlistCollectionView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.height.equalTo(200)
+            make.top.equalTo(contentView.snp.top)
+            make.width.equalTo(contentView.snp.width)
+            make.height.equalTo(220)
         }
         
         likedSongsButton.snp.makeConstraints { make in
@@ -215,6 +240,7 @@ final class LibraryViewController: BaseViewController {
             make.trailing.equalTo(recentlyPlayedButton.snp.leading).offset(-20)
             make.height.equalTo(likedSongsButton.snp.width)
             make.width.equalTo(recentlyPlayedButton.snp.width)
+            make.bottom.equalToSuperview()
         }
         
         recentlyPlayedButton.snp.makeConstraints { make in
@@ -223,11 +249,11 @@ final class LibraryViewController: BaseViewController {
             make.height.equalTo(recentlyPlayedButton.snp.width)
         }
         
-//        albumCollectionView.snp.makeConstraints { make in
-//            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
-//            make.horizontalEdges.equalToSuperview()
-//            make.bottom.equalToSuperview()
-//        }
+        //        albumCollectionView.snp.makeConstraints { make in
+        //            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
+        //            make.horizontalEdges.equalToSuperview()
+        //            make.bottom.equalToSuperview()
+        //        }
         
         miniPlayerView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
@@ -265,60 +291,66 @@ extension LibraryViewController: UISearchBarDelegate {
     }
 }
 
-// MARK: - CoverFlowCollectionView
-
-extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDelegate {
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return playlist.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LibraryCell.identifier, for: indexPath) as? LibraryCell else {
-            return UICollectionViewCell()
-        }
-        let playlist = playlist[indexPath.item]
-        cell.configureCell(title: playlist.title, track: playlist.item?.first)
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(indexPath.item)
-                Task {
-        viewModel.coordinator?.pushToList(track: playlist[indexPath.item].item)
-                }
-    }
-}
+//// MARK: - CoverFlowCollectionView
+//
+//extension LibraryViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+//
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        print(#function)
+//        guard let count = try? playlistSubject.value().count else { return 0 }
+//        print(count)
+//        return count
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LibraryCell.identifier, for: indexPath) as? LibraryCell,
+//              let playlists = try? playlistSubject.value()
+//        else {
+//            return UICollectionViewCell()
+//        }
+//        print(cell)
+//        print(playlists[indexPath.item])
+//        cell.configureCell(playlists[indexPath.item])
+//        return cell
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        guard let playlists = try? playlistSubject.value() else { return }
+//        Task {
+//            viewModel.coordinator?.pushToList(playlist: playlists[indexPath.item])
+//        }
+//    }
+//}
 
 // MARK: - AlbumCollectionView
 
-extension LibraryViewController {
-    
-    enum Section: Int, CaseIterable {
-        case album
-    }
-    
-    private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<AlbumArtCell, Album> { cell, indexPath, itemIdentifier in
-            cell.configureCell(itemIdentifier)
-        }
-        
-        dataSource = UICollectionViewDiffableDataSource(collectionView: albumCollectionView) { collectionView, indexPath, itemIdentifier in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-            return cell
-        }
-    }
-    
-    private func createLayout() -> UICollectionViewCompositionalLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalWidth(0.5))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0)
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalWidth(0.5))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(10)
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
-        let layout = UICollectionViewCompositionalLayout(section: section)
-        return layout
-    }
-}
+//extension LibraryViewController {
+//
+//    enum Section: Int, CaseIterable {
+//        case album
+//    }
+//
+//    private func configureDataSource() {
+//        let cellRegistration = UICollectionView.CellRegistration<AlbumArtCell, Album> { cell, indexPath, itemIdentifier in
+//            cell.configureCell(itemIdentifier)
+//        }
+//
+//        dataSource = UICollectionViewDiffableDataSource(collectionView: albumCollectionView) { collectionView, indexPath, itemIdentifier in
+//            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+//            return cell
+//        }
+//    }
+//
+//    private func createLayout() -> UICollectionViewCompositionalLayout {
+//        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalWidth(0.5))
+//        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+//        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0)
+//        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalWidth(0.5))
+//        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+//        group.interItemSpacing = .fixed(10)
+//        let section = NSCollectionLayoutSection(group: group)
+//        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+//        let layout = UICollectionViewCompositionalLayout(section: section)
+//        return layout
+//    }
+//}
