@@ -59,7 +59,6 @@ final class LibraryListViewModel: ViewModel {
     
     
     func transform(_ input: Input) -> Output {
-        
         let tracks = input.viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
@@ -69,6 +68,16 @@ final class LibraryListViewModel: ViewModel {
                     return Disposables.create()
                 }
             }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
+        
+        input.viewDidLoad
+            .withUnretained(self)
+            .flatMap{ owner, void -> Observable<Track?> in
+                owner.getCurrentPlaySong()
+            }
+            .subscribe { [weak self] track in
+                guard let self else { return }
+                trackSubject.onNext(track)
+            }.disposed(by: disposeBag)
 
         input.playButtonTapped
             .withUnretained(self)

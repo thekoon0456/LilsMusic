@@ -56,13 +56,21 @@ final class MusicListViewModel: ViewModel {
     // MARK: - Helpers
     
     func transform(_ input: Input) -> Output {
-//        let tracks = getTracks().asDriver(onErrorJustReturn: MusicItemCollection<Track>())
-        
         let tracks = input.viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.getTracks()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
+        
+        input.viewDidLoad
+            .withUnretained(self)
+            .flatMap{ owner, void -> Observable<Track?> in
+                owner.getCurrentPlaySong()
+            }
+            .subscribe { [weak self] track in
+                guard let self else { return }
+                trackSubject.onNext(track)
+            }.disposed(by: disposeBag)
         
         input.playButtonTapped
             .withUnretained(self)
@@ -147,14 +155,6 @@ final class MusicListViewModel: ViewModel {
                 }
             }.disposed(by: disposeBag)
         
-        let currentPlaySong = input
-            .viewDidLoad
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                print(try? owner.trackSubject.value())
-                return owner.trackSubject.asObservable()
-            }
-        
         input.viewWillDisappear
             .withUnretained(self)
             .subscribe{ owner, _ in
@@ -163,7 +163,7 @@ final class MusicListViewModel: ViewModel {
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
                       tracks: tracks,
-                      currentPlaySong: currentPlaySong.asDriver(onErrorJustReturn: nil),
+                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }
     
