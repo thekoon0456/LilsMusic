@@ -73,7 +73,8 @@ final class LibraryListViewController: BaseViewController {
                                              miniPlayerTapped: miniPlayerView.tap,
                                              miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                              miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
-                                             miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
+                                             miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap,
+                                               viewWillDisappear: self.rx.viewWillDisappear.map { _ in })
         let output = viewModel.transform(input)
         
         output.item.drive(with: self) { owner, item in

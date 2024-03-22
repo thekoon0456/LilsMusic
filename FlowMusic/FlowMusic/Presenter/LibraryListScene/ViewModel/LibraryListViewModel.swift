@@ -23,6 +23,7 @@ final class LibraryListViewModel: ViewModel {
         let miniPlayerPlayButtonTapped: Observable<Bool>
         let miniPlayerPreviousButtonTapped: ControlEvent<Void>
         let miniPlayerNextButtonTapped: ControlEvent<Void>
+        let viewWillDisappear: Observable<Void>
     }
     
     struct Output {
@@ -147,6 +148,12 @@ final class LibraryListViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToNext()
                 }
+            }.disposed(by: disposeBag)
+        
+        input.viewWillDisappear
+            .withUnretained(self)
+            .subscribe{ owner, _ in
+                owner.coordinator?.finish()
             }.disposed(by: disposeBag)
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),

@@ -23,6 +23,7 @@ final class MusicListViewModel: ViewModel {
         let miniPlayerPlayButtonTapped: Observable<Bool>
         let miniPlayerPreviousButtonTapped: ControlEvent<Void>
         let miniPlayerNextButtonTapped: ControlEvent<Void>
+        let viewWillDisappear: Observable<Void>
     }
     
     struct Output {
@@ -146,9 +147,23 @@ final class MusicListViewModel: ViewModel {
                 }
             }.disposed(by: disposeBag)
         
+        let currentPlaySong = input
+            .viewDidLoad
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                print(try? owner.trackSubject.value())
+                return owner.trackSubject.asObservable()
+            }
+        
+        input.viewWillDisappear
+            .withUnretained(self)
+            .subscribe{ owner, _ in
+                owner.coordinator?.finish()
+            }.disposed(by: disposeBag)
+        
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
                       tracks: tracks,
-                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
+                      currentPlaySong: currentPlaySong.asDriver(onErrorJustReturn: nil),
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }
     

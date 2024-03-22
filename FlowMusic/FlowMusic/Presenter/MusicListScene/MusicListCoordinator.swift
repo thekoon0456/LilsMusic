@@ -23,6 +23,10 @@ final class MusicListCoordinator: Coordinator, CoordinatorDelegate {
         self.item = item
     }
     
+    deinit {
+        print("MusicListCoordinator Deinit")
+    }
+    
     func start() {
         let vm = MusicListViewModel(coordinator: self, item: item)
         
