@@ -21,7 +21,6 @@ final class LibraryViewController: BaseViewController {
     private let layout = CollectionViewPagingLayout()
     private let itemSelected = PublishSubject<MusicItem>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
-    private let searchTrackSubject = BehaviorSubject<[Track]>(value: [])
     
     // MARK: - UI
     
@@ -32,13 +31,14 @@ final class LibraryViewController: BaseViewController {
         $0.searchBar.tintColor = FMDesign.Color.tintColor.color
         $0.searchBar.delegate = self
         $0.definesPresentationContext = true
-        $0.searchResultsUpdater = self
     }
     
     private lazy var libraryCollectionViewController = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = .init(width: UIScreen.main.bounds.width, height: 60)
-        let cv = LibraryCollectionViewController(collectionViewLayout: layout)
+        let cv = UICollectionViewController(collectionViewLayout: layout)
+        cv.collectionView.delegate = nil
+        cv.collectionView.dataSource = nil
         cv.collectionView.register(MusicListCell.self, forCellWithReuseIdentifier: MusicListCell.identifier)
         return cv
     }()
@@ -111,7 +111,6 @@ final class LibraryViewController: BaseViewController {
         super.viewDidLoad()
         
         configureDataSource()
-        
 //                        Task {
 //                            self.playlist = try await viewModel.musicRepository.requestCatalogPlaylistCharts()
 //                        }
@@ -128,21 +127,17 @@ final class LibraryViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-//        let searchButtonTapped = searchController.searchBar.rx.searchButtonClicked
-//            .throttle(.seconds(1), scheduler: MainScheduler.instance)
-//            .withLatestFrom(searchController.searchBar.rx.text) { $1 ?? "" } //$0은 이벤트, $1은 text
-        
-        let searchButtonTapped = searchController.searchBar.rx.text
+        let searchText = searchController.searchBar.rx.text
              .orEmpty // nil을 방지하기 위해 빈 문자열로 변환
              .distinctUntilChanged() // 연속적인 중복 값 방지
-             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
-                                           searchText: searchButtonTapped,
+                                           searchText: searchText,
                                            likedSongTapped: likedSongsButton.tap,
                                            recentlyPlayedSongTapped: recentlyPlayedButton.tap,
                                            itemSelected: itemSelected,  
@@ -152,23 +147,9 @@ final class LibraryViewController: BaseViewController {
                                            miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
         let output = viewModel.transform(input)
         
-        //        output.playlist.drive(with: self) { owner, playlists in
-        //            DispatchQueue.global().async {
-        ////                owner.playlist = playlists
-        //            }
-        //        }.disposed(by: disposeBag)
-        //
-        //        output.likes.drive(with: self) { owner, likes in
-        //
-        //        }.disposed(by: disposeBag)
-        //
-        //        output.recentlyPlaylist.drive(with: self) { owner, likes in
-        //
-        //        }.disposed(by: disposeBag)
-        
-        output.searchResult.drive(with: self) { owner, tracks in
-            owner.searchTrackSubject.onNext(tracks)
-            owner.libraryCollectionViewController.collectionView.reloadData()
+        output.searchResult
+            .drive(libraryCollectionViewController.collectionView.rx.items(cellIdentifier: MusicListCell.identifier, cellType: MusicListCell.self)) { item, model, cell in
+            cell.configureCell(model)
         }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
@@ -262,29 +243,11 @@ final class LibraryViewController: BaseViewController {
     }
 }
 
-// MARK: - SearchResultsUpdater
-
-extension LibraryViewController: UISearchResultsUpdating {
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let searchBarText = searchController.searchBar.text,
-              let resultController = searchController.searchResultsController as? LibraryCollectionViewController
-        else { return }
-
-        // 데이터 필터링 로직
-//        resultController.filteredData = [] // 여기에 필터링된 데이터를 할당
-        guard let result = try? searchTrackSubject.value() else { return }
-        
-        resultController.results = result
-        resultController.collectionView.reloadData()
-    }
-}
-
 // MARK: - SearchBar
 
 extension LibraryViewController: UISearchBarDelegate {
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        //        viewModel.input.searchText.onNext(searchBar.text)
         view.endEditing(true)
     }
     
