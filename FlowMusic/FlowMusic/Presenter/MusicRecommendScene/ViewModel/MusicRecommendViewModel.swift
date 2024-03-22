@@ -139,6 +139,7 @@ final class MusicRecommendViewModel: ViewModel {
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
+                guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
                     try await owner.musicPlayer.skipToNext()
                 }

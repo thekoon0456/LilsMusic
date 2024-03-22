@@ -107,6 +107,8 @@ final class MusicPlayerViewModel: ViewModel {
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
+                //큐에 한곡만 남았을때는 넘기지 않음.
+                guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
                     try await owner.musicPlayer.skipToNext()
                 }
