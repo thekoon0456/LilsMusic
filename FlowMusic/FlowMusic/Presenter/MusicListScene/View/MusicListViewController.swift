@@ -64,8 +64,7 @@ final class MusicListViewController: BaseViewController {
                 return !miniPlayerView.playButton.isSelected
             }
         
-        let input = MusicListViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
-                                             itemSelected: itemSelected.asObservable(),
+        let input = MusicListViewModel.Input(itemSelected: itemSelected.asObservable(),
                                              playButtonTapped: playButtonTapped.asObservable(),
                                              shuffleButtonTapped: shuffleButtonTapped.asObservable(),
                                              miniPlayerTapped: miniPlayerView.tap,

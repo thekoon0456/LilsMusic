@@ -178,7 +178,6 @@ final class MusicRecommendViewModel: ViewModel {
                 guard let self else { return }
                 do {
                     let songs = try await musicRepository.requestCatalogTop100Charts()
-                    print(songs)
                     observer.onNext(songs)
                     observer.onCompleted()
                 } catch {
@@ -227,7 +226,6 @@ final class MusicRecommendViewModel: ViewModel {
                 guard let self else { return }
                 do {
                     let stations = try await musicRepository.requestCatalogMostPlayedCharts()
-                    print(stations)
                     observer.onNext(stations)
                     observer.onCompleted()
                 } catch {

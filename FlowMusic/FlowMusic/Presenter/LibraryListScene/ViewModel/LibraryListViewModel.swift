@@ -15,7 +15,6 @@ import RxSwift
 final class LibraryListViewModel: ViewModel {
     
     struct Input {
-        let viewWillAppear: Observable<Void>
         let itemSelected: Observable<(index: Int, track: Track)>
         let playButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
@@ -48,8 +47,8 @@ final class LibraryListViewModel: ViewModel {
     
     init(coordinator: LibraryListCoordinator?, tracks: MusicItemCollection<Track>) {
         self.coordinator = coordinator
-        print(tracks)
         trackListSubject.onNext(tracks)
+        musicItem.onNext(tracks.first)
         playerUpdateSink()
         playerStateUpdateSink()
     }

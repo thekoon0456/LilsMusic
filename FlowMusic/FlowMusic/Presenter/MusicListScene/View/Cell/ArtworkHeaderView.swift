@@ -120,6 +120,12 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
                         endColor: album.artwork?.backgroundColor)
             titleLabel.text = album.title
             artistLabel.text = album.artistName
+        case let track as Track:
+            artworkImageView.kf.setImage(with: track.artwork?.url(width: 300, height: 300))
+            setGradient(startColor: track.artwork?.backgroundColor,
+                        endColor: track.artwork?.backgroundColor)
+            titleLabel.text = track.title
+            artistLabel.text = track.artistName
         default:
             return
         }

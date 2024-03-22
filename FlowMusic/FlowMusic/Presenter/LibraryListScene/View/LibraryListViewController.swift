@@ -50,9 +50,9 @@ final class LibraryListViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         configureDataSource()
-        viewDidLoadTrigger.onNext(())
+        updateSnapshot(tracks: [])
     }
     
     override func bind() {
@@ -65,8 +65,7 @@ final class LibraryListViewController: BaseViewController {
                 return !miniPlayerView.playButton.isSelected
             }
         
-        let input = LibraryListViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in },
-                                             itemSelected: itemSelected.asObservable(),
+        let input = LibraryListViewModel.Input(itemSelected: itemSelected.asObservable(),
                                              playButtonTapped: playButtonTapped.asObservable(),
                                              shuffleButtonTapped: shuffleButtonTapped.asObservable(),
                                              miniPlayerTapped: miniPlayerView.tap,
@@ -77,11 +76,12 @@ final class LibraryListViewController: BaseViewController {
         
         output.item.drive(with: self) { owner, item in
             guard let item else { return }
+            print("item:", item)
             owner.headerItem = item
         }.disposed(by: disposeBag)
         
         output.tracks.drive(with: self) { owner, tracks in
-            print(tracks)
+            print("tracks:", tracks)
             owner.updateSnapshot(tracks: tracks)
         }.disposed(by: disposeBag)
         
@@ -150,7 +150,6 @@ extension LibraryListViewController {
     
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
-            print(itemIdentifier)
             cell.configureCell(itemIdentifier)
         }
         
@@ -226,8 +225,7 @@ extension LibraryListViewController {
     
     private func setLayout() {
         collectionView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
         miniPlayerView.snp.makeConstraints { make in

@@ -41,7 +41,6 @@ final class LibraryCell: BaseCollectionViewCell {
     }
     
     func configureCell(_ playlist: Playlist) {
-        print(playlist)
         artworkImageView.kf.setImage(with: playlist.artwork?.url(width: 200, height: 200))
         nameLabel.text = playlist.name
         descriptionLabel.text = playlist.curatorName

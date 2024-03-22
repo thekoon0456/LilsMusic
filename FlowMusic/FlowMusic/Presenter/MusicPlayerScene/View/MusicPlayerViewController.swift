@@ -178,7 +178,6 @@ final class MusicPlayerViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, state in
-            print(state)
             if state == .playing {
                 owner.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
             } else {

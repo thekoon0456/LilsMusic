@@ -221,7 +221,6 @@ final class LibraryViewModel: ViewModel {
             else { return Disposables.create() }
             Task {
                 let result = try await self.musicRepository.requestSearchSongCatalog(term: text)
-                print(result)
                 let tracks = result.map { Track.song($0) }
                 observer.onNext(tracks)
                 observer.onCompleted()
