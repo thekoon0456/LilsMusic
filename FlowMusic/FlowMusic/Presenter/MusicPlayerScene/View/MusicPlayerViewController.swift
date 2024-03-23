@@ -26,6 +26,7 @@ final class MusicPlayerViewController: BaseViewController {
     
     private let chevronButton = UIButton().then {
         $0.setImage(UIImage(systemName: FMDesign.Icon.chevronDown.name), for: .normal)
+        $0.tapAnimation()
     }
     
     private let artistLabel = UILabel().then {
@@ -54,6 +55,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     private lazy var nextButton = UIButton().then {
@@ -62,6 +64,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     private lazy var previousButton = UIButton().then {
@@ -70,17 +73,19 @@ final class MusicPlayerViewController: BaseViewController {
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     private lazy var progressSlider = FMSlider(barHeight: 8).then {
         $0.isContinuous = true
         $0.minimumValue = 0
-        $0.setThumbImage(UIImage(), for: .normal)
-        $0.setThumbImage(UIImage(), for: .highlighted)
+//        $0.setThumbImage(UIImage().applyingSymbolConfiguration(UIImage.SymbolConfiguration(font: 0.8)), for: .normal)
+//        $0.setThumbImage(UIImage(), for: .highlighted)
         $0.layer.cornerRadius = 4
         $0.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped))
         $0.addGestureRecognizer(tapGesture)
+        $0.progressAnimation()
 //        $0.addShadow()
     }
     
@@ -89,6 +94,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: "repeat"), for: .normal)
         $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     //알파값 바뀜
@@ -96,6 +102,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
         $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     //상태에 따라 아이콘 바뀜
@@ -104,6 +111,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: FMDesign.Icon.heart.fill), for: .selected)
         $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     //알파값 바뀜
@@ -111,6 +119,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(UIImage(systemName: FMDesign.Icon.library.name), for: .normal)
         $0.tintColor = FMDesign.Color.tintColor.color
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     // MARK: - Lifecycle

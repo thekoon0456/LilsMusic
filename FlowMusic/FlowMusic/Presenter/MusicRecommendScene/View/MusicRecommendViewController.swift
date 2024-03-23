@@ -11,7 +11,6 @@ import UIKit
 import RxCocoa
 import RxSwift
 import SnapKit
-import StoreKit
 
 final class MusicRecommendViewController: BaseViewController {
     
@@ -341,7 +340,7 @@ extension MusicRecommendViewController {
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
-                                                              bottom: 0,
+                                                              bottom: 12,
                                                               trailing: 0)
                 let section = NSCollectionLayoutSection(group: group)
                 section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),

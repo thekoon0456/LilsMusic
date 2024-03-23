@@ -39,6 +39,7 @@ final class MiniPlayerView: BaseView {
         $0.contentHorizontalAlignment = .fill
         $0.tintColor = .white
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     lazy var nextButton = UIButton().then {
@@ -47,6 +48,7 @@ final class MiniPlayerView: BaseView {
         $0.contentHorizontalAlignment = .center
         $0.tintColor = .white
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     lazy var previousButton = UIButton().then {
@@ -55,6 +57,7 @@ final class MiniPlayerView: BaseView {
         $0.contentHorizontalAlignment = .center
         $0.tintColor = .white
         $0.addShadow()
+        $0.tapAnimation()
     }
     
     var tap: Observable<Void> {
@@ -67,7 +70,9 @@ final class MiniPlayerView: BaseView {
     // MARK: - Helpers
     
     func configureView(_ data: Track) {
+        guard let bgColor = data.artwork?.backgroundColor else { return }
         iconImageView.kf.setImage(with: data.artwork?.url(width: 40, height: 40))
+        backgroundColor = UIColor(cgColor: bgColor)
         titleLabel.text = data.title
         subtitleLabel.text = data.artistName
     }
@@ -120,10 +125,11 @@ final class MiniPlayerView: BaseView {
     
     override func configureView() {
         super.configureView()
-        addShadow()
-        backgroundColor = .systemBackground
-        layer.cornerRadius = 20
-        alpha = 0.95
+//        addShadow()
+//        backgroundColor = .systemBackground
+        layer.cornerRadius = 12
+        clipsToBounds = true
+//        alpha = 0.95
     }
 }
 
