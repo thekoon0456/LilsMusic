@@ -36,7 +36,7 @@ final class MusicChartsCell: BaseCollectionViewCell {
     }
     
     func configureCell(_ data: Playlist) {
-        artworkImageView.kf.setImage(with: data.artwork?.url(width: 200, height: 200))
+        artworkImageView.kf.setImage(with: data.artwork?.url(width: 400, height: 400))
         albumlabel.text = data.name
         artistlabel.text = data.shortDescription
     }

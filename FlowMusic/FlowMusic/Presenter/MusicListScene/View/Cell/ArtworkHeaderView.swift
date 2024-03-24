@@ -38,7 +38,7 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     
     lazy var playButton = UIButton().then {
         let image = UIImage(systemName: "play.circle.fill")?
-            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 40)))
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 44)))
         $0.setImage(image, for: .normal)
         $0.tintColor = .bgColor
         $0.tapAnimation()
@@ -79,29 +79,31 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(artworkImageView.snp.bottom).offset(12)
+            make.height.equalTo(20)
+            make.top.equalTo(artworkImageView.snp.bottom).offset(16)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalTo(shuffleButton.snp.leading).offset(-8)
         }
         
         descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom)
+            make.height.equalTo(12)
+            make.top.equalTo(titleLabel.snp.bottom).offset(4)
             make.leading.equalTo(titleLabel.snp.leading)
             make.trailing.equalTo(shuffleButton.snp.leading).offset(-8)
-            make.bottom.equalToSuperview().offset(-12)
+            make.bottom.equalToSuperview().offset(-20)
         }
         
         shuffleButton.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.top)
-            make.trailing.equalTo(playButton.snp.leading).offset(-20)
-            make.bottom.equalToSuperview().offset(-12)
+            make.top.equalTo(artworkImageView.snp.bottom).offset(8)
+            make.trailing.equalTo(playButton.snp.leading).offset(-8)
+            make.bottom.equalToSuperview().offset(-8)
             make.width.equalTo(shuffleButton.snp.height)
         }
         
         playButton.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.top)
+            make.top.equalTo(artworkImageView.snp.bottom).offset(8)
             make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalToSuperview().offset(-12)
+            make.bottom.equalToSuperview().offset(-8)
             make.width.equalTo(playButton.snp.height)
         }
     }

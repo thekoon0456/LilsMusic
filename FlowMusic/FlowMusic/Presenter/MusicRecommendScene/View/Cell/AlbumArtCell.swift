@@ -39,7 +39,7 @@ final class AlbumArtCell: BaseCollectionViewCell {
     // MARK: - Helpers
     
     func configureCell(_ data: Album) {
-        artworkImageView.kf.setImage(with: data.artwork?.url(width: 200, height: 200))
+        artworkImageView.kf.setImage(with: data.artwork?.url(width: 600, height: 600))
         titleLabel.text = data.title
         artistLabel.text = data.artistName
     }
