@@ -19,7 +19,8 @@ final class LibraryViewController: BaseViewController {
     
     private let viewModel: LibraryViewModel
     private let layout = CollectionViewPagingLayout()
-    private let itemSelected = PublishSubject<MusicItem>()
+    private let playlistItemSelected = PublishSubject<MusicItem>()
+    private let likeItemSelected = PublishSubject<(index: Int, track: Track)>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
     private let playlistSubject = BehaviorSubject< MusicItemCollection<Playlist>>(value: [])
     private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
@@ -47,12 +48,6 @@ final class LibraryViewController: BaseViewController {
         $0.textColor = .tintColor
     }
     
-    private lazy var likeListCollectionView = UICollectionView(frame: .zero,
-                                                       collectionViewLayout: createLayout()).then {
-        $0.backgroundColor = .clear
-        $0.contentInsetAdjustmentBehavior = .never
-    }
-    
     private lazy var playlistCollectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .bgColor
@@ -62,11 +57,17 @@ final class LibraryViewController: BaseViewController {
         return cv
     }()
     
+    private lazy var likeListCollectionView = UICollectionView(frame: .zero,
+                                                               collectionViewLayout: createLayout()).then {
+        $0.backgroundColor = .clear
+        $0.contentInsetAdjustmentBehavior = .never
+    }
+    
     private let miniPlayerView = MiniPlayerView().then {
         $0.isHidden = true
         $0.alpha = 0
     }
-
+    
     // MARK: - Lifecycles
     
     init(viewModel: LibraryViewModel) {
@@ -81,23 +82,24 @@ final class LibraryViewController: BaseViewController {
         updateSnapshot(tracks: [])
         viewDidLoadTrigger.onNext(())
     }
-
+    
     override func bind() {
         super.bind()
-
+        
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
-                                           itemSelected: itemSelected,
+                                           viewWillAppear: self.rx.viewWillAppear.map { _ in },
+                                           playlistItemSelected: playlistItemSelected,
+                                           likeItemSelected: likeItemSelected.asObservable(),
                                            mixSelected: mixSelected,
                                            miniPlayerTapped: miniPlayerView.tap,
                                            miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                            miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
                                            miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
-        
         let output = viewModel.transform(input)
         
         output.mix
@@ -119,6 +121,13 @@ final class LibraryViewController: BaseViewController {
         output.playState.drive(with: self) { owner, state in
             owner.setPlayButton(state: state)
         }.disposed(by: disposeBag)
+        
+        likeListCollectionView.rx.itemSelected
+            .withUnretained(self)
+            .subscribe { owner, indexPath in
+                guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                owner.likeItemSelected.onNext((index: indexPath.item, track: track))
+            }.disposed(by: disposeBag)
     }
     
     private func setPlayButton(state: MusicPlayer.PlaybackStatus) {
