@@ -21,9 +21,9 @@ enum FMDesign {
         var name: String {
             switch self {
             case .recommend:
-                "music.note.tv"
+                "music.note.house"
             case .reels:
-                "play.rectangle.on.rectangle"
+                "play.square.stack"
             case .library:
                 "list.bullet.rectangle.portrait"
             case .user:
@@ -40,9 +40,9 @@ enum FMDesign {
         var fill: String {
             switch self {
             case .recommend:
-                "music.note.tv.fill"
+                "music.note.house.fill"
             case .reels:
-                "play.rectangle.on.rectangle.fill"
+                "play.square.stack.fill"
             case .library:
                 "list.bullet.rectangle.portrait.fill"
             case .user:
