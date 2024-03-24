@@ -379,7 +379,7 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
-                                                       heightDimension: .fractionalHeight(0.3))
+                                                       heightDimension: .fractionalHeight(0.32))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
@@ -397,7 +397,7 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.45),
-                                                       heightDimension: .fractionalHeight(0.31))
+                                                       heightDimension: .fractionalHeight(0.36))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
@@ -415,7 +415,7 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.6),
-                                                       heightDimension: .fractionalHeight(0.4))
+                                                       heightDimension: .fractionalHeight(0.46))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,

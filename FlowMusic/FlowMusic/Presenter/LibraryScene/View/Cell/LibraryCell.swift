@@ -43,7 +43,13 @@ final class LibraryCell: BaseCollectionViewCell {
     func configureCell(_ playlist: Playlist) {
         artworkImageView.kf.setImage(with: playlist.artwork?.url(width: 400, height: 400))
         nameLabel.text = playlist.name
-        descriptionLabel.text = playlist.curatorName
+        descriptionLabel.text = updateTimeLabel(date: playlist.lastModifiedDate)
+    }
+    
+    func updateTimeLabel( date: Date?) -> String {
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat =  "MMMM dd 'updated'"
+        return dateformatter.string(from: date ?? Date())
     }
     
     override func configureHierarchy() {
@@ -68,13 +74,13 @@ final class LibraryCell: BaseCollectionViewCell {
         
         nameLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.bottom.equalTo(descriptionLabel.snp.top).offset(-4)
-            make.height.equalTo(22)
+            make.top.equalTo(infoBGView.snp.top).offset(4)
         }
         
         descriptionLabel.snp.makeConstraints { make in
             make.horizontalEdges.bottom.equalToSuperview()
-            make.height.equalTo(14)
+            make.top.equalTo(nameLabel.snp.bottom).offset(4)
+            make.bottom.lessThanOrEqualToSuperview().offset(-4)
         }
     }
     

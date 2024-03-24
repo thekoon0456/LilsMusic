@@ -13,6 +13,8 @@ import SnapKit
 
 final class MixCell: BaseCollectionViewCell {
     
+    // MARK: - Properties
+    
     private let backView = UIView().then {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
@@ -35,11 +37,21 @@ final class MixCell: BaseCollectionViewCell {
         $0.textAlignment = .center
     }
     
+    // MARK: - Helpers
+    
     func configureCell(_ data: Playlist) {
         artworkImageView.kf.setImage(with: data.artwork?.url(width: 400, height: 400))
         nameLabel.text = data.name
-        descriptionLabel.text = data.shortDescription
+        descriptionLabel.text = updateTimeLabel(date: data.lastModifiedDate)
     }
+    
+    func updateTimeLabel( date: Date?) -> String {
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat =  "MMMM dd 'updated'"
+        return dateformatter.string(from: date ?? Date())
+    }
+    
+    // MARK: - Layout
     
     override func configureHierarchy() {
         contentView.addSubview(backView)
