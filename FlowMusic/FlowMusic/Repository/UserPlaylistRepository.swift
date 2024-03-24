@@ -7,14 +7,43 @@
 
 import Foundation
 
+import RxSwift
 import RealmSwift
 
 final class UserRepository<T: Object>: Repository {
     
+    let userLikeSubject = BehaviorSubject<[String]>(value: [])
+    
     private let realm = try! Realm()
+    private var notificationToken: NotificationToken?
     
     func printURL() {
         print(realm.configuration.fileURL ?? "")
+    }
+    
+    // Realm 객체 변경 감지 및 구독 설정
+    private func observeLikeListChanges() {
+        // UserLikeList 객체의 변경을 감지
+        notificationToken = realm.objects(UserLikeList.self).observe { [weak self] (changes: RealmCollectionChange) in
+            guard let self else { return }
+            switch changes {
+            case .initial, .update:
+                let likeArr = fetchLikeList()
+                userLikeSubject.onNext(likeArr)
+            case .error(let error):
+                print("\(error.localizedDescription)")
+            }
+        }
+    }
+    
+    // MARK: - Lifecycles
+    
+    init() {
+        observeLikeListChanges()
+    }
+    
+    deinit {
+        notificationToken?.invalidate()
     }
     
     // MARK: - Create
@@ -31,6 +60,12 @@ final class UserRepository<T: Object>: Repository {
     }
     
     // MARK: - Read
+    
+    private func fetchLikeList() -> [String] {
+        guard let likeIDs = realm.objects(UserLikeList.self).first?.likeID else { return [] }
+        let likeArr = Array(likeIDs)
+        return likeArr
+    }
     
     func fetch() -> Results<T> {
         return realm.objects(T.self)

@@ -50,6 +50,7 @@ final class LibraryViewModel: ViewModel {
     //사용자가 선택한 track
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
+    private lazy var userLikeSubject = likesRepository.userLikeSubject
     
     // MARK: - Lifecycles
     
@@ -60,12 +61,6 @@ final class LibraryViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        input.mixSelected
-            .withUnretained(self)
-            .subscribe { owner, playlist in
-                owner.coordinator?.pushToList(playlist: playlist)
-            }.disposed(by: disposeBag)
-        
         let mix = input
             .viewDidLoad
             .withUnretained(self)
@@ -73,7 +68,7 @@ final class LibraryViewModel: ViewModel {
                 owner.fetchRecommendMix()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
-        let likeTracks = input.viewWillAppear
+        let likeTracks = userLikeSubject
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchLikesList()
@@ -100,9 +95,11 @@ final class LibraryViewModel: ViewModel {
                 owner.fetchAlbumList()
             }.asDriver(onErrorJustReturn: [])
         
-        input.playlistItemSelected.withUnretained(self).subscribe { owner, item in
-            //            owner.coordinator?.pushToList(item: item)
-        }.disposed(by: disposeBag)
+        input.mixSelected
+            .withUnretained(self)
+            .subscribe { owner, playlist in
+                owner.coordinator?.pushToList(playlist: playlist)
+            }.disposed(by: disposeBag)
         
         input.likeItemSelected
             .withUnretained(self)
