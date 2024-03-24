@@ -5,11 +5,11 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
-import AVFoundation
-import AVKit
 import MusicKit
 import UIKit
 
+import RxCocoa
+import RxSwift
 import SnapKit
 
 final class ReelsViewController: BaseViewController {
@@ -17,16 +17,15 @@ final class ReelsViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: ReelsViewModel
-    private let musicRequest = MusicRepository()
+    private var dataSource: UICollectionViewDiffableDataSource<Section, MusicVideo>?
+    
+    // MARK: - UI
     
     private let titleView = UILabel().then {
         $0.text = "Hot MV"
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .white
     }
-    
-    private var musicVideos: MusicItemCollection<MusicVideo>?
-    var currentIndex: IndexPath = IndexPath(item: 0, section: 0)
     
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero,
@@ -37,8 +36,6 @@ final class ReelsViewController: BaseViewController {
         cv.contentInsetAdjustmentBehavior = .never
         return cv
     }()
-    
-    private var dataSource: UICollectionViewDiffableDataSource<Section, MusicVideo>?
     
     // MARK: - Lifecycles
     
@@ -51,11 +48,17 @@ final class ReelsViewController: BaseViewController {
         super.viewDidLoad()
         
         configureDataSource()
+        updateSnapshot(mv: [])
+    }
+    
+    override func bind() {
+        super.bind()
+        let input = ReelsViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in })
+        let output = viewModel.transform(input)
         
-        Task {
-            musicVideos = try await musicRequest.requestCatalogMVCharts()
-            updateSnapshot()
-        }
+        output.mvList.drive(with: self) { owner, mv in
+            owner.updateSnapshot(mv: Array(mv))
+        }.disposed(by: disposeBag)
     }
     
     // MARK: - Layout
@@ -112,8 +115,7 @@ extension ReelsViewController {
         }
     }
     
-    private func updateSnapshot() {
-        guard let mv: [MusicVideo] = (musicVideos?.map { $0 }) else { return }
+    private func updateSnapshot(mv: [MusicVideo]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, MusicVideo>()
         snapshot.appendSections(Section.allCases)
         snapshot.appendItems(mv, toSection: .main)

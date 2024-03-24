@@ -43,9 +43,22 @@ final class ReelsCell: BaseCollectionViewCell {
         $0.clipsToBounds = true
     }
     
-    private let addToPlaylistButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "list.bullet.rectangle.portrait"), for: .normal)
+    private lazy var heartButton = UIButton().then {
+        let image = UIImage(systemName: FMDesign.Icon.heart.name)?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 28)))
+        let fillImage = UIImage(systemName: FMDesign.Icon.heart.fill)?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 28)))
+        $0.setImage(image, for: .normal)
+        $0.setImage(fillImage, for: .selected)
+        $0.contentVerticalAlignment = .bottom
+        $0.contentHorizontalAlignment = .trailing
+        $0.tintColor = .bgColor
+        $0.tapAnimation()
     }
+    
+//    private let addToPlaylistButton = UIButton().then {
+//        $0.setImage(UIImage(systemName: "list.bullet.rectangle.portrait"), for: .normal)
+//    }
     
     private var player: AVPlayer?
     
@@ -53,11 +66,9 @@ final class ReelsCell: BaseCollectionViewCell {
     //
     override func prepareForReuse() {
         super.prepareForReuse()
-        print(#function)
         player?.pause()
-        NotificationCenter.default.removeObserver(self)
-        //cell 재사용시 뮤비 플레이어 레이아웃 초기화 필요
         musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Helpers
@@ -74,10 +85,6 @@ final class ReelsCell: BaseCollectionViewCell {
             play()
         }
         
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self else { return }
-//            DisplayVideoFromUrl(url: <#T##URL?#>, view: <#T##UIView#>)
-//        }
         musicLabel.text = data.title
         artistLabel.text = data.artistName
         genreLabel.text = data.genreNames.first
@@ -90,31 +97,13 @@ final class ReelsCell: BaseCollectionViewCell {
     }
     
     override func configureHierarchy() {
-        contentView.addSubviews(musicVideoView, musicLabel, artistLabel, genreLabel)
+        super.configureHierarchy()
+        contentView.addSubviews(musicVideoView, musicLabel, artistLabel, genreLabel, heartButton)
     }
     
     override func configureLayout() {
-        musicVideoView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        musicLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalTo(artistLabel.snp.top).offset(-4)
-        }
-        
-        artistLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).offset(-60)
-        }
-        
-        genreLabel.snp.makeConstraints { make in
-            make.height.equalTo(24)
-            make.leading.equalToSuperview().offset(20)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).offset(-30)
-        }
+        super.configureLayout()
+        setLayout()
     }
     
     func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
@@ -122,6 +111,7 @@ final class ReelsCell: BaseCollectionViewCell {
         player = AVPlayer(playerItem: playerItem).then {
             $0.isMuted = true
         }
+        
         let playerLayer = AVPlayerLayer(player: player)
         playerLayer.videoGravity = .resizeAspectFill
         playerLayer.needsDisplayOnBoundsChange = true
@@ -137,6 +127,11 @@ final class ReelsCell: BaseCollectionViewCell {
             player?.play()
         }
     }
+}
+
+// MARK: - Play
+
+extension ReelsCell {
     
     func play() {
         print(#function)
@@ -160,53 +155,35 @@ final class ReelsCell: BaseCollectionViewCell {
     }
 }
 
-//    func DisplayVideoFromUrl(url: URL?, view: UIView) {
-//        guard let url else { return }
-//        player = AVPlayer(url: url).then {
-//            $0.isMuted = true
-//        }
-//        print(url)
-//        let playerLayer = AVPlayerLayer(player: player)
-//        playerLayer.videoGravity = .resizeAspectFill
-//        playerLayer.needsDisplayOnBoundsChange = true
-//        playerLayer.frame = view.bounds
-//        view.layer.masksToBounds = true
-//        view.layer.addSublayer(playerLayer)
-//
-//        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-//                                               object: player?.currentItem,
-//                                               queue: .main) { [weak self] _ in
-//            guard let self else { return }
-//            player?.seek(to: .zero)
-//            player?.play()
-//        }
-//    }
-
-//
-//func configureCell(_ data: MusicVideo) {
-//    Task {
-//        guard let video1 = try await musicRequest.requestSearchMusicVideoCatalog(term: "이세계아이돌").first else { return }
-//        let video = try await video1.with(.songs, preferredSource: .catalog)
-//        let response = try await musicRequest.requestSearchMVIDCatalog(id: data.id)
-//        let song = try await musicRequest.requestSearchSongCatalog(term: "\(data.artistName) \(data.title)")
-//        musicPlayer.setSongQueue(song: song[0])
-//        print(song[0])
-//        try await musicPlayer.play()
-//        print(data.previewAssets?.first?.hlsURL)
-//        DisplayVideoFromUrl(url: data.previewAssets?.first?.hlsURL, view: musicVideoView)
-//    }
-//}
-//func configureAudioSession() {
-//    do {
-//        // 오디오 세션 인스턴스 가져오기
-//        let audioSession = AVAudioSession.sharedInstance()
-//        // 오디오 세션 카테고리 설정. 이 경우, 다른 앱의 오디오와 함께 재생될 수 있도록 함
-//        try audioSession.setCategory(.playback,
-//                                     mode: .default,
-//                                     options: [.mixWithOthers])
-//        // 오디오 세션 활성화
-//        try audioSession.setActive(true)
-//    } catch {
-//        print("Failed to configure audio session: \(error.localizedDescription)")
-//    }
-//}
+extension ReelsCell {
+    
+    private func setLayout() {
+        musicVideoView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        musicLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(artistLabel.snp.top).offset(-8)
+        }
+        
+        artistLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(genreLabel.snp.top).offset(-12)
+        }
+        
+        genreLabel.snp.makeConstraints { make in
+            make.height.equalTo(24)
+            make.leading.equalToSuperview().offset(20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).offset(-28)
+        }
+        
+        heartButton.snp.makeConstraints { make in
+            make.size.equalTo(44)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).offset(-28)
+        }
+    }
+}

@@ -6,14 +6,59 @@
 //
 
 import Foundation
+import MusicKit
 
-final class ReelsViewModel {
+import RxCocoa
+import RxSwift
+
+final class ReelsViewModel: ViewModel {
+    
+    struct Input {
+        let viewWillAppear: Observable<Void>
+    }
+    
+    struct Output {
+        let mvList: Driver<MusicItemCollection<MusicVideo>>
+    }
+    
+    // MARK: - Properties
     
     weak var coordinator: ReelsCoordinator?
+    let disposeBag = DisposeBag()
+    private let musicRepository = MusicRepository()
+    
+    // MARK: - Lifecycles
     
     init(coordinator: ReelsCoordinator?) {
         self.coordinator = coordinator
     }
     
+    // MARK: - Helpers
     
+    func transform(_ input: Input) -> Output {
+        
+        let mvList = input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.fetchMovieList()
+            }.asDriver(onErrorJustReturn: [])
+        
+        return Output(mvList: mvList)
+    }
+    
+    private func fetchMovieList() -> Observable<MusicItemCollection<MusicVideo>> {
+        return Observable.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            Task {
+                do {
+                    let result = try await self.musicRepository.requestCatalogMVCharts()
+                    observer.onNext(result)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
+    }
 }
