@@ -13,13 +13,11 @@ import UIKit
 import SnapKit
 
 final class ReelsViewController: BaseViewController {
-
+    
     // MARK: - Properties
     
     private let viewModel: ReelsViewModel
     private let musicRequest = MusicRepository()
-    private var queuePlayer = AVQueuePlayer()
-    var videoURLs: [URL] = []
     
     private let titleView = UILabel().then {
         $0.text = "Hot MV"
@@ -28,9 +26,8 @@ final class ReelsViewController: BaseViewController {
     }
     
     private var musicVideos: MusicItemCollection<MusicVideo>?
-    var videoURL = [URL]()
     var currentIndex: IndexPath = IndexPath(item: 0, section: 0)
-
+    
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero,
                                   collectionViewLayout: createLayout())
@@ -69,7 +66,7 @@ final class ReelsViewController: BaseViewController {
     
     override func configureLayout() {
         collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.leading.trailing.bottom.equalToSuperview()
         }
     }
     
@@ -83,20 +80,14 @@ extension ReelsViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? ReelsCell else { return }
-        //cellPlayer초기화 시점 뒤로 미룸
         DispatchQueue.main.async {
             cell.soundOn()
         }
-        if currentIndex != indexPath {
-            cell.play()
-        }
-        
-        currentIndex = indexPath
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if currentIndex != indexPath {
-            guard let cell = cell as? ReelsCell else { return }
+        guard let cell = cell as? ReelsCell else { return }
+        DispatchQueue.main.async {
             cell.mute()
         }
     }
@@ -112,7 +103,7 @@ extension ReelsViewController {
     
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
-                cell.configureCell(itemIdentifier)
+            cell.configureCell(itemIdentifier)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
@@ -122,7 +113,6 @@ extension ReelsViewController {
     }
     
     private func updateSnapshot() {
-        print(#function)
         guard let mv: [MusicVideo] = (musicVideos?.map { $0 }) else { return }
         var snapshot = NSDiffableDataSourceSnapshot<Section, MusicVideo>()
         snapshot.appendSections(Section.allCases)
