@@ -19,39 +19,37 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
         return self.description()
     }
     
-    private let artworkImageView = UIImageView().then {
-        $0.layer.cornerRadius = 10
-        $0.clipsToBounds = true
+    private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark)).then {
+        $0.alpha = 0.3
     }
+    
+    private let artworkImageView = UIImageView()
     
     private let titleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
-        $0.textAlignment = .center
+        $0.textColor = .bgColor
+        $0.textAlignment = .left
     }
-    private let artistLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 14)
+    private let descriptionLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 12)
         $0.textColor = .lightGray
-        $0.textAlignment = .center
+        $0.textAlignment = .left
     }
     
     lazy var playButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
-//        $0.layer.borderColor = UIColor.tintColor.cgColor
-//        $0.layer.borderWidth = 1
-//        $0.layer.cornerRadius = 16
-//        $0.clipsToBounds = true
-        $0.tintColor = .tintColor
-//        $0.addShadow()
+        let image = UIImage(systemName: "play.circle.fill")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 40)))
+        $0.setImage(image, for: .normal)
+        $0.tintColor = .bgColor
+        $0.tapAnimation()
     }
     
     lazy var shuffleButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
-        $0.layer.borderColor = FMDesign.Color.tintColor.color.cgColor
-        $0.layer.borderWidth = 1
-        $0.layer.cornerRadius = 16
-        $0.clipsToBounds = true
-        $0.tintColor = .tintColor
-//        $0.addShadow()
+        let image = UIImage(systemName: "shuffle")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 24)))
+        $0.setImage(image, for: .normal)
+        $0.tintColor = .bgColor
+        $0.tapAnimation()
     }
     
     // MARK: - Lifecycles
@@ -68,64 +66,66 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     // MARK: - Configure
     
     private func setupLayout() {
-        addSubviews(artworkImageView, titleLabel, artistLabel, playButton, shuffleButton)
+        addSubviews(blurView, artworkImageView, titleLabel, descriptionLabel, playButton, shuffleButton)
+        
+        blurView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
         artworkImageView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.size.equalTo(200)
-            make.bottom.equalTo(titleLabel.snp.top).offset(-20)
+            make.top.equalToSuperview()
+            make.width.equalToSuperview()
+            make.height.equalTo(artworkImageView.snp.width)
         }
         
         titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(artworkImageView.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalTo(artistLabel.snp.top).offset(-8)
+            make.trailing.equalTo(shuffleButton.snp.leading).offset(-8)
         }
         
-        artistLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalTo(playButton.snp.top).offset(-20)
-        }
-        
-        playButton.snp.makeConstraints { make in
-            make.width.equalTo(120)
-            make.height.equalTo(40)
-            make.centerX.equalToSuperview().offset(-(frame.width / 4))
-            make.top.equalTo(artistLabel.snp.bottom).offset(20)
-            make.bottom.equalTo(safeAreaLayoutGuide).offset(-20)
+        descriptionLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom)
+            make.leading.equalTo(titleLabel.snp.leading)
+            make.trailing.equalTo(shuffleButton.snp.leading).offset(-8)
+            make.bottom.equalToSuperview().offset(-12)
         }
         
         shuffleButton.snp.makeConstraints { make in
-            make.width.equalTo(120)
-            make.height.equalTo(40)
-            make.centerX.equalToSuperview().offset(frame.width / 4)
-            make.top.equalTo(artistLabel.snp.bottom).offset(20)
-            make.bottom.equalTo(safeAreaLayoutGuide).offset(-20)
+            make.top.equalTo(titleLabel.snp.top)
+            make.trailing.equalTo(playButton.snp.leading).offset(-20)
+            make.bottom.equalToSuperview().offset(-12)
+            make.width.equalTo(shuffleButton.snp.height)
+        }
+        
+        playButton.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.top)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-12)
+            make.width.equalTo(playButton.snp.height)
         }
     }
     
     func updateUI(_ item: MusicItem) {
         switch item {
         case let playlist as Playlist:
-            artworkImageView.kf.setImage(with: playlist.artwork?.url(width: 300, height: 300))
+            artworkImageView.kf.setImage(with: playlist.artwork?.url(width: 800, height: 800))
             setGradient(startColor: playlist.artwork?.backgroundColor,
                         endColor: playlist.artwork?.backgroundColor)
             titleLabel.text = playlist.name
-            artistLabel.text = playlist.shortDescription
+            descriptionLabel.text = playlist.curatorName
         case let album as Album:
-            artworkImageView.kf.setImage(with: album.artwork?.url(width: 300, height: 300))
+            artworkImageView.kf.setImage(with: album.artwork?.url(width: 800, height: 800))
             setGradient(startColor: album.artwork?.backgroundColor,
                         endColor: album.artwork?.backgroundColor)
             titleLabel.text = album.title
-            artistLabel.text = album.artistName
+            descriptionLabel.text = album.artistName
         case let track as Track:
-            artworkImageView.kf.setImage(with: track.artwork?.url(width: 300, height: 300))
+            artworkImageView.kf.setImage(with: track.artwork?.url(width: 800, height: 800))
             setGradient(startColor: track.artwork?.backgroundColor,
                         endColor: track.artwork?.backgroundColor)
             titleLabel.text = track.title
-            artistLabel.text = track.artistName
+            descriptionLabel.text = track.artistName
         default:
             return
         }

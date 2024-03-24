@@ -19,15 +19,16 @@ final class MusicListViewController: BaseViewController {
     
     private let viewModel: MusicListViewModel
     private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
-    private let itemSelected = PublishSubject<(index: Int, track: Track)>()
     private var headerItem: MusicItem?
+    private let viewDidLoadTrigger = PublishSubject<Void>()
+    private let itemSelected = PublishSubject<(index: Int, track: Track)>()
     private let playButtonTapped = PublishSubject<Void>()
     private let shuffleButtonTapped = PublishSubject<Void>()
-    private let viewDidLoadTrigger = PublishSubject<Void>()
     
     // MARK: - UI
     
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
+    private lazy var collectionView = UICollectionView(frame: .zero,
+                                                       collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
         $0.contentInsetAdjustmentBehavior = .never
         $0.register(ArtworkHeaderReusableView.self,
@@ -58,14 +59,14 @@ final class MusicListViewController: BaseViewController {
         super.bind()
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { [weak self] _ -> Bool in
                 guard let self else { return true }
                 return !miniPlayerView.playButton.isSelected
             }
         
         let input = MusicListViewModel.Input(viewDidLoad: viewDidLoadTrigger.asObservable(),
-                                            itemSelected: itemSelected.asObservable(),
+                                             itemSelected: itemSelected.asObservable(),
                                              playButtonTapped: playButtonTapped.asObservable(),
                                              shuffleButtonTapped: shuffleButtonTapped.asObservable(),
                                              miniPlayerTapped: miniPlayerView.tap,
@@ -101,7 +102,7 @@ final class MusicListViewController: BaseViewController {
         
     }
     
-    // MARK: - Configure
+    // MARK: - UI
     
     private func setPlayButton(state: MusicPlayer.PlaybackStatus) {
         if state == .playing {
@@ -129,6 +130,8 @@ final class MusicListViewController: BaseViewController {
             miniPlayerView.alpha = 1
         }
     }
+    
+    // MARK: - Configure
     
     override func configureHierarchy() {
         view.addSubviews(collectionView, miniPlayerView)
@@ -168,8 +171,8 @@ extension MusicListViewController {
                   kind == UICollectionView.elementKindSectionHeader,
                   let item = headerItem,
                   let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: ArtworkHeaderReusableView.identifier,
-                                                                         for: indexPath) as? ArtworkHeaderReusableView
+                                                                                   withReuseIdentifier: ArtworkHeaderReusableView.identifier,
+                                                                                   for: indexPath) as? ArtworkHeaderReusableView
             else {
                 return UICollectionReusableView()
             }
@@ -180,13 +183,13 @@ extension MusicListViewController {
                 .withUnretained(self)
                 .subscribe{ owner, _ in
                     owner.playButtonTapped.onNext(())
-            }.disposed(by: disposeBag)
+                }.disposed(by: disposeBag)
             
             headerView.shuffleButton.rx.tap
                 .withUnretained(self)
                 .subscribe{ owner, _ in
                     owner.shuffleButtonTapped.onNext(())
-            }.disposed(by: disposeBag)
+                }.disposed(by: disposeBag)
             return headerView
         }
     }
@@ -203,7 +206,7 @@ extension MusicListViewController {
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                   heightDimension: .fractionalHeight(1.0))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
+            
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                    heightDimension: .absolute(60))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,

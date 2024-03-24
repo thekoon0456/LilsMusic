@@ -535,8 +535,8 @@
 		7C813E012B9B15D200CDFF1D /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				7C813E022B9B15D900CDFF1D /* MusicListCell.swift */,
 				7C446E672BA623AB00AAC5CB /* ArtworkHeaderView.swift */,
+				7C813E022B9B15D900CDFF1D /* MusicListCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
