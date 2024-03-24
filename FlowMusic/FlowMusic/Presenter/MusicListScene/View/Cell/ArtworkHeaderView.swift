@@ -35,13 +35,13 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     }
     
     lazy var playButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "play.fill"), for: .normal)
-        $0.layer.borderColor = FMDesign.Color.tintColor.color.cgColor
-        $0.layer.borderWidth = 1
-        $0.layer.cornerRadius = 16
-        $0.clipsToBounds = true
-        $0.tintColor = FMDesign.Color.tintColor.color
-        $0.addShadow()
+        $0.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
+//        $0.layer.borderColor = UIColor.tintColor.cgColor
+//        $0.layer.borderWidth = 1
+//        $0.layer.cornerRadius = 16
+//        $0.clipsToBounds = true
+        $0.tintColor = .tintColor
+//        $0.addShadow()
     }
     
     lazy var shuffleButton = UIButton().then {
@@ -50,8 +50,8 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
         $0.layer.borderWidth = 1
         $0.layer.cornerRadius = 16
         $0.clipsToBounds = true
-        $0.tintColor = FMDesign.Color.tintColor.color
-        $0.addShadow()
+        $0.tintColor = .tintColor
+//        $0.addShadow()
     }
     
     // MARK: - Lifecycles

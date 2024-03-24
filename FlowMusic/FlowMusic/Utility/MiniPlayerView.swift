@@ -33,30 +33,30 @@ final class MiniPlayerView: BaseView {
     }
     
     lazy var playButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "pause"), for: .normal)
-        $0.setImage(UIImage(systemName: "play.fill"), for: .selected)
+        $0.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
+        $0.setImage(UIImage(systemName: "play.circle.fill"), for: .selected)
         $0.contentVerticalAlignment = .fill
         $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .white
-        $0.addShadow()
+        $0.tintColor = .tintColor
+//        $0.addShadow()
         $0.tapAnimation()
     }
     
     lazy var nextButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "forward.fill"), for: .normal)
+        $0.setImage(UIImage(systemName: "forward.end.circle"), for: .normal)
         $0.contentVerticalAlignment = .center
         $0.contentHorizontalAlignment = .center
-        $0.tintColor = .white
-        $0.addShadow()
+        $0.tintColor = .tintColor
+//        $0.addShadow()
         $0.tapAnimation()
     }
     
     lazy var previousButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "backward.fill"), for: .normal)
+        $0.setImage(UIImage(systemName: "backward.end.circle"), for: .normal)
         $0.contentVerticalAlignment = .center
         $0.contentHorizontalAlignment = .center
-        $0.tintColor = .white
-        $0.addShadow()
+        $0.tintColor = .tintColor
+//        $0.addShadow()
         $0.tapAnimation()
     }
     

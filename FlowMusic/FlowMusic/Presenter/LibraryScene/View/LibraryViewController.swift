@@ -29,7 +29,7 @@ final class LibraryViewController: BaseViewController {
         $0.searchBar.placeholder = "Find Your Music"
         $0.searchBar.backgroundColor = .clear
         $0.searchBar.searchBarStyle = .minimal
-        $0.searchBar.tintColor = FMDesign.Color.tintColor.color
+        $0.searchBar.tintColor = .tintColor
         $0.searchBar.delegate = self
         $0.definesPresentationContext = true
     }
@@ -51,7 +51,7 @@ final class LibraryViewController: BaseViewController {
     }
     
     private lazy var refreshControl = UIRefreshControl().then {
-        $0.tintColor = .white
+        $0.tintColor = .tintColor
         $0.addTarget(self, action: #selector(refreshData), for: .valueChanged)
     }
     
@@ -76,12 +76,12 @@ final class LibraryViewController: BaseViewController {
     private let likedSongsButton = LibraryButtonView(imageName: "heart.fill",
                                                      title: "Liked Songs",
                                                      subTitle: "",
-                                                     bgColor: .systemPink)
+                                                     bgColor: .tintColor)
     
     private let recentlyPlayedButton = LibraryButtonView(imageName: "play.circle",
                                                          title: "Recently\nPlayed Songs",
                                                          subTitle: "",
-                                                         bgColor: FMDesign.Color.tintColor.color)
+                                                         bgColor:  .tintColor)
     
     private let miniPlayerView = MiniPlayerView().then {
         $0.isHidden = true

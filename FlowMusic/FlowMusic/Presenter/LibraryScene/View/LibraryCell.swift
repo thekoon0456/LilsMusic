@@ -80,7 +80,7 @@ final class LibraryCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-        contentView.addShadow()
+//        contentView.addShadow()
     }
 }
 

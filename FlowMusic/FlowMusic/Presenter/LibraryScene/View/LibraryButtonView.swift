@@ -101,6 +101,6 @@ final class LibraryButtonView: BaseView {
     
     override func configureView() {
         super.configureView()
-        addShadow()
+//        addShadow()
     }
 }

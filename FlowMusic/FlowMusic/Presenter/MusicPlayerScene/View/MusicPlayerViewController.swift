@@ -25,22 +25,37 @@ final class MusicPlayerViewController: BaseViewController {
     // MARK: - UI
     
     private let chevronButton = UIButton().then {
-        $0.setImage(UIImage(systemName: FMDesign.Icon.chevronDown.name), for: .normal)
+        $0.setImage(UIImage(systemName: "chevron.down"), for: .normal)
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
+        $0.tapAnimation()
+    }
+
+    private lazy var heartButton = UIButton().then {
+        $0.setImage(UIImage(systemName: FMDesign.Icon.heart.name), for: .normal)
+        $0.setImage(UIImage(systemName: FMDesign.Icon.heart.fill), for: .selected)
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
         $0.tapAnimation()
     }
     
-    private let artistLabel = UILabel().then {
-        $0.font = .boldSystemFont(ofSize: 20)
-        $0.textColor = .white
-        $0.textAlignment = .center
-        $0.addShadow()
+    //알파값 바뀜
+    private lazy var playlistButton = FMPlaylistButton(menus: ["새 플레이리스트 만들기"]).then {
+        $0.setImage(UIImage(systemName: FMDesign.Icon.library.name), for: .normal)
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
+        $0.tapAnimation()
     }
     
     private let songLabel = UILabel().then {
-        $0.font = .systemFont(ofSize: 18)
-        $0.textColor = .white
+        $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .label
         $0.textAlignment = .center
-        $0.addShadow()
+    }
+    
+    private let artistLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 18)
+        $0.textColor = .tintColor
+        $0.textAlignment = .center
     }
     
     private var artworkImage = UIImageView().then {
@@ -50,75 +65,52 @@ final class MusicPlayerViewController: BaseViewController {
     }
     
     private lazy var playButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "pause"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .white
-        $0.addShadow()
+        $0.setImage(UIImage(systemName: "pause.circle"), for: .normal)
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
         $0.tapAnimation()
     }
     
     private lazy var nextButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "forward.fill"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .white
-        $0.addShadow()
+        $0.setImage(UIImage(systemName: "forward.end.circle"), for: .normal)
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
         $0.tapAnimation()
     }
     
     private lazy var previousButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "backward.fill"), for: .normal)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .white
-        $0.addShadow()
+        $0.setImage(UIImage(systemName: "backward.end.circle"), for: .normal)
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
         $0.tapAnimation()
     }
     
     private lazy var progressSlider = FMSlider(barHeight: 8).then {
         $0.isContinuous = true
         $0.minimumValue = 0
-//        $0.setThumbImage(UIImage().applyingSymbolConfiguration(UIImage.SymbolConfiguration(font: 0.8)), for: .normal)
+        $0.tintColor = .bgColor
+        $0.setThumbImage(UIImage(), for: .normal)
 //        $0.setThumbImage(UIImage(), for: .highlighted)
         $0.layer.cornerRadius = 4
         $0.addTarget(self, action: #selector(sliderValueChanged), for: .valueChanged)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(sliderTapped))
         $0.addGestureRecognizer(tapGesture)
         $0.progressAnimation()
-//        $0.addShadow()
     }
     
     //상태에 따라 아이콘 바뀜
     private lazy var repeatButton = UIButton().then {
         $0.setImage(UIImage(systemName: "repeat"), for: .normal)
-        $0.tintColor = FMDesign.Color.tintColor.color
-        $0.addShadow()
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
         $0.tapAnimation()
     }
     
     //알파값 바뀜
     private lazy var shuffleButton = UIButton().then {
         $0.setImage(UIImage(systemName: "shuffle"), for: .normal)
-        $0.tintColor = FMDesign.Color.tintColor.color
-        $0.addShadow()
-        $0.tapAnimation()
-    }
-    
-    //상태에 따라 아이콘 바뀜
-    private lazy var heartButton = UIButton().then {
-        $0.setImage(UIImage(systemName: FMDesign.Icon.heart.name), for: .normal)
-        $0.setImage(UIImage(systemName: FMDesign.Icon.heart.fill), for: .selected)
-        $0.tintColor = FMDesign.Color.tintColor.color
-        $0.addShadow()
-        $0.tapAnimation()
-    }
-    
-    //알파값 바뀜
-    private lazy var playlistButton = FMPlaylistButton(menus: ["새 플레이리스트 만들기"]).then {
-        $0.setImage(UIImage(systemName: FMDesign.Icon.library.name), for: .normal)
-        $0.tintColor = FMDesign.Color.tintColor.color
-        $0.addShadow()
+        $0.tintColor = .bgColor
+        $0.imageEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
         $0.tapAnimation()
     }
     
@@ -188,9 +180,9 @@ final class MusicPlayerViewController: BaseViewController {
         
         output.playState.drive(with: self) { owner, state in
             if state == .playing {
-                owner.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+                owner.playButton.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
             } else {
-                owner.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+                owner.playButton.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
             }
         }.disposed(by: disposeBag)
         
@@ -284,6 +276,7 @@ final class MusicPlayerViewController: BaseViewController {
     override func configureView() {
         super.configureView()
         sheetPresentationController?.prefersGrabberVisible = true
+        view.backgroundColor = .bgColor
     }
 }
 
@@ -305,11 +298,25 @@ extension MusicPlayerViewController {
 extension MusicPlayerViewController {
     
     func setLayout() {
+        
         chevronButton.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+            make.top.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.size.equalTo(44)
-            make.centerX.equalToSuperview()
         }
+        
+        heartButton.snp.makeConstraints { make in
+            make.size.equalTo(44)
+            make.centerY.equalTo(chevronButton.snp.centerY)
+            make.trailing.equalToSuperview().offset(-16)
+        }
+        
+//        playlistButton.snp.makeConstraints { make in
+//            make.size.equalTo(44)
+//            make.centerY.equalTo(chevronButton.snp.centerY)
+//            make.trailing.equalToSuperview().offset(-16)
+//        }
+        
+        
         
         artworkImage.snp.makeConstraints { make in
             make.size.equalTo(300)
@@ -330,7 +337,7 @@ extension MusicPlayerViewController {
         }
         
         previousButton.snp.makeConstraints { make in
-            make.size.equalTo(32)
+            make.size.equalTo(44)
             make.centerY.equalTo(playButton.snp.centerY)
             make.trailing.equalTo(playButton.snp.leading).offset(-40)
         }
@@ -342,21 +349,9 @@ extension MusicPlayerViewController {
         }
         
         nextButton.snp.makeConstraints { make in
-            make.size.equalTo(32)
+            make.size.equalTo(44)
             make.centerY.equalTo(playButton.snp.centerY)
             make.leading.equalTo(playButton.snp.trailing).offset(40)
-        }
-        
-        heartButton.snp.makeConstraints { make in
-            make.size.equalTo(44)
-            make.top.equalTo(previousButton.snp.bottom).offset(20)
-            make.leading.equalTo(progressSlider.snp.leading)
-        }
-        
-        playlistButton.snp.makeConstraints { make in
-            make.size.equalTo(44)
-            make.centerY.equalTo(heartButton.snp.centerY)
-            make.trailing.equalTo(progressSlider.snp.trailing)
         }
         
         progressSlider.snp.makeConstraints { make in

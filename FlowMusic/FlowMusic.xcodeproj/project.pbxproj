@@ -32,7 +32,7 @@
 		7C3927712BA3420C0074F87E /* AlbumArtCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927702BA3420C0074F87E /* AlbumArtCell.swift */; };
 		7C3927732BA343B30074F87E /* ArtistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927722BA343B30074F87E /* ArtistCell.swift */; };
 		7C3927752BA34FF60074F87E /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927742BA34FF60074F87E /* PlaylistCell.swift */; };
-		7C3927772BA3526C0074F87E /* MusicItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927762BA3526C0074F87E /* MusicItem.swift */; };
+		7C3927772BA3526C0074F87E /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927762BA3526C0074F87E /* UIColor+.swift */; };
 		7C446E622BA5B7D800AAC5CB /* UserSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E612BA5B7D800AAC5CB /* UserSetting.swift */; };
 		7C446E642BA5E20900AAC5CB /* BaseCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E632BA5E20900AAC5CB /* BaseCollectionView.swift */; };
 		7C446E662BA6150E00AAC5CB /* PlaylistMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */; };
@@ -107,7 +107,7 @@
 		7C3927702BA3420C0074F87E /* AlbumArtCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtCell.swift; sourceTree = "<group>"; };
 		7C3927722BA343B30074F87E /* ArtistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistCell.swift; sourceTree = "<group>"; };
 		7C3927742BA34FF60074F87E /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
-		7C3927762BA3526C0074F87E /* MusicItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicItem.swift; sourceTree = "<group>"; };
+		7C3927762BA3526C0074F87E /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
 		7C446E612BA5B7D800AAC5CB /* UserSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSetting.swift; sourceTree = "<group>"; };
 		7C446E632BA5E20900AAC5CB /* BaseCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCollectionView.swift; sourceTree = "<group>"; };
 		7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMenuButton.swift; sourceTree = "<group>"; };
@@ -362,10 +362,10 @@
 			children = (
 				7C813DD62B9AE2B800CDFF1D /* Then+.swift */,
 				7C813DD82B9AE2CD00CDFF1D /* UIView+.swift */,
-				7C813DDA2B9AE2D700CDFF1D /* String+.swift */,
 				7C813DFC2B9B13AB00CDFF1D /* UIVIewController+.swift */,
+				7C813DDA2B9AE2D700CDFF1D /* String+.swift */,
 				7C03F7CF2BA179D800FB748C /* Array+.swift */,
-				7C3927762BA3526C0074F87E /* MusicItem.swift */,
+				7C3927762BA3526C0074F87E /* UIColor+.swift */,
 				7C6EE4D72BAEE6D600087EF2 /* UIControl+.swift */,
 			);
 			path = Extension;
@@ -656,7 +656,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C3927772BA3526C0074F87E /* MusicItem.swift in Sources */,
+				7C3927772BA3526C0074F87E /* UIColor+.swift in Sources */,
 				7C916E072B9D99DC00C5F6C0 /* MusicRecommendViewModel.swift in Sources */,
 				7C813DAC2B9ADFEF00CDFF1D /* AppDelegate.swift in Sources */,
 				7C916E0B2B9D9C5500C5F6C0 /* AppCoordinator.swift in Sources */,

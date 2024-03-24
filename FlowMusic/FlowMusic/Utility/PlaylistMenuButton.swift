@@ -33,7 +33,7 @@ final class FMPlaylistButton: UIButton {
     
     private func configureUI(menus: [String]) {
         setImage(UIImage(systemName: FMDesign.Icon.plus.name), for: .normal)
-        tintColor = FMDesign.Color.tintColor.color
+        tintColor = .tintColor
         showsMenuAsPrimaryAction = true
         menu = UIMenu(children: menus.map { title in
             UIAction(title: title) { [weak self] _ in

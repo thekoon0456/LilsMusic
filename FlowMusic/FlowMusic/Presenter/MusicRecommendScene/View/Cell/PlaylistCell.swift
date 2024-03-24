@@ -79,6 +79,6 @@ final class PlaylistCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-        addShadow()
+//        addShadow()
     }
 }

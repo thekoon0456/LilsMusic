@@ -77,6 +77,6 @@ final class MixCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-        addShadow()
+//        addShadow()
     }
 }

@@ -73,6 +73,6 @@ final class MusicChartsCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-        addShadow()
+//        addShadow()
     }
 }
