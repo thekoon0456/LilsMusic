@@ -48,6 +48,12 @@ final class LibraryViewController: BaseViewController {
         $0.textColor = .tintColor
     }
     
+    private let emptyLabel = UILabel().then {
+        $0.text = "Press the heart for your favorite music"
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .tintColor
+    }
+    
     private lazy var playlistCollectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .bgColor
@@ -111,6 +117,7 @@ final class LibraryViewController: BaseViewController {
             }.disposed(by: disposeBag)
         
         output.likeTracks.drive(with: self) { owner, tracks in
+            owner.updateEmptyLabel(tracks: tracks)
             owner.updateSnapshot(tracks: tracks)
         }.disposed(by: disposeBag)
         
@@ -143,6 +150,10 @@ final class LibraryViewController: BaseViewController {
         }
     }
     
+    private func updateEmptyLabel(tracks: MusicItemCollection<Track>) {
+        emptyLabel.isHidden = tracks.isEmpty ? false : true
+    }
+    
     private func updateMiniPlayer(track: Track?) {
         guard let track else {
             miniPlayerView.isHidden = true
@@ -161,7 +172,7 @@ final class LibraryViewController: BaseViewController {
         view.addSubviews(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(forYouLabel, playlistCollectionView,
-                                likeLabel, likeListCollectionView, miniPlayerView)
+                                likeLabel, likeListCollectionView, emptyLabel, miniPlayerView)
     }
     
     override func configureLayout() {
@@ -188,6 +199,11 @@ final class LibraryViewController: BaseViewController {
         
         likeLabel.snp.makeConstraints { make in
             make.top.equalTo(playlistCollectionView.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(12)
+        }
+        
+        emptyLabel.snp.makeConstraints { make in
+            make.top.equalTo(likeLabel.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(12)
         }
         

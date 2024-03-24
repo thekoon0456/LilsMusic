@@ -16,8 +16,7 @@ final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Properties
     
-    let musicPlayer = FMMusicPlayer()
-    private let musicRequest = MusicRepository()
+    let viewModel: ReelsCellViewModel = ReelsCellViewModel()
     
     // MARK: - UI
     
@@ -88,17 +87,12 @@ final class ReelsCell: BaseCollectionViewCell {
         musicLabel.text = data.title
         artistLabel.text = data.artistName
         genreLabel.text = data.genreNames.first
-        
-        Task {
-            //뮤비의 song타입
-            let result = try await musicRequest.MusicVideoToSong(data)
-            
-        }
     }
     
     override func configureHierarchy() {
         super.configureHierarchy()
-        contentView.addSubviews(musicVideoView, musicLabel, artistLabel, genreLabel, heartButton)
+        contentView.addSubviews(musicVideoView, musicLabel, artistLabel,
+                                genreLabel, heartButton)
     }
     
     override func configureLayout() {

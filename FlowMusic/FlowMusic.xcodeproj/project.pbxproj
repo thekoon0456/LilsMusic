@@ -25,6 +25,7 @@
 		7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C5D2BA4B93F004B3FF2 /* RxGesture */; };
 		7C286FD92BA88B1700244559 /* MixCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C286FD82BA88B1700244559 /* MixCell.swift */; };
 		7C2F2A5A2BB075A900FE6CE2 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F2A592BB075A900FE6CE2 /* LaunchViewController.swift */; };
+		7C2F2A5C2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F2A5B2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift */; };
 		7C3927672BA32B150074F87E /* FMSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927662BA32B150074F87E /* FMSlider.swift */; };
 		7C3927692BA341590074F87E /* MusicRecommendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3927682BA341590074F87E /* MusicRecommendViewController.swift */; };
 		7C39276F2BA341BA0074F87E /* TrendingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C39276E2BA341BA0074F87E /* TrendingHeaderView.swift */; };
@@ -98,6 +99,7 @@
 		7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
 		7C286FD82BA88B1700244559 /* MixCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MixCell.swift; sourceTree = "<group>"; };
 		7C2F2A592BB075A900FE6CE2 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
+		7C2F2A5B2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelsCellViewModel.swift; sourceTree = "<group>"; };
 		7C3927662BA32B150074F87E /* FMSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMSlider.swift; sourceTree = "<group>"; };
 		7C3927682BA341590074F87E /* MusicRecommendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecommendViewController.swift; sourceTree = "<group>"; };
 		7C39276E2BA341BA0074F87E /* TrendingHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingHeaderView.swift; sourceTree = "<group>"; };
@@ -557,6 +559,7 @@
 			isa = PBXGroup;
 			children = (
 				7C916E0F2B9D9FF500C5F6C0 /* ReelsViewModel.swift */,
+				7C2F2A5B2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -658,6 +661,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C2F2A5C2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift in Sources */,
 				7C3927772BA3526C0074F87E /* UIColor+.swift in Sources */,
 				7C916E072B9D99DC00C5F6C0 /* MusicRecommendViewModel.swift in Sources */,
 				7C813DAC2B9ADFEF00CDFF1D /* AppDelegate.swift in Sources */,
