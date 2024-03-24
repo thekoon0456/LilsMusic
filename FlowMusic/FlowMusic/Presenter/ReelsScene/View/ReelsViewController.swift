@@ -5,24 +5,24 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
+import AVFoundation
+import AVKit
 import MusicKit
 import UIKit
 
 import SnapKit
 
 final class ReelsViewController: BaseViewController {
-    
-    enum Section: CaseIterable {
-        case main
-    }
-    
+
     // MARK: - Properties
     
     private let viewModel: ReelsViewModel
     private let musicRequest = MusicRepository()
-
+    private var queuePlayer = AVQueuePlayer()
+    var videoURLs: [URL] = []
+    
     private let titleView = UILabel().then {
-        $0.text = "MV Reels"
+        $0.text = "Hot MV"
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .white
     }
@@ -61,40 +61,7 @@ final class ReelsViewController: BaseViewController {
         }
     }
     
-    private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
-                cell.configureCell(itemIdentifier)
-        }
-        
-        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-            return cell
-        }
-    }
-    
-    private func updateSnapshot() {
-        print(#function)
-        guard let mv: [MusicVideo] = (musicVideos?.map { $0 }) else { return }
-        var snapshot = NSDiffableDataSourceSnapshot<Section, MusicVideo>()
-        snapshot.appendSections(Section.allCases)
-        snapshot.appendItems(mv, toSection: .main)
-        dataSource?.apply(snapshot)
-    }
-    
     // MARK: - Layout
-    
-    private func createLayout() -> UICollectionViewCompositionalLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                              heightDimension: .fractionalHeight(1))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                               heightDimension: .fractionalHeight(1))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
-                                                       subitems: [item])
-        let section = NSCollectionLayoutSection(group: group)
-        let layout = UICollectionViewCompositionalLayout(section: section)
-        return layout
-    }
     
     override func configureHierarchy() {
         view.addSubview(collectionView)
@@ -135,7 +102,47 @@ extension ReelsViewController: UICollectionViewDelegate {
     }
 }
 
+// MARK: - CollectionViewLayout
 
+extension ReelsViewController {
+    
+    enum Section: CaseIterable {
+        case main
+    }
+    
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
+                cell.configureCell(itemIdentifier)
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+            return cell
+        }
+    }
+    
+    private func updateSnapshot() {
+        print(#function)
+        guard let mv: [MusicVideo] = (musicVideos?.map { $0 }) else { return }
+        var snapshot = NSDiffableDataSourceSnapshot<Section, MusicVideo>()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(mv, toSection: .main)
+        dataSource?.apply(snapshot)
+    }
+    
+    private func createLayout() -> UICollectionViewCompositionalLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                              heightDimension: .fractionalHeight(1))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                               heightDimension: .fractionalHeight(1))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                       subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
+    }
+}
 
 
 
