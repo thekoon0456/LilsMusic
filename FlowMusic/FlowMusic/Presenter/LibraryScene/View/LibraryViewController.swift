@@ -42,7 +42,7 @@ final class LibraryViewController: BaseViewController {
     }
     
     private let likeLabel = UILabel().then {
-        $0.text = "Library"
+        $0.text = "Liked Songs"
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .tintColor
     }
@@ -61,17 +61,6 @@ final class LibraryViewController: BaseViewController {
         cv.showsHorizontalScrollIndicator = false
         return cv
     }()
-    
-    
-    private let likedSongsButton = LibraryButtonView(imageName: "heart.fill",
-                                                     title: "Liked Songs",
-                                                     subTitle: "",
-                                                     bgColor: .tintColor)
-    
-    private let recentlyPlayedButton = LibraryButtonView(imageName: "play.circle",
-                                                         title: "Recently\nPlayed Songs",
-                                                         subTitle: "",
-                                                         bgColor:  .tintColor)
     
     private let miniPlayerView = MiniPlayerView().then {
         $0.isHidden = true
@@ -101,8 +90,6 @@ final class LibraryViewController: BaseViewController {
         let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
-                                           likedSongTapped: likedSongsButton.tap,
-                                           recentlyPlayedSongTapped: recentlyPlayedButton.tap,
                                            itemSelected: itemSelected,
                                            mixSelected: mixSelected,
                                            miniPlayerTapped: miniPlayerView.tap,
@@ -192,7 +179,7 @@ final class LibraryViewController: BaseViewController {
         
         likeListCollectionView.snp.makeConstraints { make in
             make.top.equalTo(likeLabel.snp.bottom).offset(8)
-            make.height.equalTo(view.bounds.height)
+            make.height.equalTo(view.bounds.height * 0.6)
             make.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }

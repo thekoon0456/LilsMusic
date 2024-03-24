@@ -16,8 +16,6 @@ final class LibraryViewModel: ViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
-        let likedSongTapped: Observable<Void>
-        let recentlyPlayedSongTapped: Observable<Void>
         let itemSelected: Observable<MusicItem>
         let mixSelected: ControlEvent<Playlist>
         let miniPlayerTapped: Observable<Void>
@@ -65,37 +63,37 @@ final class LibraryViewModel: ViewModel {
                 owner.coordinator?.pushToList(playlist: playlist)
             }.disposed(by: disposeBag)
         
-        input
-            .likedSongTapped
-            .withUnretained(self)
-            .subscribe{ owner, _ in
-                let likeID = owner.fetchLikeList()
-                Task {
-                    do {
-                        let result = try await self.musicRepository.requestLikeList(ids: likeID)
-                        DispatchQueue.main.async {
-                            owner.coordinator?.pushToLibraryList(tracks: result)
-                        }
-                    } catch {
-                        print(error)
-                    }
-                }
-            }.disposed(by: disposeBag)
-        
-        input.recentlyPlayedSongTapped
-            .withUnretained(self)
-            .subscribe{ owner, _ in
-                Task {
-                    do {
-                        let result = try await owner.fetchRecentlyPlayList()
-                        DispatchQueue.main.async {
-                            owner.coordinator?.pushToLibraryList(tracks: result)
-                        }
-                    } catch {
-                        print(error)
-                    }
-                }
-            }.disposed(by: disposeBag)
+//        input
+//            .likedSongTapped
+//            .withUnretained(self)
+//            .subscribe{ owner, _ in
+//                let likeID = owner.fetchLikeList()
+//                Task {
+//                    do {
+//                        let result = try await self.musicRepository.requestLikeList(ids: likeID)
+//                        DispatchQueue.main.async {
+//                            owner.coordinator?.pushToLibraryList(tracks: result)
+//                        }
+//                    } catch {
+//                        print(error)
+//                    }
+//                }
+//            }.disposed(by: disposeBag)
+//        
+//        input.recentlyPlayedSongTapped
+//            .withUnretained(self)
+//            .subscribe{ owner, _ in
+//                Task {
+//                    do {
+//                        let result = try await owner.fetchRecentlyPlayList()
+//                        DispatchQueue.main.async {
+//                            owner.coordinator?.pushToLibraryList(tracks: result)
+//                        }
+//                    } catch {
+//                        print(error)
+//                    }
+//                }
+//            }.disposed(by: disposeBag)
         
         let playlist = input
             .viewDidLoad
