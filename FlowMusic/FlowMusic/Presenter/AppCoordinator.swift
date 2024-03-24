@@ -18,7 +18,7 @@ final class AppCoordinator: NSObject, Coordinator {
     var childCoordinators: [Coordinator]
     var type: CoordinatorType
     
-    init(navigationController: UINavigationController? = nil) {
+    init(navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
         self.type = .app
@@ -27,17 +27,10 @@ final class AppCoordinator: NSObject, Coordinator {
     // MARK: - Helpers
     
     func start() {
-        //TODO: -온보딩 분기처리
-        Task {
-            do {
-                try await requestMusicAuthorization()
-                DispatchQueue.main.async {
-                    self.makeTabbar()
-                }
-            } catch {
-                moveToUserSetting()
-            }
-        }
+        //TODO: - 온보딩 분기처리
+        presentLaunch()
+        requestMusicAuthorization()
+//        makeTabbar()
     }
     
     func makeTabbar() {
@@ -69,34 +62,39 @@ final class AppCoordinator: NSObject, Coordinator {
         tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav]
         navigationController?.pushViewController(tabBarController, animated: false)
     }
+    
+    func presentLaunch() {
+        let vc = LaunchViewController()
+        navigationController?.pushViewController(vc, animated: false)
+    }
+    
 }
 
 extension AppCoordinator: SKCloudServiceSetupViewControllerDelegate {
     
-//    func requestMusicAuthorization() {
-//        SKCloudServiceController.requestAuthorization { (authorizationStatus) in
-//            switch authorizationStatus {
-//            case .authorized:
-//                // 권한이 부여된 경우, 계속해서 작업을 진행
-//                print("승인됨")
-//                self.checkAppleMusicSubscriptionEligibility()
-//                break
-//            default:
-//                // 사용자가 권한을 거부한 경우, 필요한 조치 안내
-//                self.moveToUserSetting()
-//                break
-//            }
-//        }
-//    }
-    
-    func requestMusicAuthorization() async throws {
-        let status = await MusicAuthorization.request()
-        switch status {
-        case .authorized:
-            print("승인됨")
-        default:
-            moveToUserSetting()
-            print("승인안됨. 재요청")
+    func requestMusicAuthorization() {
+        SKCloudServiceController.requestAuthorization { [weak self] status in
+            guard let self else { return }
+            switch status {
+            case .authorized:
+                print("승인됨")
+                makeTabbar()
+                break
+            default:
+                moveToUserSetting()
+                break
+            }
         }
     }
+    
+//    func requestMusicAuthorization() async throws {
+//        let status = await MusicAuthorization.request()
+//        switch status {
+//        case .authorized:
+//            print("승인됨")
+//        default:
+//            moveToUserSetting()
+//            print("승인안됨. 재요청")
+//        }
+//    }
 }
