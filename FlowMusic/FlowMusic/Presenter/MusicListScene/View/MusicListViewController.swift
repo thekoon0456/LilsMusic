@@ -7,6 +7,7 @@
 
 import UIKit
 import MusicKit
+import StoreKit
 
 import RxCocoa
 import RxSwift
@@ -95,17 +96,16 @@ final class MusicListViewController: BaseViewController {
             owner.updateMiniPlayer(track: track)
         }.disposed(by: disposeBag)
         
+        output.playState.drive(with: self) { owner, state in
+            owner.setPlayButton(state: state)
+        }.disposed(by: disposeBag)
+        
         collectionView.rx.itemSelected
             .withUnretained(self)
             .subscribe { owner, indexPath in
                 guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
                 owner.itemSelected.onNext((index: indexPath.item, track: track))
             }.disposed(by: disposeBag)
-        
-        output.playState.drive(with: self) { owner, state in
-            owner.setPlayButton(state: state)
-        }.disposed(by: disposeBag)
-        
     }
     
     // MARK: - UI

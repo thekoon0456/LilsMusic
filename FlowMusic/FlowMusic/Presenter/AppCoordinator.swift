@@ -31,7 +31,6 @@ final class AppCoordinator: NSObject, Coordinator {
         Task {
             do {
                 try await requestMusicAuthorization()
-                checkAppleMusicSubscriptionEligibility()
                 DispatchQueue.main.async {
                     self.makeTabbar()
                 }
@@ -90,39 +89,6 @@ extension AppCoordinator: SKCloudServiceSetupViewControllerDelegate {
 //        }
 //    }
     
-    func checkAppleMusicSubscriptionEligibility() {
-        let controller = SKCloudServiceController()
-        controller.requestCapabilities { (capabilities, error) in
-            if let error {
-                print(error.localizedDescription)
-                return
-            }
-
-            if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
-                self.presentAppleMusicSubscriptionOffer()
-            }
-        }
-    }
-    
-    func presentAppleMusicSubscriptionOffer() {
-        var options: [SKCloudServiceSetupOptionsKey: Any] = [.action: SKCloudServiceSetupAction.subscribe]
-        
-        options[.messageIdentifier] = SKCloudServiceSetupMessageIdentifier.addMusic
-        
-        let setupViewController = SKCloudServiceSetupViewController()
-        setupViewController.delegate = self
-        
-        setupViewController.load(options: options) { (result, error) in
-            if result {
-                DispatchQueue.main.async {
-                    self.navigationController?.present(setupViewController, animated: true)
-                }
-            } else if let error = error {
-                print("Error presenting Apple Music subscription offer: \(error.localizedDescription)")
-            }
-        }
-    }
-    
     func requestMusicAuthorization() async throws {
         let status = await MusicAuthorization.request()
         switch status {
@@ -133,17 +99,4 @@ extension AppCoordinator: SKCloudServiceSetupViewControllerDelegate {
             print("승인안됨. 재요청")
         }
     }
-    
-    //        Task {
-    //            do {
-    //                try await requestMusicAuthorization()
-    //                checkAppleMusicSubscriptionEligibility()
-    //            } catch {
-    //                print("에러 발생", error)
-    //                presentErrorAlert(title: "Error", message: "please SingedIn") {
-    //                    self.moveToUserSetting()
-    //                }
-    //            }
-    //        }
-        
 }

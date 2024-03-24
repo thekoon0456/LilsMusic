@@ -11,6 +11,7 @@ import MusicKit
 
 import RxCocoa
 import RxSwift
+import StoreKit
 
 final class MusicListViewModel: ViewModel {
     
@@ -75,6 +76,7 @@ final class MusicListViewModel: ViewModel {
         input.playButtonTapped
             .withUnretained(self)
             .subscribe { owner, _ in
+                owner.checkAppleMusicSubscriptionEligibility()
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
@@ -103,6 +105,7 @@ final class MusicListViewModel: ViewModel {
         input.itemSelected
             .withUnretained(self)
             .subscribe { owner, item in
+                owner.checkAppleMusicSubscriptionEligibility()
                 Task {
                     guard let tracks = try await owner.fetchTracks() else { return }
                     try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
@@ -252,5 +255,23 @@ extension MusicListViewModel {
             let state = musicPlayer.getPlaybackState()
             playStateSubject.onNext(state)
         }.store(in: &cancellable)
+    }
+}
+
+extension MusicListViewModel {
+    
+    func checkAppleMusicSubscriptionEligibility() {
+        let controller = SKCloudServiceController()
+        controller.requestCapabilities { [weak self] (capabilities, error) in
+            guard let self else { return }
+            if let error {
+                print(error.localizedDescription)
+                return
+            }
+
+            if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
+                coordinator?.presentAppleMusicSubscriptionOffer()
+            }
+        }
     }
 }
