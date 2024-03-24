@@ -153,25 +153,28 @@ final class MusicRepository {
     // MARK: - RequestLibrary
     
     func requestPlaylist(ids: [String]) async throws -> MusicItemCollection<Track> {
-        let playlists = [MusicItemCollection<Track>]()
+        guard !ids.isEmpty else { return [] }
         let response = try await MusicCatalogResourceRequest<Song>(matching: \.id, memberOf: setMusicItemID(ids)).response()
         let tracks = response.items.map { Track.song($0) }
         return MusicItemCollection(tracks)
     }
     
     func requestArtistList(ids: [String]) async throws -> MusicItemCollection<Artist> {
+        guard !ids.isEmpty else { return [] }
         let response = try await MusicCatalogResourceRequest<Artist>(matching: \.id, memberOf: setMusicItemID(ids)).response()
         let artists = response.items
         return artists
     }
     
     func requestLikeList(ids: [String]) async throws -> MusicItemCollection<Track> {
+        guard !ids.isEmpty else { return [] }
         let response = try await MusicCatalogResourceRequest<Song>(matching: \.id, memberOf: setMusicItemID(ids)).response()
         let tracks = response.items.map { Track.song($0) }
         return MusicItemCollection(tracks)
     }
     
     func requestAlbumList(ids: [String]) async throws -> MusicItemCollection<Album> {
+        guard !ids.isEmpty else { return [] }
         let response = try await MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: setMusicItemID(ids)).response()
         let albums = response.items
         return albums

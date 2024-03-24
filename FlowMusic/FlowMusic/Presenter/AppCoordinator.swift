@@ -35,7 +35,6 @@ final class AppCoordinator: NSObject, Coordinator {
                 DispatchQueue.main.async {
                     self.makeTabbar()
                 }
-
             } catch {
                 moveToUserSetting()
             }
@@ -94,9 +93,8 @@ extension AppCoordinator: SKCloudServiceSetupViewControllerDelegate {
     func checkAppleMusicSubscriptionEligibility() {
         let controller = SKCloudServiceController()
         controller.requestCapabilities { (capabilities, error) in
-            guard error == nil else {
-                // 에러 처리
-                self.moveToUserSetting()
+            if let error {
+                print(error.localizedDescription)
                 return
             }
 
