@@ -107,13 +107,27 @@ final class MusicPlayerViewController: BaseViewController {
         $0.progressAnimation()
     }
     
+    private let playTimeLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 10)
+        $0.text = "00:00"
+        $0.textColor = .bgColor
+        $0.textAlignment = .center
+    }
+    
+    private let endTimeLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 10)
+        $0.text = "00:00"
+        $0.textColor = .bgColor
+        $0.textAlignment = .center
+    }
+    
     private lazy var repeatButton = UIButton().then {
         let image = UIImage(systemName: "repeat")
         $0.setImage(image, for: .normal)
         $0.tintColor = .bgColor
         $0.contentHorizontalAlignment = .trailing
+        $0.contentVerticalAlignment = .top
         $0.tapAnimation()
-
     }
     
     private lazy var shuffleButton = UIButton().then {
@@ -122,6 +136,7 @@ final class MusicPlayerViewController: BaseViewController {
         $0.setImage(image, for: .normal)
         $0.tintColor = .bgColor
         $0.contentHorizontalAlignment = .leading
+        $0.contentVerticalAlignment = .top
         $0.tapAnimation()
     }
     
@@ -211,6 +226,7 @@ final class MusicPlayerViewController: BaseViewController {
     
     @objc func updateProgressBar() {
         let playbackTime = viewModel.musicPlayer.getPlayBackTime()
+        playTimeLabel.text = formatDuration(playbackTime)
         let progress = playbackTime / Double(progressSlider.maximumValue)
         guard progress > 0.02 else { return }
         let value = Float(playbackTime)
@@ -237,6 +253,7 @@ final class MusicPlayerViewController: BaseViewController {
         artworkImage.kf.setImage(with: track.artwork?.url(width: 600, height: 600))
         artistLabel.text = track.artistName
         songLabel.text = track.title
+        endTimeLabel.text = formatDuration(track.duration)
         //백그라운드 설정
         setGradient(startColor: track.artwork?.backgroundColor,
                     endColor: track.artwork?.backgroundColor)
@@ -289,13 +306,22 @@ final class MusicPlayerViewController: BaseViewController {
         }
     }
     
+    func formatDuration(_ duration: TimeInterval?) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.minute, .second]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = .pad
+        
+        return formatter.string(from: duration ?? 0) ?? "00:00"
+    }
+    
     // MARK: - Configure
     
     override func configureHierarchy() {
         super.configureHierarchy()
         view.addSubviews(blurView, chevronButton, artworkImage, songLabel, artistLabel, playButton,
                          previousButton, nextButton, progressSlider,
-                         shuffleButton, repeatButton, heartButton, playlistButton)
+                         shuffleButton, repeatButton, heartButton, playlistButton, playTimeLabel, endTimeLabel)
     }
     
     override func configureLayout() {
@@ -327,7 +353,6 @@ extension MusicPlayerViewController {
 extension MusicPlayerViewController {
     
     func setLayout() {
-        
         blurView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -374,16 +399,26 @@ extension MusicPlayerViewController {
             make.height.equalTo(16)
         }
         
-        shuffleButton.snp.makeConstraints { make in
-            make.size.equalTo(44)
+        playTimeLabel.snp.makeConstraints { make in
             make.leading.equalTo(progressSlider.snp.leading)
-            make.top.equalTo(progressSlider.snp.bottom)
+            make.bottom.equalTo(progressSlider.snp.top).offset(-4)
+        }
+        
+        endTimeLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(progressSlider.snp.trailing)
+            make.bottom.equalTo(progressSlider.snp.top).offset(-4)
+        }
+        
+        shuffleButton.snp.makeConstraints { make in
+            make.size.equalTo(36)
+            make.leading.equalTo(progressSlider.snp.leading)
+            make.top.equalTo(progressSlider.snp.bottom).offset(4)
         }
         
         repeatButton.snp.makeConstraints { make in
-            make.size.equalTo(44)
+            make.size.equalTo(36)
             make.trailing.equalTo(progressSlider.snp.trailing)
-            make.top.equalTo(progressSlider.snp.bottom)
+            make.top.equalTo(progressSlider.snp.bottom).offset(4)
         }
         
         previousButton.snp.makeConstraints { make in
