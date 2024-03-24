@@ -65,10 +65,16 @@ final class MusicListViewController: BaseViewController {
                 return !miniPlayerView.playButton.isSelected
             }
         
+        let playButtonTapped = playButtonTapped.asObservable()
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+        
+        let shuffleButtonTapped = shuffleButtonTapped.asObservable()
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+        
         let input = MusicListViewModel.Input(viewDidLoad: viewDidLoadTrigger.asObservable(),
                                              itemSelected: itemSelected.asObservable(),
-                                             playButtonTapped: playButtonTapped.asObservable(),
-                                             shuffleButtonTapped: shuffleButtonTapped.asObservable(),
+                                             playButtonTapped: playButtonTapped,
+                                             shuffleButtonTapped: shuffleButtonTapped,
                                              miniPlayerTapped: miniPlayerView.tap,
                                              miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                              miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,

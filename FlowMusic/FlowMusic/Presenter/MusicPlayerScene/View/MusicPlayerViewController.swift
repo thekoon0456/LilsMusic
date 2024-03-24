@@ -331,7 +331,8 @@ final class MusicPlayerViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        sheetPresentationController?.prefersGrabberVisible = true
+        view.layer.cornerRadius = 20
+        view.clipsToBounds = true
     }
 }
 
