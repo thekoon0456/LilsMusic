@@ -17,6 +17,10 @@ final class MiniPlayerView: BaseView {
     
     // MARK: - Properties
     
+    private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark)).then {
+        $0.alpha = 0.3
+    }
+    
     private lazy var iconImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.layer.cornerRadius = 4
@@ -24,39 +28,39 @@ final class MiniPlayerView: BaseView {
     }
     
     private let titleLabel = UILabel().then {
-        $0.font = .boldSystemFont(ofSize: 14)
+        $0.font = .boldSystemFont(ofSize: 16)
+        $0.textColor = .bgColor
     }
     
     private let subtitleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
-        $0.textColor = .lightGray
+        $0.textColor = .bgColor
     }
     
     lazy var playButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
-        $0.setImage(UIImage(systemName: "play.circle.fill"), for: .selected)
-        $0.contentVerticalAlignment = .fill
-        $0.contentHorizontalAlignment = .fill
-        $0.tintColor = .tintColor
-//        $0.addShadow()
+        let image = UIImage(systemName: "pause.circle.fill")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 36)))
+        let selectedImage = UIImage(systemName: "play.circle.fill")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 36)))
+        $0.setImage(image, for: .normal)
+        $0.setImage(selectedImage, for: .selected)
+        $0.tintColor = .bgColor
         $0.tapAnimation()
     }
     
     lazy var nextButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "forward.end.circle"), for: .normal)
-        $0.contentVerticalAlignment = .center
-        $0.contentHorizontalAlignment = .center
-        $0.tintColor = .tintColor
-//        $0.addShadow()
+        let image = UIImage(systemName: "forward.end.circle")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 24)))
+        $0.setImage(image, for: .normal)
+        $0.tintColor = .bgColor
         $0.tapAnimation()
     }
     
     lazy var previousButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "backward.end.circle"), for: .normal)
-        $0.contentVerticalAlignment = .center
-        $0.contentHorizontalAlignment = .center
-        $0.tintColor = .tintColor
-//        $0.addShadow()
+        let image = UIImage(systemName: "backward.end.circle")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 24)))
+        $0.setImage(image, for: .normal)
+        $0.tintColor = .bgColor
         $0.tapAnimation()
     }
     
@@ -70,9 +74,9 @@ final class MiniPlayerView: BaseView {
     // MARK: - Helpers
     
     func configureView(_ data: Track) {
-        guard let bgColor = data.artwork?.backgroundColor else { return }
-        iconImageView.kf.setImage(with: data.artwork?.url(width: 40, height: 40))
-        backgroundColor = UIColor(cgColor: bgColor)
+        iconImageView.kf.setImage(with: data.artwork?.url(width: 80, height: 80))
+        setGradient(startColor: data.artwork?.backgroundColor,
+                    endColor: data.artwork?.backgroundColor)
         titleLabel.text = data.title
         subtitleLabel.text = data.artistName
     }
@@ -80,10 +84,15 @@ final class MiniPlayerView: BaseView {
     // MARK: - Configure
     
     override func configureHierarchy() {
-        addSubviews(iconImageView, titleLabel, subtitleLabel, previousButton, playButton, nextButton)
+        addSubviews(blurView, iconImageView, titleLabel, subtitleLabel,
+                    previousButton, playButton, nextButton)
     }
     
     override func configureLayout() {
+        blurView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         iconImageView.snp.makeConstraints { make in
             make.size.equalTo(44)
             make.top.equalToSuperview().offset(8)
@@ -105,19 +114,22 @@ final class MiniPlayerView: BaseView {
         }
         
         previousButton.snp.makeConstraints { make in
-            make.size.equalTo(28)
+            make.width.equalTo(32)
+            make.height.equalToSuperview()
             make.centerY.equalToSuperview()
-            make.trailing.equalTo(playButton.snp.leading).offset(-20)
+            make.trailing.equalTo(playButton.snp.leading).offset(-16)
         }
         
         playButton.snp.makeConstraints { make in
-            make.size.equalTo(28)
+            make.width.equalTo(40)
+            make.height.equalToSuperview()
             make.centerY.equalToSuperview()
-            make.trailing.equalTo(nextButton.snp.leading).offset(-20)
+            make.trailing.equalTo(nextButton.snp.leading).offset(-16)
         }
         
         nextButton.snp.makeConstraints { make in
-            make.size.equalTo(28)
+            make.width.equalTo(32)
+            make.height.equalToSuperview()
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-8)
         }
@@ -125,11 +137,8 @@ final class MiniPlayerView: BaseView {
     
     override func configureView() {
         super.configureView()
-//        addShadow()
-//        backgroundColor = .systemBackground
         layer.cornerRadius = 12
         clipsToBounds = true
-//        alpha = 0.95
     }
 }
 

@@ -170,8 +170,13 @@ final class LibraryViewController: BaseViewController {
     private func setPlayButton(state: MusicPlayer.PlaybackStatus) {
         if state == .playing {
             miniPlayerView.playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+            let image = UIImage(systemName: "pause.circle.fill")?
+                .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 36)))
+            miniPlayerView.playButton.setImage(image, for: .normal)
         } else {
-            miniPlayerView.playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            let selectedImage = UIImage(systemName: "play.circle.fill")?
+                .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 36)))
+            miniPlayerView.playButton.setImage(selectedImage, for: .normal)
         }
     }
     

@@ -231,7 +231,7 @@ final class MusicPlayerViewController: BaseViewController {
     // MARK: - UI
     
     func updateUI(_ track: Track) {
-        artworkImage.kf.setImage(with: track.artwork?.url(width: 500, height: 500))
+        artworkImage.kf.setImage(with: track.artwork?.url(width: 600, height: 600))
         artistLabel.text = track.artistName
         songLabel.text = track.title
         //백그라운드 설정
