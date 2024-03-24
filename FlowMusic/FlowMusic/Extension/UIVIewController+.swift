@@ -16,6 +16,7 @@ extension UIViewController {
         let gradientLayer = CAGradientLayer()
         let startColor = startColor?.copy(alpha: 1.0) ?? CGColor(gray: 0, alpha: 0)
         let endColor = endColor?.copy(alpha: 0.5) ?? CGColor(gray: 0, alpha: 0)
+//        let endColor = endColor?.copy(alpha: 0.5) ?? CGColor(gray: 0, alpha: 0)
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [startColor, endColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)

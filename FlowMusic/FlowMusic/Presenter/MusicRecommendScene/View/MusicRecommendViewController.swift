@@ -28,6 +28,7 @@ final class MusicRecommendViewController: BaseViewController {
     
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createSectionLayout())
+        cv.backgroundColor = .bgColor
         cv.register(TrendingHeaderView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                     withReuseIdentifier: TrendingHeaderView.identifier)

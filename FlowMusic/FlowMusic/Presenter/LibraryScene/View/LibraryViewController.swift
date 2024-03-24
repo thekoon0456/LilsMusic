@@ -38,6 +38,7 @@ final class LibraryViewController: BaseViewController {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = .init(width: UIScreen.main.bounds.width, height: 60)
         let cv = UICollectionViewController(collectionViewLayout: layout)
+        cv.view.backgroundColor = .bgColor
         cv.collectionView.delegate = nil
         cv.collectionView.dataSource = nil
         cv.collectionView.register(MusicListCell.self, forCellWithReuseIdentifier: MusicListCell.identifier)
@@ -66,6 +67,7 @@ final class LibraryViewController: BaseViewController {
     
     private lazy var playlistCollectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.backgroundColor = .bgColor
         cv.isPagingEnabled = true
         cv.register(LibraryCell.self, forCellWithReuseIdentifier: LibraryCell.identifier)
         cv.showsHorizontalScrollIndicator = false

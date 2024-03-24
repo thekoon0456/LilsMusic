@@ -19,6 +19,7 @@ final class TrendingHeaderView: UICollectionReusableView {
         
     private let titleLabel = UILabel().then {
         $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .tintColor
     }
     
     // MARK: - Lifecycles

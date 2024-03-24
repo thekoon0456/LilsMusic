@@ -45,12 +45,10 @@ enum RepeatMode: Codable {
     
     var iconName: String {
         switch self {
-        case .all:
+        case .all, .off:
             return "repeat"
         case .one:
             return "repeat.1"
-        case .off:
-            return "autostartstop.slash"
         }
     }
 }

@@ -34,7 +34,9 @@ class BaseViewController: UIViewController {
     
     func configureHierarchy() { }
     func configureLayout() { }
-    func configureView() { view.backgroundColor = .systemBackground }
+    func configureView() { 
+        view.backgroundColor = .bgColor
+    }
     func bind() { }
     
     @available(*, unavailable)
