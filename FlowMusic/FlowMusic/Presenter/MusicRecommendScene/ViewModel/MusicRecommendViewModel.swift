@@ -17,6 +17,8 @@ final class MusicRecommendViewModel: ViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let searchText: Observable<String>
+        let searchModelSelected: ControlEvent<Track>
         let itemSelected: Observable<MusicItem>
         let miniPlayerTapped: Observable<Void>
         let miniPlayerPlayButtonTapped: Observable<Void>
@@ -25,6 +27,7 @@ final class MusicRecommendViewModel: ViewModel {
     }
     
     struct Output {
+        let searchResult: Driver<[Track]>
         let currentPlaySong: Driver<Track?>
         let recommendSongs: Driver<MusicItemCollection<Playlist>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
@@ -72,6 +75,21 @@ final class MusicRecommendViewModel: ViewModel {
                 }
                 print(owner.likesRepository.printURL())
             }.disposed(by: disposeBag)
+        
+        input.searchModelSelected
+            .withUnretained(self)
+            .subscribe { owner, track in
+                Task {
+                    try await owner.musicPlayer.playTrack(track)
+                }
+                owner.coordinator?.presentMusicPlayer(track: track)
+            }.disposed(by: disposeBag)
+        
+        let searchResult = input.searchText
+            .withUnretained(self)
+            .flatMap { owner, text in
+                owner.fetchSearchResult(text: text)
+            }.asDriver(onErrorJustReturn: [])
         
         let songs = input.viewDidLoad
             .withUnretained(self)
@@ -145,12 +163,29 @@ final class MusicRecommendViewModel: ViewModel {
                 }
             }.disposed(by: disposeBag)
         
-        return Output(currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
+        return Output(searchResult: searchResult.asDriver(onErrorJustReturn: []),
+                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
                       recommendMixList: mix,
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
+    }
+    
+    
+    private func fetchSearchResult(text: String) -> Observable<[Track]> {
+        return Observable.create { [weak self] observer in
+            guard let self,
+                  !text.isEmpty
+            else { return Disposables.create() }
+            Task {
+                let result = try await self.musicRepository.requestSearchSongCatalog(term: text)
+                let tracks = result.map { Track.song($0) }
+                observer.onNext(tracks)
+                observer.onCompleted()
+            }
+            return Disposables.create()
+        }
     }
     
     func getCurrentPlaySong() -> Observable<Track?> {

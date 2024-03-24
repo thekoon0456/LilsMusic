@@ -16,8 +16,6 @@ final class LibraryViewModel: ViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
-        let searchText: Observable<String>
-        let searchModelSelected: ControlEvent<Track>
         let likedSongTapped: Observable<Void>
         let recentlyPlayedSongTapped: Observable<Void>
         let itemSelected: Observable<MusicItem>
@@ -35,7 +33,6 @@ final class LibraryViewModel: ViewModel {
         let albums: Driver<MusicItemCollection<Album>>
         let currentPlaySong: Driver<Track?>
         let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
-        let searchResult: Driver<[Track]>
     }
     
     // MARK: - Properties
@@ -62,16 +59,6 @@ final class LibraryViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        
-        input.searchModelSelected
-            .withUnretained(self)
-            .subscribe { owner, track in
-                Task {
-                    try await owner.musicPlayer.playTrack(track)
-                }
-                owner.coordinator?.presentMusicPlayer(track: track)
-            }.disposed(by: disposeBag)
-        
         input.mixSelected
             .withUnretained(self)
             .subscribe { owner, playlist in
@@ -101,21 +88,14 @@ final class LibraryViewModel: ViewModel {
                 Task {
                     do {
                         let result = try await owner.fetchRecentlyPlayList()
-                         DispatchQueue.main.async {
-                             owner.coordinator?.pushToLibraryList(tracks: result)
-                         }
+                        DispatchQueue.main.async {
+                            owner.coordinator?.pushToLibraryList(tracks: result)
+                        }
                     } catch {
                         print(error)
                     }
                 }
             }.disposed(by: disposeBag)
-        
-        
-        let searchResult = input.searchText
-            .withUnretained(self)
-            .flatMap { owner, text in
-                owner.fetchSearchResult(text: text)
-            }.asDriver(onErrorJustReturn: [])
         
         let playlist = input
             .viewDidLoad
@@ -145,12 +125,12 @@ final class LibraryViewModel: ViewModel {
         //                owner.fetchLikeList()
         //            }.asDriver(onErrorJustReturn: [])
         
-//        let recentlyPlaylist = input
-//            .viewDidLoad
-//            .withUnretained(self)
-//            .flatMap { owner, _ in
-//                owner.fetchRecentlyPlayList()
-//            }.asDriver(onErrorJustReturn: [])
+        //        let recentlyPlaylist = input
+        //            .viewDidLoad
+        //            .withUnretained(self)
+        //            .flatMap { owner, _ in
+        //                owner.fetchRecentlyPlayList()
+        //            }.asDriver(onErrorJustReturn: [])
         
         let albums = input
             .viewDidLoad
@@ -210,23 +190,7 @@ final class LibraryViewModel: ViewModel {
                       artists: artist,
                       albums: albums,
                       currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing),
-                      searchResult: searchResult.asDriver(onErrorJustReturn: []))
-    }
-    
-    private func fetchSearchResult(text: String) -> Observable<[Track]> {
-        return Observable.create { [weak self] observer in
-            guard let self,
-                  !text.isEmpty
-            else { return Disposables.create() }
-            Task {
-                let result = try await self.musicRepository.requestSearchSongCatalog(term: text)
-                let tracks = result.map { Track.song($0) }
-                observer.onNext(tracks)
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        }
+                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
     }
     
     func fetchRecommendMix() -> Observable<MusicItemCollection<Playlist>> {

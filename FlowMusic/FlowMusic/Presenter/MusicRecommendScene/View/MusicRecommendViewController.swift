@@ -26,6 +26,26 @@ final class MusicRecommendViewController: BaseViewController {
     
     // MARK: - UI
     
+    private lazy var searchController = UISearchController(searchResultsController: libraryCollectionViewController).then {
+        $0.searchBar.placeholder = "Find Your Music"
+        $0.searchBar.backgroundColor = .clear
+        $0.searchBar.searchBarStyle = .minimal
+        $0.searchBar.tintColor = .tintColor
+        $0.searchBar.delegate = self
+        $0.definesPresentationContext = true
+    }
+    
+    private lazy var libraryCollectionViewController = {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = .init(width: UIScreen.main.bounds.width, height: 60)
+        let cv = UICollectionViewController(collectionViewLayout: layout)
+        cv.view.backgroundColor = .bgColor
+        cv.collectionView.delegate = nil
+        cv.collectionView.dataSource = nil
+        cv.collectionView.register(MusicListCell.self, forCellWithReuseIdentifier: MusicListCell.identifier)
+        return cv
+    }()
+    
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createSectionLayout())
         cv.backgroundColor = .bgColor
@@ -65,17 +85,30 @@ final class MusicRecommendViewController: BaseViewController {
     override func bind() {
         super.bind()
         
+        let searchText = searchController.searchBar.rx.text
+            .orEmpty
+            .distinctUntilChanged() // 연속적인 중복 값 방지
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+        let modelSelected = libraryCollectionViewController.collectionView.rx.modelSelected(Track.self)
+        
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
+                                                  searchText: searchText,
+                                                  searchModelSelected: modelSelected,
                                                   itemSelected: itemSelected.asObservable(),
                                                   miniPlayerTapped: miniPlayerView.tap,
                                                   miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                                   miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
                                                   miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
         let output = viewModel.transform(input)
+        
+        output.searchResult
+            .drive(libraryCollectionViewController.collectionView.rx.items(cellIdentifier: MusicListCell.identifier, cellType: MusicListCell.self)) { item, model, cell in
+                cell.configureCell(model)
+            }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
             owner.updateMiniPlayer(track: track)
@@ -179,8 +212,30 @@ final class MusicRecommendViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIImageView(image: UIImage(systemName: "leaf.fill")))
         navigationItem.backButtonDisplayMode = .minimal
+        
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+    }
+}
+
+// MARK: - SearchBar
+
+extension MusicRecommendViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        view.endEditing(true)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        guard let inputText = searchBar.text,
+              inputText.count < 30 else { return false } //30자 제한
+        
+        let input = (inputText as NSString).replacingCharacters(in: range, with: text)
+        let trimmedText = input.trimmingCharacters(in: .whitespaces)
+        let hasWhiteSpace = input != trimmedText
+        return !hasWhiteSpace
     }
 }
 

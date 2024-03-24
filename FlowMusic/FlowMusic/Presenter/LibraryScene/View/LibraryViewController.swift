@@ -22,47 +22,35 @@ final class LibraryViewController: BaseViewController {
     private let itemSelected = PublishSubject<MusicItem>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
     private let playlistSubject = BehaviorSubject< MusicItemCollection<Playlist>>(value: [])
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
     
     // MARK: - UI
-    
-    private lazy var searchController = UISearchController(searchResultsController: libraryCollectionViewController).then {
-        $0.searchBar.placeholder = "Find Your Music"
-        $0.searchBar.backgroundColor = .clear
-        $0.searchBar.searchBarStyle = .minimal
-        $0.searchBar.tintColor = .tintColor
-        $0.searchBar.delegate = self
-        $0.definesPresentationContext = true
-    }
-    
-    private lazy var libraryCollectionViewController = {
-        let layout = UICollectionViewFlowLayout()
-        layout.itemSize = .init(width: UIScreen.main.bounds.width, height: 60)
-        let cv = UICollectionViewController(collectionViewLayout: layout)
-        cv.view.backgroundColor = .bgColor
-        cv.collectionView.delegate = nil
-        cv.collectionView.dataSource = nil
-        cv.collectionView.register(MusicListCell.self, forCellWithReuseIdentifier: MusicListCell.identifier)
-        return cv
-    }()
     
     private lazy var scrollView = UIScrollView().then {
         $0.showsVerticalScrollIndicator = false
         $0.addSubview(contentView)
-        $0.refreshControl = refreshControl
-    }
-    
-    private lazy var refreshControl = UIRefreshControl().then {
-        $0.tintColor = .tintColor
-        $0.addTarget(self, action: #selector(refreshData), for: .valueChanged)
     }
     
     private let contentView = UIView().then {
         $0.isUserInteractionEnabled = true
     }
     
-    private let titleView = UILabel().then {
+    private let forYouLabel = UILabel().then {
+        $0.text = "For you"
+        $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .tintColor
+    }
+    
+    private let likeLabel = UILabel().then {
         $0.text = "Library"
         $0.font = .boldSystemFont(ofSize: 20)
+        $0.textColor = .tintColor
+    }
+    
+    private lazy var likeListCollectionView = UICollectionView(frame: .zero,
+                                                       collectionViewLayout: createLayout()).then {
+        $0.backgroundColor = .clear
+        $0.contentInsetAdjustmentBehavior = .never
     }
     
     private lazy var playlistCollectionView: UICollectionView = {
@@ -89,11 +77,6 @@ final class LibraryViewController: BaseViewController {
         $0.isHidden = true
         $0.alpha = 0
     }
-    
-    //    private lazy var albumCollectionView = UICollectionView(frame: .zero,
-    //                                                            collectionViewLayout: createLayout())
-    //    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
-    //        private var album: MusicItemCollection<Album>?
 
     // MARK: - Lifecycles
     
@@ -105,36 +88,19 @@ final class LibraryViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureDataSource()
         viewDidLoadTrigger.onNext(())
-        
-        //        configureDataSource()
     }
-    
-    @objc func refreshData() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            guard let self else { return }
-            scrollView.refreshControl?.endRefreshing()
-        }
-    }
-    
+
     override func bind() {
         super.bind()
-        
-        let searchText = searchController.searchBar.rx.text
-            .orEmpty
-            .distinctUntilChanged() // 연속적인 중복 값 방지
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
-        
+
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
-        
-        let modelSelected = libraryCollectionViewController.collectionView.rx.modelSelected(Track.self)
         let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
-                                           searchText: searchText,
-                                           searchModelSelected: modelSelected,
                                            likedSongTapped: likedSongsButton.tap,
                                            recentlyPlayedSongTapped: recentlyPlayedButton.tap,
                                            itemSelected: itemSelected,
@@ -143,12 +109,8 @@ final class LibraryViewController: BaseViewController {
                                            miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                            miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
                                            miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
-        let output = viewModel.transform(input)
         
-        output.searchResult
-            .drive(libraryCollectionViewController.collectionView.rx.items(cellIdentifier: MusicListCell.identifier, cellType: MusicListCell.self)) { item, model, cell in
-                cell.configureCell(model)
-            }.disposed(by: disposeBag)
+        let output = viewModel.transform(input)
         
         output.mix
             .drive(playlistCollectionView.rx.items(cellIdentifier: LibraryCell.identifier, cellType: LibraryCell.self)) { [weak self] item, model, cell in
@@ -197,9 +159,8 @@ final class LibraryViewController: BaseViewController {
     override func configureHierarchy() {
         view.addSubviews(scrollView, miniPlayerView)
         scrollView.addSubview(contentView)
-        contentView.addSubviews(playlistCollectionView,
-                                likedSongsButton,
-                                recentlyPlayedButton)
+        contentView.addSubviews(forYouLabel, playlistCollectionView,
+                                likeLabel, likeListCollectionView)
     }
     
     override func configureLayout() {
@@ -213,25 +174,27 @@ final class LibraryViewController: BaseViewController {
             make.width.equalToSuperview()
         }
         
+        forYouLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(12)
+            make.leading.equalToSuperview().offset(12)
+        }
+        
         playlistCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(contentView.snp.top)
+            make.top.equalTo(forYouLabel.snp.bottom).offset(8)
             make.width.equalTo(contentView.snp.width)
             make.height.equalTo(220)
         }
         
-        likedSongsButton.snp.makeConstraints { make in
-            make.top.equalTo(playlistCollectionView.snp.bottom)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalTo(recentlyPlayedButton.snp.leading).offset(-20)
-            make.height.equalTo(likedSongsButton.snp.width)
-            make.width.equalTo(recentlyPlayedButton.snp.width)
-            make.bottom.equalToSuperview()
+        likeLabel.snp.makeConstraints { make in
+            make.top.equalTo(playlistCollectionView.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(12)
         }
         
-        recentlyPlayedButton.snp.makeConstraints { make in
-            make.top.equalTo(playlistCollectionView.snp.bottom)
-            make.trailing.equalToSuperview().offset(-20)
-            make.height.equalTo(recentlyPlayedButton.snp.width)
+        likeListCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(likeLabel.snp.bottom).offset(8)
+            make.height.equalTo(view.bounds.height)
+            make.width.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
         
         //        albumCollectionView.snp.makeConstraints { make in
@@ -249,36 +212,74 @@ final class LibraryViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIImageView(image: UIImage(systemName: "leaf.fill")))
         navigationItem.backButtonDisplayMode = .minimal
-        
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
     }
 }
 
-// MARK: - SearchBar
 
-extension LibraryViewController: UISearchBarDelegate {
+// MARK: - LikeListCollectionView
+
+extension LibraryViewController {
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        view.endEditing(true)
+    enum Section: Int, CaseIterable {
+        case main
     }
     
-    func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        guard let inputText = searchBar.text,
-              inputText.count < 30 else { return false } //30자 제한
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
+            cell.configureCell(itemIdentifier)
+        }
         
-        let input = (inputText as NSString).replacingCharacters(in: range, with: text)
-        let trimmedText = input.trimmingCharacters(in: .whitespaces)
-        let hasWhiteSpace = input != trimmedText
-        return !hasWhiteSpace
+        dataSource = UICollectionViewDiffableDataSource(collectionView: likeListCollectionView) { collectionView, indexPath, itemIdentifier in
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+            return cell
+        }
+    }
+    
+    private func updateSnapshot(tracks: MusicItemCollection<Track>) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Track>()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(Array(tracks), toSection: .main)
+        dataSource?.apply(snapshot)
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { (sectionIndex, environment) -> NSCollectionLayoutSection? in
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                  heightDimension: .fractionalHeight(1.0))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                   heightDimension: .absolute(60))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                           subitems: [item])
+            
+            let section = NSCollectionLayoutSection(group: group)
+            
+            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                    heightDimension: .estimated(450))
+            let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+                                                                     elementKind: UICollectionView.elementKindSectionHeader,
+                                                                     alignment: .top)
+            section.boundarySupplementaryItems = [header]
+            
+            return section
+        }
+        return layout
     }
 }
 
 // MARK: - AlbumCollectionView
 
 //extension LibraryViewController {
+
+
+//    private lazy var albumCollectionView = UICollectionView(frame: .zero,
+//                                                            collectionViewLayout: createLayout())
+//    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
+//        private var album: MusicItemCollection<Album>?
+
 //
 //    enum Section: Int, CaseIterable {
 //        case album
