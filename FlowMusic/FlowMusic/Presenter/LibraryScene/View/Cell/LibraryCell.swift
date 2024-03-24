@@ -53,7 +53,7 @@ final class LibraryCell: BaseCollectionViewCell {
     
     override func configureLayout() {
         backView.snp.makeConstraints { make in
-            make.size.equalTo(220)
+            make.size.equalTo(260)
             make.center.equalToSuperview()
         }
         

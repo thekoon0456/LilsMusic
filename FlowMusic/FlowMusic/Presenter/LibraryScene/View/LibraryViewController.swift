@@ -78,6 +78,7 @@ final class LibraryViewController: BaseViewController {
         super.viewDidLoad()
         
         configureDataSource()
+        updateSnapshot(tracks: [])
         viewDidLoadTrigger.onNext(())
     }
 
@@ -106,6 +107,10 @@ final class LibraryViewController: BaseViewController {
                 //collectionView1번부터
                 layout.setCurrentPage(1)
             }.disposed(by: disposeBag)
+        
+        output.likeTracks.drive(with: self) { owner, tracks in
+            owner.updateSnapshot(tracks: tracks)
+        }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
             owner.updateMiniPlayer(track: track)
@@ -144,16 +149,16 @@ final class LibraryViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        view.addSubviews(scrollView, miniPlayerView)
+        view.addSubviews(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(forYouLabel, playlistCollectionView,
-                                likeLabel, likeListCollectionView)
+                                likeLabel, likeListCollectionView, miniPlayerView)
     }
     
     override func configureLayout() {
         super.configureLayout()
         scrollView.snp.makeConstraints { make in
-            make.size.equalTo(view.safeAreaLayoutGuide)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
         contentView.snp.makeConstraints { make in
@@ -236,21 +241,11 @@ extension LibraryViewController {
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                   heightDimension: .fractionalHeight(1.0))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
             let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                    heightDimension: .absolute(60))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
                                                            subitems: [item])
-            
             let section = NSCollectionLayoutSection(group: group)
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                    heightDimension: .estimated(450))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
-                                                                     elementKind: UICollectionView.elementKindSectionHeader,
-                                                                     alignment: .top)
-            section.boundarySupplementaryItems = [header]
-            
             return section
         }
         return layout

@@ -29,6 +29,7 @@ final class LibraryViewModel: ViewModel {
         let playlist: Driver<[(title: String, item: MusicItemCollection<Track>)]>
         let artists: Driver<MusicItemCollection<Artist>>
         let albums: Driver<MusicItemCollection<Album>>
+        let likeTracks: Driver<MusicItemCollection<Track>>
         let currentPlaySong: Driver<Track?>
         let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
     }
@@ -63,37 +64,12 @@ final class LibraryViewModel: ViewModel {
                 owner.coordinator?.pushToList(playlist: playlist)
             }.disposed(by: disposeBag)
         
-//        input
-//            .likedSongTapped
-//            .withUnretained(self)
-//            .subscribe{ owner, _ in
-//                let likeID = owner.fetchLikeList()
-//                Task {
-//                    do {
-//                        let result = try await self.musicRepository.requestLikeList(ids: likeID)
-//                        DispatchQueue.main.async {
-//                            owner.coordinator?.pushToLibraryList(tracks: result)
-//                        }
-//                    } catch {
-//                        print(error)
-//                    }
-//                }
-//            }.disposed(by: disposeBag)
-//        
-//        input.recentlyPlayedSongTapped
-//            .withUnretained(self)
-//            .subscribe{ owner, _ in
-//                Task {
-//                    do {
-//                        let result = try await owner.fetchRecentlyPlayList()
-//                        DispatchQueue.main.async {
-//                            owner.coordinator?.pushToLibraryList(tracks: result)
-//                        }
-//                    } catch {
-//                        print(error)
-//                    }
-//                }
-//            }.disposed(by: disposeBag)
+        let likeTracks = input.viewDidLoad
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.fetchLikesList()
+            }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
+
         
         let playlist = input
             .viewDidLoad
@@ -187,8 +163,26 @@ final class LibraryViewModel: ViewModel {
                       playlist: playlist,
                       artists: artist,
                       albums: albums,
+                      likeTracks: likeTracks,
                       currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
+    }
+
+    private func fetchLikesList() -> Observable<MusicItemCollection<Track>> {
+        return Observable.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            let likeID = fetchLikeList()
+            Task {
+                do {
+                    let result = try await self.musicRepository.requestLikeList(ids: likeID)
+                    observer.onNext(result)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
     }
     
     func fetchRecommendMix() -> Observable<MusicItemCollection<Playlist>> {
