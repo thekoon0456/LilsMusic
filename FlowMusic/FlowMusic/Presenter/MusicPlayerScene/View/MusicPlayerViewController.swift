@@ -210,7 +210,10 @@ final class MusicPlayerViewController: BaseViewController {
     // MARK: - Selectors
     
     @objc func updateProgressBar() {
-        let value = Float(viewModel.musicPlayer.getPlayBackTime())
+        let playbackTime = viewModel.musicPlayer.getPlayBackTime()
+        let progress = playbackTime / Double(progressSlider.maximumValue)
+        guard progress > 0.02 else { return }
+        let value = Float(playbackTime)
         progressSlider.setValue(value, animated: false)
     }
     

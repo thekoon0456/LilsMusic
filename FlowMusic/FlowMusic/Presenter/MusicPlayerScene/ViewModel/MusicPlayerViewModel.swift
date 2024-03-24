@@ -64,11 +64,8 @@ final class MusicPlayerViewModel: ViewModel {
         
         input.viewWillAppear
             .map { [weak self] _ in
-                guard let self,
-                      let item = userLikeRepository.fetchArr().first,
-                      let id = try? trackSubject.value()?.id.rawValue
-                else { return false }
-                return item.likeID.contains { $0 == id }
+                guard let self else { return false }
+                return checkHeart()
             }
             .withUnretained(self)
             .subscribe{ owner, bool in
@@ -193,18 +190,30 @@ final class MusicPlayerViewModel: ViewModel {
             return Disposables.create()
         }
     }
+    
+    func checkHeart() -> Bool {
+        guard let item = userLikeRepository.fetchArr().first,
+              let id = try? trackSubject.value()?.id.rawValue
+        else { return false }
+        return item.likeID.contains { $0 == id }
+    }
 }
  
 extension MusicPlayerViewModel {
     //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _  in
+        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _ in
             Task { [weak self] in
                 guard let self,
                       let entry = try await musicPlayer.getCurrentEntry(),
-                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+                      let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
                 let track = Track.song(song)
                 trackSubject.onNext(track)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    let bool = checkHeart()
+                    heartSubject.onNext(bool)
+                }
             }
         }.store(in: &cancellables)
     }

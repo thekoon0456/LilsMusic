@@ -32,7 +32,7 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     }
     private let descriptionLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
-        $0.textColor = .lightGray
+        $0.textColor = .bgColor
         $0.textAlignment = .left
     }
     

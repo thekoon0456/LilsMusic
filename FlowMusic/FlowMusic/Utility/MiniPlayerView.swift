@@ -117,14 +117,14 @@ final class MiniPlayerView: BaseView {
             make.width.equalTo(32)
             make.height.equalToSuperview()
             make.centerY.equalToSuperview()
-            make.trailing.equalTo(playButton.snp.leading).offset(-16)
+            make.trailing.equalTo(playButton.snp.leading).offset(-12)
         }
         
         playButton.snp.makeConstraints { make in
             make.width.equalTo(40)
             make.height.equalToSuperview()
             make.centerY.equalToSuperview()
-            make.trailing.equalTo(nextButton.snp.leading).offset(-16)
+            make.trailing.equalTo(nextButton.snp.leading).offset(-12)
         }
         
         nextButton.snp.makeConstraints { make in
