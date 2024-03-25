@@ -55,6 +55,14 @@ final class MusicRecommendViewController: BaseViewController {
         return cv
     }()
     
+    let iconView = UIImageView().then {
+        $0.image = UIImage(named: "lil")
+        $0.contentMode = .scaleAspectFit
+        $0.snp.makeConstraints { make in
+            make.size.equalTo(44)
+        }
+    }
+    
     private let titleView = UILabel().then {
         $0.text = "Trending"
         $0.font = .boldSystemFont(ofSize: 20)
@@ -212,7 +220,7 @@ final class MusicRecommendViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIImageView(image: UIImage(systemName: "leaf.fill")))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: iconView)
         navigationItem.backButtonDisplayMode = .minimal
         
         navigationItem.searchController = searchController

@@ -22,7 +22,7 @@ final class ReelsViewController: BaseViewController {
     // MARK: - UI
     
     private let titleView = UILabel().then {
-        $0.text = "Hot MV"
+        $0.text = "Lils MV"
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .white
     }

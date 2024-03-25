@@ -36,6 +36,14 @@ final class LibraryViewController: BaseViewController {
         $0.isUserInteractionEnabled = true
     }
     
+    let iconView = UIImageView().then {
+        $0.image = UIImage(named: "lil")
+        $0.contentMode = .scaleAspectFit
+        $0.snp.makeConstraints { make in
+            make.size.equalTo(44)
+        }
+    }
+    
     private let forYouLabel = UILabel().then {
         $0.text = "For you"
         $0.font = .boldSystemFont(ofSize: 20)
@@ -229,7 +237,7 @@ final class LibraryViewController: BaseViewController {
     
     override func configureView() {
         super.configureView()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIImageView(image: UIImage(systemName: "leaf.fill")))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: iconView)
         navigationItem.backButtonDisplayMode = .minimal
     }
 }
