@@ -119,6 +119,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .map { [weak self]  _ -> RepeatMode in
                 guard let self else { return .off }
                 setting.userSetting.repeatMode.toggle()
@@ -132,6 +133,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.asDriver(onErrorJustReturn: .off)
         
         let shuffleMode = input.shuffleButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .map { [weak self]  _ -> ShuffleMode in
                 guard let self else { return .off }
                 setting.userSetting.shuffleMode.toggle()
@@ -147,6 +149,7 @@ final class MusicPlayerViewModel: ViewModel {
         input
             .heartButtonTapped
             .map {!$0 }
+            .observe(on:MainScheduler.asyncInstance)
             .do { [weak self] bool in
                 guard let self,
                       let item = userLikeRepository.fetchArr().first,
@@ -157,7 +160,6 @@ final class MusicPlayerViewModel: ViewModel {
                 : userLikeRepository.deleteUserLikeList(item, id: id)
                 tapImpact()
             }
-            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, bool in
                 owner.heartSubject.onNext(bool)
