@@ -23,8 +23,10 @@ final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - UI
     
+    private let indicatorView = UIActivityIndicatorView(style: .medium)
+    
     var musicVideoView = UIView().then {
-        $0.backgroundColor = .tertiarySystemBackground
+        $0.backgroundColor = .lightGray
     }
     
     private let musicLabel = UILabel().then {
@@ -103,7 +105,7 @@ final class ReelsCell: BaseCollectionViewCell {
         //cell재사용할때 bind
         bind()
         mvSubject.onNext(data)
-        
+
         guard let url = data.previewAssets?.first?.hlsURL else { return }
         let asset = AVURLAsset(url: url)
         
@@ -120,7 +122,7 @@ final class ReelsCell: BaseCollectionViewCell {
     
     override func configureHierarchy() {
         super.configureHierarchy()
-        contentView.addSubviews(musicVideoView, musicLabel, artistLabel,
+        contentView.addSubviews(musicVideoView, indicatorView, musicLabel, artistLabel,
                                 genreLabel, heartButton)
     }
     
@@ -129,8 +131,15 @@ final class ReelsCell: BaseCollectionViewCell {
         setLayout()
     }
     
+    override func configureView() {
+        super.configureView()
+    }
+    
     func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
+        startLoadingIndicator()
+        
         let playerItem = AVPlayerItem(asset: asset)
+        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
         player = AVPlayer(playerItem: playerItem).then {
             $0.isMuted = true
         }
@@ -141,13 +150,49 @@ final class ReelsCell: BaseCollectionViewCell {
         playerLayer.frame = view.bounds
         view.layer.masksToBounds = true
         view.layer.addSublayer(playerLayer)
-        
+
         NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
                                                object: player?.currentItem,
                                                queue: .main) { [weak self] _ in
             guard let self else { return }
             player?.seek(to: .zero)
             player?.play()
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "status" {
+            if let playerItem = object as? AVPlayerItem {
+                switch playerItem.status {
+                case .readyToPlay:
+                    stopLoadingIndicator()
+                    player?.play()
+                case .failed, .unknown:
+                    print("Failed to load the video")
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Indicator
+
+extension ReelsCell {
+    
+    func startLoadingIndicator() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            indicatorView.startAnimating()
+        }
+
+    }
+
+    func stopLoadingIndicator() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            indicatorView.stopAnimating()
         }
     }
 }
@@ -157,22 +202,18 @@ final class ReelsCell: BaseCollectionViewCell {
 extension ReelsCell {
     
     func play() {
-        print(#function)
         player?.play()
     }
     
     func mute() {
-        print(#function)
         player?.isMuted = true
     }
     
     func soundOn() {
-        print(#function)
         player?.isMuted = false
     }
     
     func pause() {
-        print(#function)
         NotificationCenter.default.removeObserver(self)
         player?.pause()
     }
@@ -183,6 +224,10 @@ extension ReelsCell {
     private func setLayout() {
         musicVideoView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        indicatorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
         
         musicLabel.snp.makeConstraints { make in
@@ -210,3 +255,36 @@ extension ReelsCell {
         }
     }
 }
+
+////스켈레톤 애니메이션
+//extension UIView {
+//
+//    func addShimmerEffect(duration: CFTimeInterval = 2.0, bounce: Bool = false, delay: CFTimeInterval = 0) {
+//        let gradientLayer = CAGradientLayer()
+//        gradientLayer.colors = [
+//            UIColor.clear.cgColor,
+//            UIColor.white.withAlphaComponent(0.75).cgColor,
+//            UIColor.clear.cgColor
+//        ]
+//        gradientLayer.frame = CGRect(x: -bounds.width, y: 0, width: bounds.width * 2, height: bounds.height)
+//        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+//        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+//        gradientLayer.locations = [0.0, 0.5, 1.0]
+//        
+//        let animation = CABasicAnimation(keyPath: "locations")
+//        animation.fromValue = [0.0, 0.0, 0.25]
+//        animation.toValue = [0.75, 1.0, 1.0]
+//        animation.duration = duration
+//        animation.repeatCount = bounce ? .greatestFiniteMagnitude : .infinity
+//        animation.isRemovedOnCompletion = false
+//        animation.fillMode = .forwards
+//        animation.beginTime = CACurrentMediaTime() + delay
+//        gradientLayer.add(animation, forKey: "shimmer")
+//
+//        layer.mask = gradientLayer
+//    }
+//
+//    func removeShimmerEffect() {
+//        layer.mask = nil
+//    }
+//}
