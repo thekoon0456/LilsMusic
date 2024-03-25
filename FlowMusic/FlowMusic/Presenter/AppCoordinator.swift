@@ -27,7 +27,6 @@ final class AppCoordinator: NSObject, Coordinator {
     // MARK: - Helpers
     
     func start() {
-        //TODO: - 온보딩 분기처리
         presentLaunch()
         requestMusicAuthorization()
 //        makeTabbar()
@@ -60,7 +59,7 @@ final class AppCoordinator: NSObject, Coordinator {
 //        tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav, userNav]
         
         tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav]
-        navigationController?.pushViewController(tabBarController, animated: false)
+        navigationController?.setViewControllers([tabBarController], animated: false)
     }
     
     func presentLaunch() {
