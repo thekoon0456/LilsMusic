@@ -24,7 +24,7 @@ final class MusicListViewModel: ViewModel {
         let miniPlayerPlayButtonTapped: Observable<Bool>
         let miniPlayerPreviousButtonTapped: ControlEvent<Void>
         let miniPlayerNextButtonTapped: ControlEvent<Void>
-        let viewWillDisappear: Observable<Void>
+        let popViewController: Observable<Void>
     }
     
     struct Output {
@@ -74,6 +74,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.playButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.tapImpact()
@@ -89,6 +90,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.shuffleButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.tapImpact()
@@ -105,6 +107,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.itemSelected
+            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, item in
                 owner.checkAppleMusicSubscriptionEligibility()
@@ -120,6 +123,7 @@ final class MusicListViewModel: ViewModel {
         
         input.miniPlayerTapped
             .withUnretained(self)
+            .observe(on:MainScheduler.asyncInstance)
             .flatMap { owner, _ in
                 owner.getCurrentPlaySong()
             }.asDriver(onErrorJustReturn: nil)
@@ -164,9 +168,10 @@ final class MusicListViewModel: ViewModel {
                 owner.tapImpact()
             }.disposed(by: disposeBag)
         
-        input.viewWillDisappear
+        input.popViewController
             .withUnretained(self)
             .subscribe{ owner, _ in
+                owner.coordinator?.popViewController()
                 owner.coordinator?.finish()
             }.disposed(by: disposeBag)
         
@@ -179,9 +184,7 @@ final class MusicListViewModel: ViewModel {
     func getTracks() -> Observable<MusicItemCollection<Track>> {
         return Observable.create { observer in
             Task { [weak self] in
-                guard let self,
-                      let item = try? musicItem.value()
-                else { return }
+                guard let self else { return }
                 do {
                     guard let tracks = try await fetchTracks() else { return }
                     observer.onNext(tracks)

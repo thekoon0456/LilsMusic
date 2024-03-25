@@ -40,7 +40,7 @@ final class FMMusicPlayer {
     }
     
     func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[0])
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
     }

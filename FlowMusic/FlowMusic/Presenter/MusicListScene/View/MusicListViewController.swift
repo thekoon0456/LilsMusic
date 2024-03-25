@@ -22,6 +22,7 @@ final class MusicListViewController: BaseViewController {
     private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
     private var headerItem: MusicItem?
     private let viewDidLoadTrigger = PublishSubject<Void>()
+    private let popTrigger = PublishSubject<Void>()
     private let itemSelected = PublishSubject<(index: Int, track: Track)>()
     private let playButtonTapped = PublishSubject<Void>()
     private let shuffleButtonTapped = PublishSubject<Void>()
@@ -42,6 +43,11 @@ final class MusicListViewController: BaseViewController {
         $0.alpha = 0
     }
     
+    private lazy var backBarButton = UIBarButtonItem(image: UIImage(systemName: "chevron.left"),
+                                                     style: .plain,
+                                                     target: self,
+                                                     action: #selector(popButtonTapped))
+    
     // MARK: - Lifecycles
     
     init(viewModel: MusicListViewModel) {
@@ -54,6 +60,18 @@ final class MusicListViewController: BaseViewController {
         
         configureDataSource()
         viewDidLoadTrigger.onNext(())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.addTarget(self,
+                                                                         action: #selector(popButtonTapped))
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        navigationController?.interactivePopGestureRecognizer?.removeTarget(self,
+                                                                            action: #selector(popButtonTapped))
     }
     
     override func bind() {
@@ -80,7 +98,7 @@ final class MusicListViewController: BaseViewController {
                                              miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
                                              miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
                                              miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap,
-                                             viewWillDisappear: self.rx.viewWillDisappear.map { _ in })
+                                             popViewController: popTrigger.asObservable())
         let output = viewModel.transform(input)
         
         output.item.drive(with: self) { owner, item in
@@ -106,6 +124,12 @@ final class MusicListViewController: BaseViewController {
                 guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
                 owner.itemSelected.onNext((index: indexPath.item, track: track))
             }.disposed(by: disposeBag)
+    }
+    
+    // MARK: - Selectors
+    
+    @objc private func popButtonTapped() {
+        popTrigger.onNext(())
     }
     
     // MARK: - UI
@@ -151,6 +175,9 @@ final class MusicListViewController: BaseViewController {
     override func configureView() {
         super.configureView()
         navigationItem.backButtonDisplayMode = .minimal
+        //커스텀 백버튼 뒤로가기 제스처 추가
+        navigationItem.leftBarButtonItem = backBarButton
+        
     }
 }
 

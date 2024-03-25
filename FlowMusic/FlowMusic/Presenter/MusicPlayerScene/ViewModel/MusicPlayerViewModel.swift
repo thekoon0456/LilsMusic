@@ -73,6 +73,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.chevronButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.coordinator?.dismissViewController()
@@ -80,6 +81,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.playButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
@@ -94,6 +96,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.previousButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
@@ -104,6 +107,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.nextButtonTapped
+            .observe(on:MainScheduler.asyncInstance)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
@@ -154,6 +158,7 @@ final class MusicPlayerViewModel: ViewModel {
                 : userLikeRepository.deleteUserLikeList(item, id: id)
                 tapImpact()
             }
+            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, bool in
                 owner.heartSubject.onNext(bool)

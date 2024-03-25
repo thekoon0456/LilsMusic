@@ -37,6 +37,7 @@
 		7C446E642BA5E20900AAC5CB /* BaseCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E632BA5E20900AAC5CB /* BaseCollectionView.swift */; };
 		7C446E662BA6150E00AAC5CB /* PlaylistMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */; };
 		7C446E682BA623AB00AAC5CB /* ArtworkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E672BA623AB00AAC5CB /* ArtworkHeaderView.swift */; };
+		7C66F05C2BB15AC800530C27 /* UINavigationController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C66F05B2BB15AC800530C27 /* UINavigationController+.swift */; };
 		7C6B06DA2BA1FE8000726AD0 /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */; };
 		7C6B06DC2BA2012D00726AD0 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */; };
 		7C6EE4D82BAEE6D600087EF2 /* UIControl+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6EE4D72BAEE6D600087EF2 /* UIControl+.swift */; };
@@ -111,6 +112,7 @@
 		7C446E632BA5E20900AAC5CB /* BaseCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCollectionView.swift; sourceTree = "<group>"; };
 		7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMenuButton.swift; sourceTree = "<group>"; };
 		7C446E672BA623AB00AAC5CB /* ArtworkHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkHeaderView.swift; sourceTree = "<group>"; };
+		7C66F05B2BB15AC800530C27 /* UINavigationController+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+.swift"; sourceTree = "<group>"; };
 		7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		7C6EE4D72BAEE6D600087EF2 /* UIControl+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+.swift"; sourceTree = "<group>"; };
 		7C773FFC2B9DA13F00B2E6E7 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
@@ -366,6 +368,7 @@
 				7C813DD62B9AE2B800CDFF1D /* Then+.swift */,
 				7C813DD82B9AE2CD00CDFF1D /* UIView+.swift */,
 				7C813DFC2B9B13AB00CDFF1D /* UIVIewController+.swift */,
+				7C66F05B2BB15AC800530C27 /* UINavigationController+.swift */,
 				7C813DDA2B9AE2D700CDFF1D /* String+.swift */,
 				7C03F7CF2BA179D800FB748C /* Array+.swift */,
 				7C3927762BA3526C0074F87E /* UIColor+.swift */,
@@ -674,6 +677,7 @@
 				7C7740072B9DA19E00B2E6E7 /* ReelsCoordinator.swift in Sources */,
 				7C813DF62B9AF6A300CDFF1D /* MusicChartsCell.swift in Sources */,
 				7C7740162B9DA64200B2E6E7 /* FMConst.swift in Sources */,
+				7C66F05C2BB15AC800530C27 /* UINavigationController+.swift in Sources */,
 				7C03F7CE2BA1792C00FB748C /* Repository.swift in Sources */,
 				7C044BF82BADA7B5007E910E /* LibraryListCoordinator.swift in Sources */,
 				7CF60D732B9EE60E001769BD /* UserLibrary.swift in Sources */,
