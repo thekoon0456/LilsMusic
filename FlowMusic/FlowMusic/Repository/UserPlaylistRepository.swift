@@ -111,6 +111,7 @@ final class UserRepository<T: Object>: Repository {
         do {
             try realm.write {
                 item.likeID.append(id)
+                print(item)
             }
         } catch {
             print(error.localizedDescription)
@@ -126,7 +127,7 @@ final class UserRepository<T: Object>: Repository {
             print(error.localizedDescription)
         }
     }
-    
+    //1734862500
     // MARK: - Delete
     
     func delete(_ item: T) {

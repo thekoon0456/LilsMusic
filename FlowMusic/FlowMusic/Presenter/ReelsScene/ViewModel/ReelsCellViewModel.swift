@@ -85,6 +85,7 @@ final class ReelsCellViewModel: ViewModel {
     }
     
     func getMusicID(item: MusicVideo?) async throws -> Track?  {
+        print(item)
         guard let item,
               let song = try await musicRepository.MusicVideoToSong(item)
         else { return nil }

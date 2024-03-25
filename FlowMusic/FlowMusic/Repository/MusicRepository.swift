@@ -30,8 +30,8 @@ final class MusicRepository {
     }
     
     func MusicVideoToSong(_ item: MusicVideo) async throws -> Song? {
-        let song = try await requestSearchSongCatalog(term: "\(item.title) \(item.artistName)")
-        return song.first
+        let song = try await requestMVToSongCatalog(term: "\(item.artistName), \(item.title)")
+        return song
     }
     
     // MARK: - Charts
@@ -109,14 +109,22 @@ final class MusicRepository {
         return try await MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: id).response().items.first
     }
     
-    func requestSearchMVIDCatalog(id: MusicItemID?) async throws -> Song? {
-        guard let id else { return nil }
-        let response = try await MusicCatalogResourceRequest<MusicVideo>(matching: \.id, equalTo: id).response()
-        let items = response.items
-        let songs = items.first?.songs
-        let song = songs?.first
-        return song
+    //MV -> Song. 제목과 가수 일치 안하면 nil 반환
+    func requestMVToSongCatalog(term: String) async throws -> Song? {
+        let songs = try await MusicCatalogSearchRequest(term: term, types: [Song.self]).response().songs
+        let result = songs.filter { term.contains($0.title) && term.contains($0.artistName) }.first
+        return result
     }
+    
+    //nil만 나옴..
+//    func requestSearchMVIDCatalog(id: MusicItemID?) async throws -> Song? {
+//        guard let id else { return nil }
+//        let response = try await MusicCatalogResourceRequest<MusicVideo>(matching: \.id, equalTo: id).response()
+//        let items = response.items
+//        let songs = items.first?.songs
+//        let song = songs?.first
+//        return song
+//    }
     
     func requestSearchArtistCatalog(term: String) async throws -> MusicItemCollection<Artist> {
         try await MusicCatalogSearchRequest(term: term, types: [Artist.self]).response().artists

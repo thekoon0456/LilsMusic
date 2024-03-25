@@ -71,6 +71,7 @@ final class ReelsCell: BaseCollectionViewCell {
         player?.pause()
         musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
         NotificationCenter.default.removeObserver(self)
+        heartButton.isSelected = false
         disposeBag = DisposeBag()
     }
     
