@@ -88,11 +88,14 @@ extension Coordinator {
     func moveToUserSetting() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            let alert = UIAlertController(title: "음악 접근 권한이 필요합니다.",
-                                          message: "음악 라이브러리에 접근하기 위해서는 설정에서 권한을 허용해주세요",
+            let alert = UIAlertController(title: "Access to Apple Music is required to use the app.",
+                                          message: 
+                                            "Please allow permission in settings to access the music library.",
                                           preferredStyle: .alert)
+            alert.view.tintColor = .tintColor
             
-            let primaryButton = UIAlertAction(title: "설정으로 가기", style: .default) { _ in
+            let cancelButton = UIAlertAction(title: "Cancel", style: .default)
+            let primaryButton = UIAlertAction(title: "Go to Settings", style: .default) { _ in
                 guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                     return
                 }
@@ -100,10 +103,9 @@ extension Coordinator {
                     UIApplication.shared.open(settingsUrl, completionHandler: nil)
                 }
             }
-            let cancelButton = UIAlertAction(title: "취소", style: .default)
             
-            alert.addAction(primaryButton)
             alert.addAction(cancelButton)
+            alert.addAction(primaryButton)
             
             navigationController?.present(alert, animated: true)
         }
