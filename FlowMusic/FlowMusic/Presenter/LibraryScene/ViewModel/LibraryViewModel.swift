@@ -308,7 +308,7 @@ extension LibraryViewModel {
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
         musicPlayer.getCurrentPlayer().state.objectWillChange
-            .throttle(for: .seconds(0.3), scheduler: RunLoop.main, latest: true)
+            .throttle(for: .seconds(0.5), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()

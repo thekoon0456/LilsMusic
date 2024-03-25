@@ -9,6 +9,7 @@ import UIKit
 import MusicKit
 
 import Kingfisher
+import MarqueeLabel
 
 final class MusicListCell: BaseCollectionViewCell {
     
@@ -20,13 +21,21 @@ final class MusicListCell: BaseCollectionViewCell {
         $0.clipsToBounds = true
     }
     
-    private let titleLabel = UILabel().then {
+    private let titleLabel = MarqueeLabel().then {
         $0.font = .systemFont(ofSize: 18)
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
-    private let subtitleLabel = UILabel().then {
+    private let subtitleLabel = MarqueeLabel().then {
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .lightGray
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
     // MARK: - Lifecycles
@@ -39,7 +48,7 @@ final class MusicListCell: BaseCollectionViewCell {
     // MARK: - Helpers
     
     func configureCell(_ data: Track) {
-        iconImageView.kf.setImage(with: data.artwork?.url(width: 40, height: 40))
+        iconImageView.kf.setImage(with: data.artwork?.url(width: 100, height: 100))
         titleLabel.text = data.title
         subtitleLabel.text = data.artistName
     }
@@ -56,7 +65,7 @@ final class MusicListCell: BaseCollectionViewCell {
     override func configureLayout() {
         super.configureLayout()
         iconImageView.snp.makeConstraints { make in
-            make.size.equalTo(44).priority(.high)
+            make.size.equalTo(44)
             make.top.equalToSuperview().offset(8)
             make.leading.equalToSuperview().offset(8)
             make.bottom.equalToSuperview().offset(-8)
@@ -69,7 +78,7 @@ final class MusicListCell: BaseCollectionViewCell {
         }
         
         subtitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(4)
+//            make.top.equalTo(titleLabel.snp.bottom).offset(4)
             make.leading.equalTo(titleLabel.snp.leading)
             make.trailing.equalToSuperview().offset(-8)
             make.bottom.equalTo(iconImageView.snp.bottom)

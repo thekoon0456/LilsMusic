@@ -8,6 +8,7 @@ import MusicKit
 import UIKit
 
 import Kingfisher
+import MarqueeLabel
 import SnapKit
 import RxCocoa
 import RxSwift
@@ -53,16 +54,24 @@ final class MusicPlayerViewController: BaseViewController {
         $0.tapAnimation()
     }
     
-    private let songLabel = UILabel().then {
+    private let songLabel = MarqueeLabel().then {
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .bgColor
         $0.textAlignment = .center
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
-    private let artistLabel = UILabel().then {
+    private let artistLabel = MarqueeLabel().then {
         $0.font = .systemFont(ofSize: 18)
         $0.textColor = .bgColor
         $0.textAlignment = .center
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
     private var artworkImage = UIImageView().then {
@@ -165,15 +174,15 @@ final class MusicPlayerViewController: BaseViewController {
         super.bind()
         
         let playButtonTapped = playButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
         let repeatButtonTapped = repeatButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
         let shuffleButtonTapped = shuffleButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
         
         let heartButtonTapped = heartButton.rx.tap
@@ -385,13 +394,13 @@ extension MusicPlayerViewController {
         
         songLabel.snp.makeConstraints { make in
             make.top.equalTo(artworkImage.snp.bottom).offset(40)
-            make.width.equalToSuperview().offset(-20)
+            make.width.equalToSuperview().offset(-40)
             make.centerX.equalToSuperview()
         }
         
         artistLabel.snp.makeConstraints { make in
             make.top.equalTo(songLabel.snp.bottom).offset(4)
-            make.width.equalToSuperview().offset(-20)
+            make.width.equalToSuperview().offset(-40)
             make.centerX.equalToSuperview()
         }
         

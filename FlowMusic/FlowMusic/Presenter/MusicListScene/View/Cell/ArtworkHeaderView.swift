@@ -10,6 +10,7 @@ import UIKit
 
 import SnapKit
 import Kingfisher
+import MarqueeLabel
 
 final class ArtworkHeaderReusableView: UICollectionReusableView {
     
@@ -25,15 +26,22 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
     
     private let artworkImageView = UIImageView()
     
-    private let titleLabel = UILabel().then {
+    private let titleLabel = MarqueeLabel().then {
         $0.font = .systemFont(ofSize: 16)
         $0.textColor = .bgColor
-        $0.textAlignment = .left
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
-    private let descriptionLabel = UILabel().then {
+    
+    private let descriptionLabel = MarqueeLabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .bgColor
-        $0.textAlignment = .left
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
     lazy var playButton = UIButton().then {
@@ -74,7 +82,7 @@ final class ArtworkHeaderReusableView: UICollectionReusableView {
         
         artworkImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.width.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.height.equalTo(artworkImageView.snp.width)
         }
         

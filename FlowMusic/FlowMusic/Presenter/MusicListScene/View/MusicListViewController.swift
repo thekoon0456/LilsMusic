@@ -78,17 +78,17 @@ final class MusicListViewController: BaseViewController {
         super.bind()
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .map { [weak self] _ -> Bool in
                 guard let self else { return true }
                 return !miniPlayerView.playButton.isSelected
             }
         
         let playButtonTapped = playButtonTapped.asObservable()
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
         
         let shuffleButtonTapped = shuffleButtonTapped.asObservable()
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
         
         let input = MusicListViewModel.Input(viewDidLoad: viewDidLoadTrigger.asObservable(),
                                              itemSelected: itemSelected.asObservable(),

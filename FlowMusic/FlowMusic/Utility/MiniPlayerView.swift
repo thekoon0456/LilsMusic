@@ -9,6 +9,7 @@ import UIKit
 import MusicKit
 
 import Kingfisher
+import MarqueeLabel
 import RxGesture
 import RxCocoa
 import RxSwift
@@ -27,14 +28,24 @@ final class MiniPlayerView: BaseView {
         $0.clipsToBounds = true
     }
     
-    private let titleLabel = UILabel().then {
+    private let titleLabel = MarqueeLabel().then {
         $0.font = .boldSystemFont(ofSize: 16)
         $0.textColor = .bgColor
+        $0.textAlignment = .center
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
-    private let subtitleLabel = UILabel().then {
+    private let subtitleLabel = MarqueeLabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .bgColor
+        $0.textAlignment = .center
+        $0.type = .continuous
+        $0.animationCurve = .easeInOut
+        $0.trailingBuffer = 60
+        $0.speed = .duration(17)
     }
     
     lazy var playButton = UIButton().then {
@@ -67,7 +78,7 @@ final class MiniPlayerView: BaseView {
     var tap: Observable<Void> {
         return self.rx.tapGesture()
             .when(.recognized)
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .asObservable()
             .map { _ in return }
     }

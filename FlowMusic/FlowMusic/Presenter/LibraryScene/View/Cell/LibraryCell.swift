@@ -80,7 +80,7 @@ final class LibraryCell: BaseCollectionViewCell {
         descriptionLabel.snp.makeConstraints { make in
             make.horizontalEdges.bottom.equalToSuperview()
             make.top.equalTo(nameLabel.snp.bottom).offset(4)
-            make.bottom.lessThanOrEqualToSuperview().offset(-4)
+//            make.bottom.equalToSuperview().offset(-4)
         }
     }
     

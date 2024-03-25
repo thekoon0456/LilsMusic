@@ -38,6 +38,7 @@
 		7C446E662BA6150E00AAC5CB /* PlaylistMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */; };
 		7C446E682BA623AB00AAC5CB /* ArtworkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E672BA623AB00AAC5CB /* ArtworkHeaderView.swift */; };
 		7C66F05C2BB15AC800530C27 /* UINavigationController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C66F05B2BB15AC800530C27 /* UINavigationController+.swift */; };
+		7C66F05F2BB1C09800530C27 /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 7C66F05E2BB1C09800530C27 /* MarqueeLabel */; };
 		7C6B06DA2BA1FE8000726AD0 /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */; };
 		7C6B06DC2BA2012D00726AD0 /* LibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */; };
 		7C6EE4D82BAEE6D600087EF2 /* UIControl+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6EE4D72BAEE6D600087EF2 /* UIControl+.swift */; };
@@ -167,6 +168,7 @@
 			files = (
 				7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */,
 				7C03F7C62BA1765A00FB748C /* RxSwift in Frameworks */,
+				7C66F05F2BB1C09800530C27 /* MarqueeLabel in Frameworks */,
 				7C03F7C12BA1762500FB748C /* RealmSwift in Frameworks */,
 				7C03F7BF2BA1762500FB748C /* Realm in Frameworks */,
 				7C03F7C42BA1765A00FB748C /* RxCocoa in Frameworks */,
@@ -601,6 +603,7 @@
 				7C03F7C52BA1765A00FB748C /* RxSwift */,
 				7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */,
 				7C131C5D2BA4B93F004B3FF2 /* RxGesture */,
+				7C66F05E2BB1C09800530C27 /* MarqueeLabel */,
 			);
 			productName = FlowMusic;
 			productReference = 7C813DA82B9ADFEF00CDFF1D /* FlowMusic.app */;
@@ -637,6 +640,7 @@
 				7C03F7C22BA1765A00FB748C /* XCRemoteSwiftPackageReference "RxSwift" */,
 				7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */,
 				7C131C5C2BA4B93F004B3FF2 /* XCRemoteSwiftPackageReference "RxGesture" */,
+				7C66F05D2BB1C09800530C27 /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
 			);
 			productRefGroup = 7C813DA92B9ADFEF00CDFF1D /* Products */;
 			projectDirPath = "";
@@ -983,6 +987,14 @@
 				minimumVersion = 4.0.4;
 			};
 		};
+		7C66F05D2BB1C09800530C27 /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cbpowell/MarqueeLabel.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
 		7C6B06D82BA1FE8000726AD0 /* XCRemoteSwiftPackageReference "CollectionViewPagingLayout" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/amirdew/CollectionViewPagingLayout";
@@ -1034,6 +1046,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C131C5C2BA4B93F004B3FF2 /* XCRemoteSwiftPackageReference "RxGesture" */;
 			productName = RxGesture;
+		};
+		7C66F05E2BB1C09800530C27 /* MarqueeLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C66F05D2BB1C09800530C27 /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
+			productName = MarqueeLabel;
 		};
 		7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */ = {
 			isa = XCSwiftPackageProductDependency;
