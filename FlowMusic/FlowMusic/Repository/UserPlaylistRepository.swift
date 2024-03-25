@@ -110,8 +110,13 @@ final class UserRepository<T: Object>: Repository {
     func updateUserLikeList(_ item: UserLikeList, id: String) {
         do {
             try realm.write {
-                item.likeID.append(id)
-                print(item)
+                let idArr = Array(item.likeID)
+                if !idArr.contains(where: { likeID in
+                    likeID == id
+                }) {
+                    item.likeID.append(id)
+                }
+                print("realm UpdateItem: ", item)
             }
         } catch {
             print(error.localizedDescription)
@@ -179,6 +184,7 @@ final class UserRepository<T: Object>: Repository {
             try realm.write {
                 if let index = item.likeID.firstIndex(of: id) {
                     item.likeID.remove(at: index)
+                    print(item.likeID)
                 }
             }
         } catch {

@@ -100,6 +100,8 @@ final class ReelsCell: BaseCollectionViewCell {
     // MARK: - Helpers
     
     func configureCell(_ data: MusicVideo) {
+        //cell재사용할때 bind
+        bind()
         mvSubject.onNext(data)
         
         guard let url = data.previewAssets?.first?.hlsURL else { return }
