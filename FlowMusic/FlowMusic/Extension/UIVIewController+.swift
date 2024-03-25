@@ -16,7 +16,6 @@ extension UIViewController {
         let gradientLayer = CAGradientLayer()
         let startColor = startColor?.copy(alpha: 1.0) ?? CGColor(gray: 0, alpha: 0)
         let endColor = endColor?.copy(alpha: 0.5) ?? CGColor(gray: 0, alpha: 0)
-//        let endColor = endColor?.copy(alpha: 0.5) ?? CGColor(gray: 0, alpha: 0)
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [startColor, endColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
@@ -24,6 +23,12 @@ extension UIViewController {
         //기존에 추가된 레이어 삭제
         view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
         view.layer.insertSublayer(gradientLayer, at: 0)
+    }
+    
+    func tapImpact() {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .soft)
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
     }
 }
 

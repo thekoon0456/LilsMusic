@@ -236,6 +236,7 @@ final class MusicPlayerViewController: BaseViewController {
     @objc func sliderValueChanged(_ sender: UISlider) {
         let newValue = sender.value
         viewModel.musicPlayer.setPlayBackTime(value: Double(newValue))
+        tapImpact()
     }
     
     @objc func sliderTapped(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -245,6 +246,7 @@ final class MusicPlayerViewController: BaseViewController {
         let value = progressSlider.maximumValue * Float(tapValue)
         progressSlider.setValue(value, animated: true)
         viewModel.musicPlayer.setPlayBackTime(value: Double(value))
+        tapImpact()
     }
     
     // MARK: - UI

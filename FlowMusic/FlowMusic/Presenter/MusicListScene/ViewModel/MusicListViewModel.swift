@@ -76,6 +76,7 @@ final class MusicListViewModel: ViewModel {
         input.playButtonTapped
             .withUnretained(self)
             .subscribe { owner, _ in
+                owner.tapImpact()
                 owner.checkAppleMusicSubscriptionEligibility()
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
@@ -90,6 +91,7 @@ final class MusicListViewModel: ViewModel {
         input.shuffleButtonTapped
             .withUnretained(self)
             .subscribe { owner, _ in
+                owner.tapImpact()
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
@@ -113,6 +115,7 @@ final class MusicListViewModel: ViewModel {
                         owner.coordinator?.presentMusicPlayer(track: item.track)
                     }
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.miniPlayerTapped
@@ -123,6 +126,7 @@ final class MusicListViewModel: ViewModel {
             .drive(with: self) { owner, track in
                 guard let track else { return }
                 owner.coordinator?.presentMusicPlayer(track: track)
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.miniPlayerPlayButtonTapped
@@ -136,6 +140,7 @@ final class MusicListViewModel: ViewModel {
                         try await owner.musicPlayer.setPlaying()
                     }
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
@@ -145,6 +150,7 @@ final class MusicListViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToPrevious()
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
@@ -155,6 +161,7 @@ final class MusicListViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToNext()
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.viewWillDisappear

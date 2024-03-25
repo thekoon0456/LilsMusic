@@ -89,6 +89,7 @@ extension ReelsViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        tapImpact()
         guard let cell = cell as? ReelsCell else { return }
         DispatchQueue.main.async {
             cell.mute()

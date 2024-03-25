@@ -76,6 +76,7 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.coordinator?.dismissViewController()
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.playButtonTapped
@@ -89,6 +90,7 @@ final class MusicPlayerViewModel: ViewModel {
                         try await owner.musicPlayer.setPlaying()
                     }
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.previousButtonTapped
@@ -98,6 +100,7 @@ final class MusicPlayerViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToPrevious()
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.nextButtonTapped
@@ -109,6 +112,7 @@ final class MusicPlayerViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToNext()
                 }
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
@@ -148,6 +152,7 @@ final class MusicPlayerViewModel: ViewModel {
                 bool
                 ? userLikeRepository.updateUserLikeList(item, id: id)
                 : userLikeRepository.deleteUserLikeList(item, id: id)
+                tapImpact()
             }
             .withUnretained(self)
             .subscribe { owner, bool in

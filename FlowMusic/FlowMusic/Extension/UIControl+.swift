@@ -8,12 +8,7 @@
 import UIKit
 
 extension UIControl {
-    
-    func tapImpact() {
-        let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
-    }
+
     func tapAnimation() {
         addTarget(self, action: #selector(animateDown), for: .touchDown)
         addTarget(self, action: #selector(animateUp), for: [.touchUpInside, .touchCancel, .touchDragExit])
