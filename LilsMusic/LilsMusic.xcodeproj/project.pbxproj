@@ -128,7 +128,7 @@
 		7C7740112B9DA45B00B2E6E7 /* UserCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCoordinator.swift; sourceTree = "<group>"; };
 		7C7740132B9DA62F00B2E6E7 /* FMDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMDesign.swift; sourceTree = "<group>"; };
 		7C7740152B9DA64200B2E6E7 /* FMConst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMConst.swift; sourceTree = "<group>"; };
-		7C813DA82B9ADFEF00CDFF1D /* FlowMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C813DA82B9ADFEF00CDFF1D /* LilsMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LilsMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C813DAB2B9ADFEF00CDFF1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7C813DAD2B9ADFEF00CDFF1D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7C813DB42B9ADFF000CDFF1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -309,7 +309,7 @@
 		7C813D9F2B9ADFEF00CDFF1D = {
 			isa = PBXGroup;
 			children = (
-				7C813DAA2B9ADFEF00CDFF1D /* FlowMusic */,
+				7C813DAA2B9ADFEF00CDFF1D /* LilsMusic */,
 				7C813DA92B9ADFEF00CDFF1D /* Products */,
 				7C131C552BA45D48004B3FF2 /* Frameworks */,
 			);
@@ -318,12 +318,12 @@
 		7C813DA92B9ADFEF00CDFF1D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7C813DA82B9ADFEF00CDFF1D /* FlowMusic.app */,
+				7C813DA82B9ADFEF00CDFF1D /* LilsMusic.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		7C813DAA2B9ADFEF00CDFF1D /* FlowMusic */ = {
+		7C813DAA2B9ADFEF00CDFF1D /* LilsMusic */ = {
 			isa = PBXGroup;
 			children = (
 				7C813DBF2B9AE19600CDFF1D /* App */,
@@ -340,7 +340,7 @@
 				7C813DC72B9AE1E800CDFF1D /* Resources */,
 				7C813DB92B9ADFF000CDFF1D /* Info.plist */,
 			);
-			path = FlowMusic;
+			path = LilsMusic;
 			sourceTree = "<group>";
 		};
 		7C813DBF2B9AE19600CDFF1D /* App */ = {
@@ -581,9 +581,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7C813DA72B9ADFEF00CDFF1D /* FlowMusic */ = {
+		7C813DA72B9ADFEF00CDFF1D /* LilsMusic */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7C813DBC2B9ADFF000CDFF1D /* Build configuration list for PBXNativeTarget "FlowMusic" */;
+			buildConfigurationList = 7C813DBC2B9ADFF000CDFF1D /* Build configuration list for PBXNativeTarget "LilsMusic" */;
 			buildPhases = (
 				7C813DA42B9ADFEF00CDFF1D /* Sources */,
 				7C813DA52B9ADFEF00CDFF1D /* Frameworks */,
@@ -593,7 +593,7 @@
 			);
 			dependencies = (
 			);
-			name = FlowMusic;
+			name = LilsMusic;
 			packageProductDependencies = (
 				7C813DC92B9AE24300CDFF1D /* SnapKit */,
 				7C813DCC2B9AE24D00CDFF1D /* Kingfisher */,
@@ -606,7 +606,7 @@
 				7C66F05E2BB1C09800530C27 /* MarqueeLabel */,
 			);
 			productName = FlowMusic;
-			productReference = 7C813DA82B9ADFEF00CDFF1D /* FlowMusic.app */;
+			productReference = 7C813DA82B9ADFEF00CDFF1D /* LilsMusic.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -624,7 +624,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7C813DA32B9ADFEF00CDFF1D /* Build configuration list for PBXProject "FlowMusic" */;
+			buildConfigurationList = 7C813DA32B9ADFEF00CDFF1D /* Build configuration list for PBXProject "LilsMusic" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -646,7 +646,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7C813DA72B9ADFEF00CDFF1D /* FlowMusic */,
+				7C813DA72B9ADFEF00CDFF1D /* LilsMusic */,
 			);
 		};
 /* End PBXProject section */
@@ -880,7 +880,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W6X76DS4Z7;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FlowMusic/Info.plist;
+				INFOPLIST_FILE = LilsMusic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = LilsMusic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Permission is required to use the app service with AppleMusic. Please allow access to continue.";
@@ -893,7 +893,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.thekoon.FlowMusic;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thekoon.LilsMusic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -914,7 +914,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W6X76DS4Z7;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FlowMusic/Info.plist;
+				INFOPLIST_FILE = LilsMusic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = LilsMusic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Permission is required to use the app service with AppleMusic. Please allow access to continue.";
@@ -927,7 +927,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.thekoon.FlowMusic;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thekoon.LilsMusic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -942,7 +942,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7C813DA32B9ADFEF00CDFF1D /* Build configuration list for PBXProject "FlowMusic" */ = {
+		7C813DA32B9ADFEF00CDFF1D /* Build configuration list for PBXProject "LilsMusic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7C813DBA2B9ADFF000CDFF1D /* Debug */,
@@ -951,7 +951,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7C813DBC2B9ADFF000CDFF1D /* Build configuration list for PBXNativeTarget "FlowMusic" */ = {
+		7C813DBC2B9ADFF000CDFF1D /* Build configuration list for PBXNativeTarget "LilsMusic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7C813DBD2B9ADFF000CDFF1D /* Debug */,

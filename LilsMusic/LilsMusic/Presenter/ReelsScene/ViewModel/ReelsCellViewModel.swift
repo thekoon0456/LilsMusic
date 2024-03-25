@@ -41,8 +41,7 @@ final class ReelsCellViewModel: ViewModel {
                 Task {
                     let track = try await owner.getMusicID(item: mv)
                     guard let id = track?.id else { return }
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self else { return }
+                    DispatchQueue.main.async {
                         let bool = owner.checkHeart(id: id.rawValue)
                         owner.heartSubject.onNext(bool)
                     }
@@ -85,7 +84,6 @@ final class ReelsCellViewModel: ViewModel {
     }
     
     func getMusicID(item: MusicVideo?) async throws -> Track?  {
-        print(item)
         guard let item,
               let song = try await musicRepository.MusicVideoToSong(item)
         else { return nil }

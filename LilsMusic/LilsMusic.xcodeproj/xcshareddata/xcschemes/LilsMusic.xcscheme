@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7C813DA72B9ADFEF00CDFF1D"
-               BuildableName = "FlowMusic.app"
-               BlueprintName = "FlowMusic"
-               ReferencedContainer = "container:FlowMusic.xcodeproj">
+               BuildableName = "LilsMusic.app"
+               BlueprintName = "LilsMusic"
+               ReferencedContainer = "container:LilsMusic.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7C813DA72B9ADFEF00CDFF1D"
-            BuildableName = "FlowMusic.app"
-            BlueprintName = "FlowMusic"
-            ReferencedContainer = "container:FlowMusic.xcodeproj">
+            BuildableName = "LilsMusic.app"
+            BlueprintName = "LilsMusic"
+            ReferencedContainer = "container:LilsMusic.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -68,9 +68,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7C813DA72B9ADFEF00CDFF1D"
-            BuildableName = "FlowMusic.app"
-            BlueprintName = "FlowMusic"
-            ReferencedContainer = "container:FlowMusic.xcodeproj">
+            BuildableName = "LilsMusic.app"
+            BlueprintName = "LilsMusic"
+            ReferencedContainer = "container:LilsMusic.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
