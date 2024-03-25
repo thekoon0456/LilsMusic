@@ -102,6 +102,7 @@ final class LibraryViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.likeItemSelected
+            .observe(on: MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, item in
                 let likeID = owner.fetchLikeList()
@@ -306,7 +307,9 @@ extension LibraryViewModel {
     
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange.sink { [weak self] _ in
+        musicPlayer.getCurrentPlayer().state.objectWillChange
+            .throttle(for: .seconds(0.3), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()
             playStateSubject.onNext(state)

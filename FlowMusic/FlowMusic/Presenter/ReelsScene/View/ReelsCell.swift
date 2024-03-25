@@ -5,18 +5,21 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
-import MusicKit
-import UIKit
 import AVFoundation
 import AVKit
+import MusicKit
+import UIKit
 
+import RxCocoa
+import RxSwift
 import SnapKit
 
 final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Properties
     
-    let viewModel: ReelsCellViewModel = ReelsCellViewModel()
+    private let viewModel: ReelsCellViewModel = ReelsCellViewModel()
+    private let mvSubject = BehaviorSubject<MusicVideo?>(value: nil)
     
     // MARK: - UI
     
@@ -68,12 +71,35 @@ final class ReelsCell: BaseCollectionViewCell {
         player?.pause()
         musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
         NotificationCenter.default.removeObserver(self)
+        disposeBag = DisposeBag()
+    }
+    
+    // MARK: - Bind
+    
+    override func bind() {
+        super.bind()
+        
+        let heartButtonTapped = heartButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .map { [weak self] _ -> Bool in
+                guard let self else { return false }
+                return heartButton.isSelected
+            }
+        
+        let input = ReelsCellViewModel.Input(mv: mvSubject.asObservable(),
+                                             heartButtonTapped: heartButtonTapped)
+        
+        let output = viewModel.transform(input)
+        
+        output.isHeart.drive(with: self) { owner, bool in
+            owner.heartButton.isSelected = bool
+        }.disposed(by: disposeBag)
     }
     
     // MARK: - Helpers
     
     func configureCell(_ data: MusicVideo) {
-        print(#function)
+        mvSubject.onNext(data)
         
         guard let url = data.previewAssets?.first?.hlsURL else { return }
         let asset = AVURLAsset(url: url)

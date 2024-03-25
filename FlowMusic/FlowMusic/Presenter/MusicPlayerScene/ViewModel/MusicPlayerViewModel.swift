@@ -22,7 +22,7 @@ final class MusicPlayerViewModel: ViewModel {
         let nextButtonTapped: ControlEvent<Void>
         let repeatButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
-        let heartButtonTapped: Observable<(Bool)>
+        let heartButtonTapped: Observable<Bool>
         let playlistButtonTapped: Observable<String>
         let viewWillDisappear: Observable<Void>
     }
@@ -61,7 +61,6 @@ final class MusicPlayerViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        
         input.viewWillAppear
             .map { [weak self] _ in
                 guard let self else { return false }
@@ -232,7 +231,7 @@ extension MusicPlayerViewModel {
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
         musicPlayer.getCurrentPlayer().state.objectWillChange
-            .throttle(for: .seconds(0.5), scheduler: RunLoop.main, latest: true)
+            .throttle(for: .seconds(0.3), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()
