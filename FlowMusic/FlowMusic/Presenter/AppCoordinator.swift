@@ -56,8 +56,6 @@ final class AppCoordinator: NSObject, Coordinator {
 //        childCoordinators.append(userCoordinator)
 //        userCoordinator.start()
         
-//        tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav, userNav]
-        
         tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav]
         navigationController?.setViewControllers([tabBarController], animated: false)
     }

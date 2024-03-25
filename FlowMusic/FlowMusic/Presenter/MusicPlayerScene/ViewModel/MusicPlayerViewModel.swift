@@ -212,7 +212,8 @@ final class MusicPlayerViewModel: ViewModel {
 extension MusicPlayerViewModel {
     //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange.sink { _ in
+        musicPlayer.getCurrentPlayer().queue.objectWillChange
+            .sink { _ in
             Task { [weak self] in
                 guard let self,
                       let entry = try await musicPlayer.getCurrentEntry(),
@@ -230,7 +231,9 @@ extension MusicPlayerViewModel {
     
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange.sink { [weak self] _ in
+        musicPlayer.getCurrentPlayer().state.objectWillChange
+            .throttle(for: .seconds(0.5), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()
             playStateSubject.onNext(state)
