@@ -51,6 +51,22 @@ final class ReelsViewController: BaseViewController {
         updateSnapshot(mv: [])
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        collectionView.visibleCells.forEach { cell in
+            guard let reelsCell = cell as? ReelsCell else { return }
+            reelsCell.soundOn()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        collectionView.visibleCells.forEach { cell in
+            guard let reelsCell = cell as? ReelsCell else { return }
+            reelsCell.mute()
+        }
+    }
+    
     override func bind() {
         super.bind()
         let input = ReelsViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in })
