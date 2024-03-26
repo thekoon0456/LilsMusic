@@ -1,10 +1,12 @@
 # LilsMusic
 `Simple, Beautiful Music App` <br>
-`UIKit + MVVM-C + RxSwift + MusicKit + Swift Concurrency` <br>
+`UIKit + MVVM-C + RxSwift + MusicKit + Swift Concurrency`
+<br>
 
 ## 🔗 Links
 ### [📱 AppStore](https://추가하기)
 ### [🧑🏻‍💻 Blog 회고](https://thekoon0456.tistory.com/127)
+<br>
 
 ## 📌 주요 기능
 - 최신 인기 음악과 개인화된 추천 음악 제공
@@ -14,15 +16,11 @@
 - 다양한 애니메이션과 햅틱 반응
 <br>
 
-
 ## 📱시연 영상
 |<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/e2310b70-0b10-4c95-b161-731807d37950"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/87b36b00-853f-4ee3-843d-70c24fe81649"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/a0107164-28f7-416d-863a-2241aa12e7c3"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/41fc960e-83c0-4d95-88eb-27f4923ecfa2"></img>|
 |:-:|:-:|:-:|:-:|
-|`알림 뷰`|`메인 뷰`|`위젯 뷰`|`온보딩 뷰`|
-|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/e863ab80-ea5a-43c9-a999-19d638d2a5c3"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/fd86103e-c18d-4338-9d34-41dcbf62aff8"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/d031ed7e-d037-4267-992e-ddca6cf91cb4"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/bddfaf18-1453-4b21-8d60-5e000e247be9"></img>|
-|`설정 뷰`|`웹, 메일 뷰`|`꾸준한 업데이트`|`긍정적 리뷰`|
+|`음악 플레이어`|`뮤직비디오`|`추천 음악`|`라이브러리`|
 <br>
-
 
 ## 📝 핵심 키워드
 ![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
@@ -32,18 +30,48 @@
 ![SwiftConcurrency](https://img.shields.io/badge/SwiftConcurrency-F54A2A?style=for-the-badge&logo=swift&logoColor=white)
 ![Realm](https://img.shields.io/badge/realm-39477F?style=for-the-badge&logo=Realm&logoColor=white)
 ![SnapKit](https://img.shields.io/badge/SnapKit-4285F4?style=for-the-badge&logo=SnapKit&logoColor=white)
+<br>
 
 ## 💡 기술 소개
 
+### MVVM
+- 뷰컨트롤러의 로직을 분리하고, Input, Output 패턴을 활용해 데이터의 흐름을 일관성있게 구현
+- ViewModel Protocol을 활용해 구조적으로 일관된 뷰모델 구성 
+<br>
 
+### Coordinator 패턴
+- 사용자 인증, 음악플레이어 재생 등 화면전환코드가 비대해져서 뷰컨트롤러와 화면전환의 역할 분리
+- Coordinator 생성 -> ViewModel 생성 -> ViewController 생성하는 패턴으로 의존성 주입
+- viewController에서 화면전환 input -> ViewModel에서 Coordinator로 화면전환
+<br>
 
+### RxSwift
+- 앱 내의 비동기 시퀀스 구현
+- 유저의 tap을 ControlEvent<Void>타입으로 Input, Output의 UI바인딩은 Driver를 활용했습니다.
+- 
+<br>
+
+### MusicKit
+- 
+<br>
+
+### SwiftConcurrency
+- 최신 API인 MusicKit의 비동기 방식
+- RxSwift와 SwiftConcurrency를 연동하기 위해 
+<br>
+
+### Realm
+- Repository 패턴 사용
+- Repository Protocol을 활용해 일관성있는 Repository 구조 구현
+- 업데이트 내역을 실시간으로 반영하기 위해 notificationToken 사용 
+- Task스레드 내에서 스레드 문제 발생. 메인스레드 설정으로 스레드 강제 지정
+<br>
 
 
 ## ✅ 트러블 슈팅
 
 ### MusicVideo타입에 연관된 Song타입을 제공해주지 않아서 뮤직비디오의 노래를 못 찾는 문제
-<div markdown="1">
-        
+<div markdown="1">   
 ```
 뮤직비디오를 보다가 좋아하는 노래를 누르면 해당 뮤직비디오의 노래를 플레이리스트에 저장해야하는데
 MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 nil만 리턴을 받았습니다.
