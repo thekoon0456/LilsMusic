@@ -343,6 +343,7 @@ final class MusicPlayerViewController: BaseViewController {
     override func configureView() {
         super.configureView()
         view.layer.cornerRadius = 20
+        view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         view.clipsToBounds = true
     }
 }
