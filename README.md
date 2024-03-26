@@ -1,20 +1,23 @@
 # LilsMusic
 `Simple, Beautiful Music App` <br>
-`UIKit + MVVM-C + RxSwift + MusicKit` <br>
+`UIKit + MVVM-C + RxSwift + MusicKit + Swift Concurrency` <br>
 
 ## 🔗 Links
 ### [📱 AppStore](https://추가하기)
+### [🧑🏻‍💻 Blog](https://thekoon0456.tistory.com/127)
 
-## 🧑🏻‍💻 핵심 키워드
+## 📝 핵심 키워드
 ![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
 ![UIKit](https://img.shields.io/badge/UIkit-2396F3?style=for-the-badge&logo=UIKit&logoColor=white)
 ![RxSwift](https://img.shields.io/badge/RxSwift-fa4db3?style=flat&logo=ReactiveX&logoColor=white)
 ![MusicKit](https://img.shields.io/badge/MusicKit-FA243C?style=for-the-badge&logo=MusicKit&logoColor=white)
+![SwiftConcurrency](https://img.shields.io/badge/SwiftConcurrency-F54A2A?style=for-the-badge&logo=swift&logoColor=white)
 ![Realm](https://img.shields.io/badge/realm-39477F?style=for-the-badge&logo=Realm&logoColor=white)
+![SnapKit](https://img.shields.io/badge/SnapKit-4285F4?style=for-the-badge&logo=SnapKit&logoColor=white)
 
 ## 📌 주요 기능
 - 최신 인기 음악과 개인화된 추천 음악 제공
-- 곡에 따라 바뀌는 예쁜 음악 플레이어
+- 곡에 따라 배경색이 변경되는 예쁜 음악 플레이어
 - 최신 뮤직비디오를 둘러보며 좋아하는 노래를 바로 플레이리스트에 저장
 - 편리한 플로팅 미니 뮤직 플레이어 사용
 - 다양한 애니메이션과 햅틱 반응
@@ -29,7 +32,7 @@
 |`설정 뷰`|`웹, 메일 뷰`|`꾸준한 업데이트`|`긍정적 리뷰`|
 <br>
 
-## ✅ 기술 소개
+## 💡 기술 소개
 
 
 
@@ -249,15 +252,16 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 <br>
 
 
-## 회고
+## 🧑🏻‍💻회고
 긍정적인 점
-- 
-- 
-- 
-- 
-
+- 짧은 시간 내에 기획한 앱을 만들었다는 점
+- MusicKit과 AVFoundation 등 평소에 접하기 힘들었던 기술스택을 도전하고, 구현했다는 점
+- RxSwift, MVVMC 등을 사용하면서 해당 기술에 대해 더 고민하고, 이해하며 구현했다는 점
+- MusicKit의 Swift Concurrency와 Combine을 UIKit, RxSwift로 구현했다는 점입니다.
+  
 아쉬운 점
-- 
-- 
-- 
-- 
+- 중간에 아파서 약 5일간 개발을 하지 못했던 점... ㅠㅠ 건강이 최고입니다!!
+- 처음에 기획했던 다양한 플레이리스트를 추가 하지 못했습니다.
+- 검색이 현재 개별 곡만 검색되고 앨범이나 아티스트 전체가 검색되지 않습니다.
+- 사용자의 취향을 파악하고, Charts를 통해 그래프로 표현하려했지만 덜어냈고, 애플뮤직의 사용자 추천 플레이리스트로 대체했습니다.
+ 
