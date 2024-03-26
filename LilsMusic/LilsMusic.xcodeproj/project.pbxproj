@@ -199,7 +199,8 @@
 				7C044BF92BADA7CA007E910E /* View */,
 				7C044BFA2BADA7CF007E910E /* ViewModel */,
 			);
-			path = LibraryListScene;
+			name = LibraryListScene;
+			path = Presenter/LibraryListScene;
 			sourceTree = "<group>";
 		};
 		7C044BF92BADA7CA007E910E /* View */ = {
@@ -333,6 +334,7 @@
 				7C813DC32B9AE1BC00CDFF1D /* Data */,
 				7C03F7CA2BA177E300FB748C /* Repository */,
 				7C813DC52B9AE1C500CDFF1D /* Presenter */,
+				7C044BF22BADA6DF007E910E /* LibraryListScene */,
 				7C7740172B9DB72400B2E6E7 /* Utility */,
 				7C813DDC2B9AE2EC00CDFF1D /* Const */,
 				7C813DFE2B9B152600CDFF1D /* Components */,
@@ -418,7 +420,6 @@
 				7C916E0C2B9D9FD700C5F6C0 /* ReelsScene */,
 				7C773FF82B9DA12200B2E6E7 /* LibraryScene */,
 				7C77400A2B9DA43400B2E6E7 /* UserScene */,
-				7C044BF22BADA6DF007E910E /* LibraryListScene */,
 				7C813DDD2B9AE2F400CDFF1D /* MusicPlayerScene */,
 				7C813DE72B9AE35400CDFF1D /* MusicListScene */,
 			);

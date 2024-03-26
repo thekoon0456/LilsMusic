@@ -52,7 +52,6 @@ extension MusicListCoordinator: SKCloudServiceSetupViewControllerDelegate {
     //애플뮤직 가입권유화면
     func presentAppleMusicSubscriptionOffer() {
         var options: [SKCloudServiceSetupOptionsKey: Any] = [.action: SKCloudServiceSetupAction.subscribe]
-        
         options[.messageIdentifier] = SKCloudServiceSetupMessageIdentifier.addMusic
         
         let setupViewController = SKCloudServiceSetupViewController()
@@ -60,8 +59,9 @@ extension MusicListCoordinator: SKCloudServiceSetupViewControllerDelegate {
         
         setupViewController.load(options: options) { (result, error) in
             if result {
-                DispatchQueue.main.async {
-                    self.navigationController?.present(setupViewController, animated: true)
+                DispatchQueue.main.async {  [weak self] in
+                    guard let self else { return }
+                    navigationController?.present(setupViewController, animated: true)
                 }
             } else if let error = error {
                 print("Error presenting Apple Music subscription offer: \(error.localizedDescription)")

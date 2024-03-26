@@ -37,29 +37,137 @@
 
 ## ✅ 트러블 슈팅
 
-### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
+### MusicVideo타입에 연관된 Song타입을 제공해주지 않아서 뮤직비디오의 노래를 못 찾는 문제
 <div markdown="1">
         
 ```
-설명
+뮤직비디오를 보다가 좋아하는 노래를 누르면 해당 뮤직비디오의 노래를 플레이리스트에 저장해야하는데
+MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 nil만 리턴을 받았습니다.
+그래서 뮤직비디오의 아티스트와 노래 이름으로 MusicKit의 Song을 검색한 뒤, 둘 다 일치하는 이름이 있는 Song이 있으면 반환하도록 구현했습니다.
 ```
 
 ```swift
-코드
+    //MusicKit의 요청 방식으로 MusicVideo타입의 Song을 요청해도 nil만 리턴
+    func requestSearchMVIDCatalog(id: MusicItemID?) async throws -> Song? {
+        guard let id else { return nil }
+        let response = try await MusicCatalogResourceRequest<MusicVideo>(matching: \.id, equalTo: id).response()
+        guard let item = response.items.first else { return nil }
+        let songs = try await item.with(.songs).songs
+        let song = songs?.first
+        return song
+    }
+    
+    => 뮤직비디오의 아티스트와 노래 이름으로 Song을 검색한 뒤, 일치하는 이름이 있는 Song이 있으면 반환
+    func MusicVideoToSong(_ item: MusicVideo) async throws -> Song? {
+        let song = try await requestMVToSongCatalog(term: "\(item.artistName), \(item.title)")
+        return song
+    }
+    
+    func requestMVToSongCatalog(term: String) async throws -> Song? {
+        let songs = try await MusicCatalogSearchRequest(term: term, types: [Song.self]).response().songs
+        let result = songs.filter { term.contains($0.title) && term.contains($0.artistName) }.first
+        return result
+    }
 ```
 </div>
 <br>
 
-
-### MusicVideo타입에 Song타입이 없어서 연관된 노래를 못 찾는 문제
+### 애플뮤직 권한 요청 -> 사용자의 구독권장까지의 분기처리
 <div markdown="1">
         
 ```
-설명
+처음 앱을 시작하면 
+1. 애플뮤직 권한 요청 
+    -> 권한 승인시 -> 앱을 사용하다가 노래 재생버튼을 눌렀을 때 -> 애플뮤직 구독 확인
+    -> 권한 거부시 -> 아이폰의 앱 권한설정 화면으로 이동
+    
+2. 애플뮤직 구독 확인 후
+    -> 구독자라면 노래 재생. 구독자 추천 플레이리스트 가져오기
+    -> 구독자가 아니라면 구독 제안 화면 Present
+의 분기처리를 Coordinator를 통해 구현했습니다.
+    
 ```
 
 ```swift
-코드
+//AppCoordinator
+    func requestMusicAuthorization() {
+        SKCloudServiceController.requestAuthorization { [weak self] status in
+            guard let self else { return }
+            switch status {
+            case .authorized:
+                print("승인됨")
+                makeTabbar() //탭바 만들고, 앱 시작
+                break
+            default:
+                moveToUserSetting() //아이폰의 세팅 설정으로
+                break
+            }
+        }
+    }
+
+    //아이폰의 세팅 설정으로 이동을 유도하는 Alert
+    func moveToUserSetting() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let alert = UIAlertController(title: "Access to Apple Music is required to use the app.",
+                                          message: 
+                                            "Please allow permission in settings to access the music library.",
+                                          preferredStyle: .alert)
+            alert.view.tintColor = .label
+            
+            let primaryButton = UIAlertAction(title: "Go to Settings", style: .default) { _ in
+                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                    return
+                }
+                if UIApplication.shared.canOpenURL(settingsUrl) {
+                    UIApplication.shared.open(settingsUrl, completionHandler: nil)
+                }
+            }
+            
+            alert.addAction(primaryButton)
+            navigationController?.present(alert, animated: true)
+        }
+    }
+```
+
+```Swift
+//MusicPlayerViewModel에서 노래 클릭시
+    //StoreKit을 활용해 구독 확인 
+    func checkAppleMusicSubscriptionEligibility() {
+        let controller = SKCloudServiceController()
+        controller.requestCapabilities { [weak self] (capabilities, error) in
+            guard let self else { return }
+            if let error {
+                print(error.localizedDescription)
+                return
+            }
+            
+            //구독자가 아니라면 애플뮤직 가입 권유화면 present
+            if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
+                coordinator?.presentAppleMusicSubscriptionOffer()
+            }
+        }
+    }
+    
+    //MusicListCoordinator의 애플뮤직 가입권유화면
+    func presentAppleMusicSubscriptionOffer() {
+        var options: [SKCloudServiceSetupOptionsKey: Any] = [.action: SKCloudServiceSetupAction.subscribe]
+        options[.messageIdentifier] = SKCloudServiceSetupMessageIdentifier.addMusic
+        
+        let setupViewController = SKCloudServiceSetupViewController()
+        setupViewController.delegate = self
+        
+        setupViewController.load(options: options) { (result, error) in
+            if result {
+                DispatchQueue.main.async {  [weak self] in
+                    guard let self else { return }
+                    navigationController?.present(setupViewController, animated: true)
+                }
+            } else if let error = error {
+                print("Error presenting Apple Music subscription offer: \(error.localizedDescription)")
+            }
+        }
+    }
 ```
 </div>
 <br>
@@ -78,7 +186,8 @@
 </div>
 <br>
 
-### 애플뮤직 권한 요청 -> 사용자의 구독권장까지의 분기처리
+
+### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
 <div markdown="1">
         
 ```
@@ -90,6 +199,7 @@
 ```
 </div>
 <br>
+
 
 ### 뮤직비디오 로딩시점을 파악해 인디케이터 표시해주기
 <div markdown="1">

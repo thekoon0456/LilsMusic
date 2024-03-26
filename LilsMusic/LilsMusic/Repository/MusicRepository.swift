@@ -34,6 +34,11 @@ final class MusicRepository {
         return song
     }
     
+//    func MusicVideoToSong(_ item: MusicVideo) async throws -> Song? {
+//        let song = try await requestSearchMVIDCatalog(id: item.id)
+//        return song
+//    }
+    
     // MARK: - Charts
     
     func requestCatalogTop100Charts() async throws -> MusicItemCollection<Playlist> {
@@ -117,14 +122,14 @@ final class MusicRepository {
     }
     
     //nil만 나옴..
-//    func requestSearchMVIDCatalog(id: MusicItemID?) async throws -> Song? {
-//        guard let id else { return nil }
-//        let response = try await MusicCatalogResourceRequest<MusicVideo>(matching: \.id, equalTo: id).response()
-//        let items = response.items
-//        let songs = items.first?.songs
-//        let song = songs?.first
-//        return song
-//    }
+    func requestSearchMVIDCatalog(id: MusicItemID?) async throws -> Song? {
+        guard let id else { return nil }
+        let response = try await MusicCatalogResourceRequest<MusicVideo>(matching: \.id, equalTo: id).response()
+        guard let item = response.items.first else { return nil }
+        let songs = try await item.with(.songs).songs
+        let song = songs?.first
+        return song
+    }
     
     func requestSearchArtistCatalog(term: String) async throws -> MusicItemCollection<Artist> {
         try await MusicCatalogSearchRequest(term: term, types: [Artist.self]).response().artists
