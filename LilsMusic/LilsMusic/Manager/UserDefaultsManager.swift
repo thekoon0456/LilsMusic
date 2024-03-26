@@ -8,7 +8,6 @@
 import Foundation
 
 //반복은 기본 설정, 셔플은 기본설정 아님
-
 final class UserDefaultsManager {
     
     static let shared = UserDefaultsManager()
