@@ -59,12 +59,21 @@
 <br>
 
 ### AVFoundation, AVKit
-- 
+- AVQueuePlayer의 인스턴스를 하나만 생성하고 재생할 Item을 미리 배열로 넣어놔서 사용했지만 화면 이동시에 딜레이 발생
+- 각 Cell마다 AVPlayer 인스턴스를 생생하고, cell이 configure될때 미리 재생하도록 설정해서 딜레이 줄임
+- observeValue()를 통해 플레이어의 상태를 옵저빙하고, 로딩준비 완료시에 로딩 인디케이터 해제
 <br>
 
 ### SwiftConcurrency
 - 최신 API인 MusicKit의 비동기 방식
 - RxSwift와 SwiftConcurrency를 연동하기 위해 
+<br>
+
+### ModernCollectionView
+- 추천화면의 다채로운 Layout을 구현하기 위해 UICollectionViewCompositionalLayout활용
+- MusicVideo 화면도 Cell이 화면을 가득 채우고, 페이징을 하기 위해 UICollectionViewCompositionalLayout 활용
+- List 화면에서도 Item 로드시 애니메이션을 사용하기 위해 UICollectionViewCompositionalLayout의 List 활용
+- 다양한 레이아웃과 애니메이션 구현
 <br>
 
 ### Realm
