@@ -148,7 +148,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
@@ -158,7 +158,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
@@ -261,7 +261,7 @@ extension MusicListViewModel {
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
         musicPlayer.getCurrentPlayer().state.objectWillChange
-            .throttle(for: .seconds(0.5), scheduler: RunLoop.main, latest: true)
+            .throttle(for: .seconds(0.3), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()

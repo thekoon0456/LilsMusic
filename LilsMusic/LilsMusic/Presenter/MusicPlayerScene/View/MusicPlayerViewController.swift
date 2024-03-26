@@ -174,26 +174,26 @@ final class MusicPlayerViewController: BaseViewController {
         super.bind()
         
         let playButtonTapped = playButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
         
         let repeatButtonTapped = repeatButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
         
         let shuffleButtonTapped = shuffleButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
         
         let heartButtonTapped = heartButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { [weak self] _ -> Bool in
                 guard let self else { return false }
                 return heartButton.isSelected
             }
         
         let playlistButtonTapped = playlistButton.menuSelectionSubject
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { $0 }
         
         let input = MusicPlayerViewModel.Input(chevronButtonTapped: chevronButton.rx.tap,
@@ -443,6 +443,7 @@ extension MusicPlayerViewController {
             make.top.equalTo(progressSlider.snp.bottom).offset(80)
             make.size.equalTo(60)
             make.centerX.equalToSuperview()
+            make.bottom.lessThanOrEqualToSuperview().offset(-50)
         }
         
         nextButton.snp.makeConstraints { make in

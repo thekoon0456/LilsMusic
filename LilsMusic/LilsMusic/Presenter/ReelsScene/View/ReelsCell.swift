@@ -83,7 +83,7 @@ final class ReelsCell: BaseCollectionViewCell {
         super.bind()
         
         let heartButtonTapped = heartButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { [weak self] _ -> Bool in
                 guard let self else { return false }
                 return heartButton.isSelected

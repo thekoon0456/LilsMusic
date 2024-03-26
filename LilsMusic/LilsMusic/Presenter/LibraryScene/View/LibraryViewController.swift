@@ -101,7 +101,7 @@ final class LibraryViewController: BaseViewController {
         super.bind()
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
         let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         

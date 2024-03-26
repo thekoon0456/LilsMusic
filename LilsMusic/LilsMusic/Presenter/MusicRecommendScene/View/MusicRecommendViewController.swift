@@ -100,7 +100,7 @@ final class MusicRecommendViewController: BaseViewController {
         let modelSelected = libraryCollectionViewController.collectionView.rx.modelSelected(Track.self)
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
         
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,
@@ -387,7 +387,7 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
-                                                       heightDimension: .fractionalHeight(0.32))
+                                                       heightDimension: .fractionalWidth(0.5))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
@@ -405,7 +405,7 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.45),
-                                                       heightDimension: .fractionalHeight(0.36))
+                                                       heightDimension: .fractionalWidth(0.57))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
@@ -423,7 +423,7 @@ extension MusicRecommendViewController {
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.6),
-                                                       heightDimension: .fractionalHeight(0.46))
+                                                       heightDimension: .fractionalWidth(0.7))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 12,
