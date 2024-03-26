@@ -92,9 +92,8 @@ extension Coordinator {
                                           message: 
                                             "Please allow permission in settings to access the music library.",
                                           preferredStyle: .alert)
-            alert.view.tintColor = .tintColor
+            alert.view.tintColor = .label
             
-            let cancelButton = UIAlertAction(title: "Cancel", style: .default)
             let primaryButton = UIAlertAction(title: "Go to Settings", style: .default) { _ in
                 guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                     return
@@ -104,7 +103,6 @@ extension Coordinator {
                 }
             }
             
-            alert.addAction(cancelButton)
             alert.addAction(primaryButton)
             
             navigationController?.present(alert, animated: true)
