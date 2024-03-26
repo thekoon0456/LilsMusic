@@ -248,6 +248,19 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 </div>
 <br>
 
+### Cell이 재사용될때 UIBinding이 제대로 되지 않던 현상 발생
+<div markdown="1">
+        
+```
+설명
+```
+
+```swift
+코드
+```
+</div>
+<br>
+
 
 ### 뮤직비디오 로딩시점을 파악해 인디케이터 표시해주기
 <div markdown="1">
