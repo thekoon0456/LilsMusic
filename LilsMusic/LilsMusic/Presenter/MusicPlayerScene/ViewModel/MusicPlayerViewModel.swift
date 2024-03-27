@@ -46,7 +46,7 @@ final class MusicPlayerViewModel: ViewModel {
     private var cancellables = Set<AnyCancellable>()
     //사용자가 선택한 track
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
-    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: .playing)
+    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     private let heartSubject = BehaviorSubject<Bool>(value: false)
     
     // MARK: - Lifecycles
@@ -172,7 +172,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing),
+                      playState: playStateSubject.asDriver(onErrorJustReturn: musicPlayer.getPlaybackState()),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
                       isHeart: heartSubject.asDriver(onErrorJustReturn: false))
@@ -235,7 +235,6 @@ extension MusicPlayerViewModel {
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
         musicPlayer.getCurrentPlayer().state.objectWillChange
-            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
             .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()
