@@ -60,9 +60,13 @@ final class ReelsCell: BaseCollectionViewCell {
         $0.tapAnimation()
     }
     
-//    private let addToPlaylistButton = UIButton().then {
-//        $0.setImage(UIImage(systemName: "list.bullet.rectangle.portrait"), for: .normal)
-//    }
+    private lazy var playButton = UIButton().then {
+        let image = UIImage(systemName: "play.circle")?
+            .withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 44)))
+        $0.setImage(image, for: .normal)
+        $0.tintColor = .bgColor
+        $0.tapAnimation()
+    }
     
     private var player: AVPlayer?
     
@@ -70,10 +74,10 @@ final class ReelsCell: BaseCollectionViewCell {
     //
     override func prepareForReuse() {
         super.prepareForReuse()
-        player?.pause()
-        musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
-        NotificationCenter.default.removeObserver(self)
         heartButton.isSelected = false
+        musicVideoView.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+        player?.pause()
+        NotificationCenter.default.removeObserver(self)
         disposeBag = DisposeBag()
     }
     
@@ -101,24 +105,77 @@ final class ReelsCell: BaseCollectionViewCell {
     
     // MARK: - Helpers
     
-    func configureCell(_ data: MusicVideo) {
+    func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
+        startLoadingIndicator()
+        
+        let playerItem = AVPlayerItem(asset: asset)
+        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
+        player = AVPlayer(playerItem: playerItem).then {
+            $0.isMuted = true
+        }
+        
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.videoGravity = .resizeAspectFill
+        playerLayer.needsDisplayOnBoundsChange = true
+        playerLayer.frame = view.bounds
+        view.layer.masksToBounds = true
+        view.layer.addSublayer(playerLayer)
+        
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+                                               object: player?.currentItem,
+                                               queue: .main) { [weak self] _ in
+            guard let self else { return }
+            player?.seek(to: .zero)
+            player?.play()
+        }
+    }
+    
+    func playToggle() {
+        guard let status = player?.timeControlStatus else { return }
+        switch status {
+        case .paused, .waitingToPlayAtSpecifiedRate:
+            play()
+        default:
+            pause()
+        }
+    }
+    
+    func getPlayerStatus() -> AVPlayer.TimeControlStatus {
+        guard let player else { return .paused }
+        return player.timeControlStatus
+    }
+    
+    func setPlayerStatus(status: AVPlayer.TimeControlStatus) {
+        switch status {
+        case .paused:
+            pause()
+        default:
+            play()
+        }
+    }
+    
+    func configureCell(_ data: MusicVideo, status: AVPlayer.TimeControlStatus) {
         //cell재사용할때 bind
         bind()
         mvSubject.onNext(data)
-
+        
         guard let url = data.previewAssets?.first?.hlsURL else { return }
         let asset = AVURLAsset(url: url)
         
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             DisplayVideoFromAssets(asset: asset, view: musicVideoView)
-            play()
+            setPlayerStatus(status: status)
+//            pause()
+//            play()
         }
         
         musicLabel.text = data.title
         artistLabel.text = data.artistName
         genreLabel.text = data.genreNames.first
     }
+    
+    // MARK: - Configure
     
     override func configureHierarchy() {
         super.configureHierarchy()
@@ -135,38 +192,14 @@ final class ReelsCell: BaseCollectionViewCell {
         super.configureView()
     }
     
-    func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
-        startLoadingIndicator()
-        
-        let playerItem = AVPlayerItem(asset: asset)
-        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
-        player = AVPlayer(playerItem: playerItem).then {
-            $0.isMuted = true
-        }
-        
-        let playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
-        playerLayer.needsDisplayOnBoundsChange = true
-        playerLayer.frame = view.bounds
-        view.layer.masksToBounds = true
-        view.layer.addSublayer(playerLayer)
-
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-                                               object: player?.currentItem,
-                                               queue: .main) { [weak self] _ in
-            guard let self else { return }
-            player?.seek(to: .zero)
-            player?.play()
-        }
-    }
-    
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "status" {
             if let playerItem = object as? AVPlayerItem {
                 switch playerItem.status {
                 case .readyToPlay:
                     stopLoadingIndicator()
-                    player?.play()
+                    
+//                    player?.play()
                 case .failed, .unknown:
                     print("Failed to load the video")
                 @unknown default:
@@ -186,9 +219,9 @@ extension ReelsCell {
             guard let self else { return }
             indicatorView.startAnimating()
         }
-
+        
     }
-
+    
     func stopLoadingIndicator() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -270,7 +303,7 @@ extension ReelsCell {
 //        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
 //        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
 //        gradientLayer.locations = [0.0, 0.5, 1.0]
-//        
+//
 //        let animation = CABasicAnimation(keyPath: "locations")
 //        animation.fromValue = [0.0, 0.0, 0.25]
 //        animation.toValue = [0.75, 1.0, 1.0]

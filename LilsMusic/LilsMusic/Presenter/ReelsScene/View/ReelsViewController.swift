@@ -5,6 +5,7 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
+import AVKit
 import MusicKit
 import UIKit
 
@@ -18,6 +19,7 @@ final class ReelsViewController: BaseViewController {
     
     private let viewModel: ReelsViewModel
     private var dataSource: UICollectionViewDiffableDataSource<Section, MusicVideo>?
+    private let playStatusSubject = BehaviorSubject<AVPlayer.TimeControlStatus>(value: .paused)
     
     // MARK: - UI
     
@@ -37,6 +39,12 @@ final class ReelsViewController: BaseViewController {
         return cv
     }()
     
+    private let playIconView = UIImageView().then {
+        $0.image = UIImage(systemName: "play.circle")?.withConfiguration(UIImage.SymbolConfiguration(font: .systemFont(ofSize: 44)))
+        $0.contentMode = .scaleAspectFill
+        $0.tintColor = .white
+    }
+    
     // MARK: - Lifecycles
     
     init(viewModel: ReelsViewModel) {
@@ -47,45 +55,104 @@ final class ReelsViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureDataSource()
+        configureDataSource(status: .paused)
         updateSnapshot(mv: [])
+        playStatusSubject.onNext(.paused)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        collectionView.visibleCells.forEach { cell in
-            guard let reelsCell = cell as? ReelsCell else { return }
-            reelsCell.soundOn()
-        }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        collectionView.visibleCells.forEach { cell in
-            guard let reelsCell = cell as? ReelsCell else { return }
-            reelsCell.mute()
-        }
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        collectionView.visibleCells.forEach { cell in
+//            guard let reelsCell = cell as? ReelsCell else { return }
+//            reelsCell.mute()
+//            reelsCell.pause()
+//        }
+//    }
+//    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        collectionView.visibleCells.forEach { cell in
+//            guard let reelsCell = cell as? ReelsCell else { return }
+//            reelsCell.mute()
+//            reelsCell.pause()
+//        }
+//    }
     
     override func bind() {
         super.bind()
+        
         let input = ReelsViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in })
         let output = viewModel.transform(input)
         
         output.mvList.drive(with: self) { owner, mv in
             owner.updateSnapshot(mv: Array(mv))
         }.disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected.subscribe(with: self) { owner, indexPath in
+            guard let currentStatus = try? owner.playStatusSubject.value() else { return }
+            owner.updatePlayButton(status: currentStatus)
+            owner.setPlayerStatus(status: currentStatus)
+        }.disposed(by: disposeBag)
+        
+        playStatusSubject.subscribe(with: self) { owner, status in
+            guard let mv = try? owner.viewModel.mvSubject.value() else { return }
+            owner.configureDataSource(status: status)
+            owner.updateSnapshot(mv: Array(mv))
+            owner.updatePlayButton(status: status)
+        }.disposed(by: disposeBag)
+    }
+    
+    func setPlayerStatus(status: AVPlayer.TimeControlStatus) {
+        switch status {
+        case .paused:
+            playStatusSubject.onNext(.waitingToPlayAtSpecifiedRate)
+        default:
+            playStatusSubject.onNext(.paused)
+        }
+    }
+    
+    func updatePlayButton(status: AVPlayer.TimeControlStatus) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            switch status {
+            case .paused:
+                playIconView.isHidden = false
+            default:
+                playIconView.isHidden = true
+            }
+        }
+    }
+    
+    func pausePlayState() {
+        collectionView.visibleCells.forEach { cell in
+            guard let reelsCell = cell as? ReelsCell else { return }
+            reelsCell.mute()
+            reelsCell.pause()
+        }
+    }
+    
+    func playPlayState() {
+        collectionView.visibleCells.forEach { cell in
+            guard let reelsCell = cell as? ReelsCell else { return }
+            reelsCell.soundOn()
+            reelsCell.play()
+        }
     }
     
     // MARK: - Layout
     
     override func configureHierarchy() {
-        view.addSubview(collectionView)
+        view.addSubviews(collectionView, playIconView)
     }
     
     override func configureLayout() {
         collectionView.snp.makeConstraints { make in
             make.top.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        playIconView.snp.makeConstraints { make in
+            make.size.equalTo(100)
+            make.center.equalToSuperview()
         }
     }
     
@@ -95,6 +162,8 @@ final class ReelsViewController: BaseViewController {
     }
 }
 
+// MARK: - CollectionView Controller
+//
 extension ReelsViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -121,9 +190,9 @@ extension ReelsViewController {
         case main
     }
     
-    private func configureDataSource() {
+    private func configureDataSource(status: AVPlayer.TimeControlStatus) {
         let cellRegistration = UICollectionView.CellRegistration<ReelsCell, MusicVideo> { cell, indexPath, itemIdentifier in
-            cell.configureCell(itemIdentifier)
+            cell.configureCell(itemIdentifier, status: status)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
