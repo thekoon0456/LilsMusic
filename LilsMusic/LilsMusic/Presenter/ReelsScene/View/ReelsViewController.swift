@@ -60,23 +60,11 @@ final class ReelsViewController: BaseViewController {
         playStatusSubject.onNext(.paused)
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        collectionView.visibleCells.forEach { cell in
-//            guard let reelsCell = cell as? ReelsCell else { return }
-//            reelsCell.mute()
-//            reelsCell.pause()
-//        }
-//    }
-//    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        collectionView.visibleCells.forEach { cell in
-//            guard let reelsCell = cell as? ReelsCell else { return }
-//            reelsCell.mute()
-//            reelsCell.pause()
-//        }
-//    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        playStatusSubject.onNext(.paused)
+    }
     
     override func bind() {
         super.bind()
@@ -221,7 +209,6 @@ extension ReelsViewController {
         return layout
     }
 }
-
 
 
 
