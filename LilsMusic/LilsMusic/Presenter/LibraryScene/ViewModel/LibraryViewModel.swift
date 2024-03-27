@@ -295,7 +295,6 @@ extension LibraryViewModel {
     //플레이어 상태 추적, 업데이트
     func playerUpdateSink() {
         musicPlayer.getCurrentPlayer().queue.objectWillChange
-            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
             .sink { _  in
             Task { [weak self] in
                 guard let self,
@@ -310,7 +309,6 @@ extension LibraryViewModel {
     //음악 재생상태 추적, 업데이트
     func playerStateUpdateSink() {
         musicPlayer.getCurrentPlayer().state.objectWillChange
-            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
             .sink { [weak self] _ in
             guard let self else { return }
             let state = musicPlayer.getPlaybackState()
