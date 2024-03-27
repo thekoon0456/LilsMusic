@@ -27,43 +27,43 @@ final class FMMusicPlayer {
         player.queue.entries
     }
     
-    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) {
+    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         play()
     }
     
-    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) {
+    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         play()
     }
     
-    func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) {
+    func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         play()
     }
     
-    func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) {
+    func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         play()
     }
     
-    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) {
+    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         play()
     }
     
     //한곡 재생
-    func playSong(_ song: Song) {
+    func playSong(_ song: Song) async throws {
         player.queue = [song]
         play()
     }
     
-    func playTrack(_ track: Track) {
+    func playTrack(_ track: Track) async throws {
         player.queue = [track]
         play()
     }
@@ -74,7 +74,7 @@ final class FMMusicPlayer {
     
     // MARK: - Play
     
-    func play() {
+    func play() async throws {
         Task {
             do {
                 try await player.play()
