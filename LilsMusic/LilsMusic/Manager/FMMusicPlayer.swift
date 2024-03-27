@@ -13,6 +13,11 @@ final class FMMusicPlayer {
     // MARK: - Properties
     
     private let player = ApplicationMusicPlayer.shared
+    private let userDefaultsManager = UserDefaultsManager.shared
+    
+    init() {
+        setRepeatMode(mode: userDefaultsManager.userSetting.repeatMode)
+    }
     
     // MARK: - Lifecycles
     
