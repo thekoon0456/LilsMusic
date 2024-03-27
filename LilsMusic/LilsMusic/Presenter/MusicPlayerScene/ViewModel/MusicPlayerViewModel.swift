@@ -215,6 +215,7 @@ extension MusicPlayerViewModel {
     func playerUpdateSink() {
         musicPlayer.getCurrentPlayer().queue.objectWillChange
             .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
+            .dropFirst() //처음 뷰 진입시 트랙 가지고옴
             .sink { _ in
             Task { [weak self] in
                 guard let self,
