@@ -54,26 +54,27 @@ final class MusicPlayerViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        let track = musicPlayer
+        musicPlayer
             .currentEntrySubject
             .withUnretained(self)
             .flatMap { owner, entry in
-                owner.fetchCurrentEntryObservable(entry: entry)
-            }.asDriver(onErrorJustReturn: nil)
+                owner.fetchCurrentEntryTrackObservable(entry: entry)
+            }
+            .subscribe(with: self) { owner, track in
+                owner.trackSubject.onNext(track)
+            }.disposed(by: disposeBag)
         
         input.viewWillAppear
             .map { [weak self] _ in
                 guard let self else { return false }
                 return checkHeart()
             }
-            .withUnretained(self)
-            .subscribe{ owner, bool in
+            .subscribe(with: self){ owner, bool in
                 owner.heartSubject.onNext(bool)
             }.disposed(by: disposeBag)
         
         input.chevronButtonTapped
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 DispatchQueue.main.async {
                     owner.coordinator?.dismissViewController()
                     owner.tapImpact()
@@ -81,8 +82,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.playButtonTapped
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
                     owner.musicPlayer.pause()
@@ -95,8 +95,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.previousButtonTapped
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 Task {
                         try await owner.musicPlayer.skipToPrevious()
                     }
@@ -104,8 +103,7 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.nextButtonTapped
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 //큐에 한곡만 남았을때는 넘기지 않음.
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
@@ -116,7 +114,6 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
             .map { [weak self]  _ -> RepeatMode in
                 guard let self else { return .off }
                 setting.userSetting.repeatMode.toggle()
@@ -126,11 +123,10 @@ final class MusicPlayerViewModel: ViewModel {
             }
             .withUnretained(self)
             .flatMap { owner, mode in
-                return owner.setRepeatButtonObservable(mode: mode)
+                owner.setRepeatButtonObservable(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
         let shuffleMode = input.shuffleButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
             .map { [weak self]  _ -> ShuffleMode in
                 guard let self else { return .off }
                 setting.userSetting.shuffleMode.toggle()
@@ -146,7 +142,6 @@ final class MusicPlayerViewModel: ViewModel {
         input
             .heartButtonTapped
             .map {!$0 }
-            .observe(on:MainScheduler.asyncInstance)
             .do { [weak self] bool in
                 guard let self,
                       let item = userLikeRepository.fetchArr().first,
@@ -163,24 +158,15 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.viewWillDisappear
-            .withUnretained(self)
-            .subscribe{ owner, _ in
+            .subscribe(with: self) { owner, _ in
                 owner.coordinator?.finish()
             }.disposed(by: disposeBag)
         
-        return Output(updateEntry: track,
+        return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
                       isHeart: heartSubject.asDriver(onErrorJustReturn: false))
-    }
-    
-    func setTrackObservable(track: Track) -> Observable<Track> {
-        return Observable.create { observer in
-            observer.onNext(track)
-            observer.onCompleted()
-            return Disposables.create()
-        }
     }
     
     func setRepeatButtonObservable(mode: RepeatMode) -> Observable<RepeatMode> {
@@ -206,7 +192,7 @@ final class MusicPlayerViewModel: ViewModel {
         return item.likeID.contains { $0 == id }
     }
     
-    func fetchCurrentEntryObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+    func fetchCurrentEntryTrackObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
@@ -223,36 +209,3 @@ final class MusicPlayerViewModel: ViewModel {
         }
     }
 }
-
-//extension MusicPlayerViewModel {
-    //플레이어 상태 추적, 업데이트
-//    func playerUpdateSink() {
-//        musicPlayer.getCurrentPlayer().queue.objectWillChange
-//            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
-//            .dropFirst() //처음 뷰 진입시 트랙 가지고옴
-//            .sink { _ in
-//                Task { [weak self] in
-//                    guard let self,
-//                          let entry = try await musicPlayer.getCurrentEntry(),
-//                          let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-//                    let track = Track.song(song)
-//                    trackSubject.onNext(track)
-//                    DispatchQueue.main.async { [weak self] in
-//                        guard let self else { return }
-//                        let bool = checkHeart()
-//                        heartSubject.onNext(bool)
-//                    }
-//                }
-//            }.store(in: &cancellables)
-//    }
-    
-    //    //음악 재생상태 추적, 업데이트
-    //    func playerStateUpdateSink() {
-    //        musicPlayer.getCurrentPlayer().state.objectWillChange
-    //            .sink { [weak self] _ in
-    //            guard let self else { return }
-    //            let state = musicPlayer.getPlaybackState()
-    //            playStateSubject.onNext(state)
-    //        }.store(in: &cancellables)
-    //    }
-//}

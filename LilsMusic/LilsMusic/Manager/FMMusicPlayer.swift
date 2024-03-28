@@ -200,10 +200,11 @@ final class FMMusicPlayer {
     
     func setCurrentEntrySubject() {
         player.queue.objectWillChange
-            .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .sink { [weak self] _  in
                 guard let self else { return }
                 let entry = player.queue.currentEntry
+                print(entry?.item)
                 currentEntrySubject.onNext(entry)
         }.store(in: &cancellable)
     }
@@ -211,7 +212,7 @@ final class FMMusicPlayer {
     //음악 재생상태 추적, 업데이트
     func setPlayStateSubject() {
         player.state.objectWillChange
-            .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .sink { [weak self] _ in
             guard let self else { return }
             let state = player.state.playbackStatus

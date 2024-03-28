@@ -8,7 +8,6 @@
 import UIKit
 
 protocol CoordinatorDelegate: AnyObject {
-    
     func didFinish(childCoordinator: Coordinator)
 }
 

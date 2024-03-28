@@ -103,6 +103,15 @@ final class LibraryViewController: BaseViewController {
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
+        
+        let previousButtonTapped = miniPlayerView.previousButton.rx.tap
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asObservable()
+        
+        let nextButtonTapped = miniPlayerView.nextButton.rx.tap
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asObservable()
+        
         let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
@@ -112,8 +121,8 @@ final class LibraryViewController: BaseViewController {
                                            mixSelected: mixSelected,
                                            miniPlayerTapped: miniPlayerView.tap,
                                            miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
-                                           miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
-                                           miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
+                                           miniPlayerPreviousButtonTapped: previousButtonTapped,
+                                           miniPlayerNextButtonTapped: nextButtonTapped)
         let output = viewModel.transform(input)
         
         output.mix

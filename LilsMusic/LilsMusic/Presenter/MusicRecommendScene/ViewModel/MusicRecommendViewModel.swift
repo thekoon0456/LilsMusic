@@ -58,7 +58,7 @@ final class MusicRecommendViewModel: ViewModel {
             .currentEntrySubject
             .withUnretained(self)
             .flatMapLatest { owner, entry in
-                owner.fetchCurrentEntryObservable(entry: entry)
+                owner.fetchCurrentEntryTrackObservable(entry: entry)
             }
         
         let playState = musicPlayer
@@ -138,8 +138,7 @@ final class MusicRecommendViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerPlayButtonTapped
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
                     owner.musicPlayer.pause()
@@ -151,18 +150,14 @@ final class MusicRecommendViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 Task {
                         try await owner.musicPlayer.skipToPrevious()
                 }
             }.disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
                         try await owner.musicPlayer.skipToNext()
@@ -285,7 +280,7 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchCurrentEntryObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+    func fetchCurrentEntryTrackObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
