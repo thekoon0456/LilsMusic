@@ -46,18 +46,28 @@ final class MusicRecommendViewModel: ViewModel {
     private let albumsRepository = UserRepository<UserAlbumList>()
     let disposeBag = DisposeBag()
     private var cancellable = Set<AnyCancellable>()
-    private let trackSubject = BehaviorSubject<Track?>(value: nil)
-    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
+//    private let trackSubject = BehaviorSubject<Track?>(value: nil)
+//    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
     init(coordinator: MusicRecommendCoordinator?) {
         self.coordinator = coordinator
-        playerUpdateSink()
-        playerStateUpdateSink()
+//        playerUpdateSink()
+//        playerStateUpdateSink()
     }
     
     func transform(_ input: Input) -> Output {
+        
+        let currentEntry = musicPlayer
+            .currentEntrySubject
+            .withUnretained(self)
+            .flatMap { owner, entry in
+                owner.fetchCurrentEntry(entry: entry)
+            }
+        
+        let state = musicPlayer
+            .currentPlayStateSubject
         
         //realm 없으면 처음에 한번 생성
         input
@@ -164,12 +174,12 @@ final class MusicRecommendViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         return Output(searchResult: searchResult.asDriver(onErrorJustReturn: []),
-                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
+                      currentPlaySong: currentEntry.asDriver(onErrorJustReturn: nil),
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
                       recommendMixList: mix,
-                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
+                      playState: state.asDriver(onErrorJustReturn: .playing))
     }
     
     
@@ -193,7 +203,7 @@ final class MusicRecommendViewModel: ViewModel {
             Task { [weak self] in
                 do {
                     guard let self,
-                          let entry = try await musicPlayer.getCurrentEntry(),
+                          let entry = musicPlayer.getCurrentEntry(),
                           let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
@@ -278,32 +288,21 @@ final class MusicRecommendViewModel: ViewModel {
             return Disposables.create()
         }
     }
-}
-
-// MARK: - 플레이어 상태 추적, 업데이트
-
-extension MusicRecommendViewModel {
     
-    func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange
-            .sink { _  in
+    func fetchCurrentEntry(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+        return Observable.create { observer in
             Task { [weak self] in
-                guard let self,
-                      let entry = try await musicPlayer.getCurrentEntry(),
-                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-                let track = Track.song(song)
-                trackSubject.onNext(track)
+                guard let self else { return }
+                do {
+                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    let track = Track.song(song)
+                    observer.onNext(track)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        }.store(in: &cancellable)
-    }
-    
-    //음악 재생상태 추적, 업데이트
-    func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange
-            .sink { [weak self] _ in
-            guard let self else { return }
-            let state = musicPlayer.getPlaybackState()
-            playStateSubject.onNext(state)
-        }.store(in: &cancellable)
+            return Disposables.create()
+        }
     }
 }

@@ -5,8 +5,11 @@
 //  Created by Deokhun KIM on 3/8/24.
 //
 
+import Combine
 import Foundation
 import MusicKit
+
+import RxSwift
 
 final class FMMusicPlayer {
     
@@ -16,14 +19,19 @@ final class FMMusicPlayer {
     private let player = ApplicationMusicPlayer.shared
     private let userDefaultsManager = UserDefaultsManager.shared
     
+    let currentEntrySubject = BehaviorSubject<MusicPlayer.Queue.Entry?>(value: nil)
+    lazy var currentPlayStateSubject = BehaviorSubject<MusicPlayer.PlaybackStatus>(value: getPlaybackState())
+    private var cancellable = Set<AnyCancellable>()
+    
     private init() {
+        setCurrentEntrySubject()
+        setPlayStateSubject()
         setRepeatMode(mode: userDefaultsManager.userSetting.repeatMode)
     }
     
     // MARK: - Lifecycles
     
-    func getCurrentEntry() async throws -> ApplicationMusicPlayer.Queue.Entry? {
-        try await Task.sleep(nanoseconds: 200_000_000)
+    func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
         return player.queue.currentEntry
     }
     
@@ -151,20 +159,6 @@ final class FMMusicPlayer {
     //현재 재생 여부
     func setPaused() {
         player.pause()
-//        switch state {
-//        case .stopped:
-//            <#code#>
-//        case .playing:
-//            <#code#>
-//        case .paused:
-//            <#code#>
-//        case .interrupted:
-//            <#code#>
-//        case .seekingForward:
-//            <#code#>
-//        case .seekingBackward:
-//            <#code#>
-//        }
     }
     
     //현재 재생 여부
@@ -181,6 +175,27 @@ final class FMMusicPlayer {
     
     func getCurrentPlayer() -> ApplicationMusicPlayer {
         player
+    }
+    
+    func setCurrentEntrySubject() {
+        player.queue.objectWillChange
+            .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+            .sink { [weak self] _  in
+                guard let self else { return }
+                let entry = player.queue.currentEntry
+                currentEntrySubject.onNext(entry)
+        }.store(in: &cancellable)
+    }
+    
+    //음악 재생상태 추적, 업데이트
+    func setPlayStateSubject() {
+        player.state.objectWillChange
+            .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+            guard let self else { return }
+            let state = getPlaybackState()
+            currentPlayStateSubject.onNext(state)
+        }.store(in: &cancellable)
     }
 }
 

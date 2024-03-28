@@ -44,23 +44,23 @@ final class MusicPlayerViewModel: ViewModel {
     private let setting = UserDefaultsManager.shared
     let disposeBag = DisposeBag()
     private var cancellables = Set<AnyCancellable>()
-    //사용자가 선택한 track
-    private let trackSubject = BehaviorSubject<Track?>(value: nil)
-    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     private let heartSubject = BehaviorSubject<Bool>(value: false)
-    
+    private let trackSubject = BehaviorSubject<Track?>(value: nil)
     // MARK: - Lifecycles
     
     init(coordinator: MusicPlayerCoordinator?, track: Track) {
         self.coordinator = coordinator
-        //선택한 track 넣어서 뷰로
-        trackSubject.onNext(track)
-        //음악플레이어 상태 추적(API기본제공 컴바인)
-        playerUpdateSink()
-        playerStateUpdateSink()
     }
     
     func transform(_ input: Input) -> Output {
+        let track = musicPlayer
+            .currentEntrySubject
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .flatMap { owner, entry in
+                owner.fetchCurrentEntry(entry: entry)
+            }
+        
         input.viewWillAppear
             .map { [weak self] _ in
                 guard let self else { return false }
@@ -171,8 +171,8 @@ final class MusicPlayerViewModel: ViewModel {
                 owner.coordinator?.finish()
             }.disposed(by: disposeBag)
         
-        return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playStateSubject.asDriver(onErrorJustReturn: musicPlayer.getPlaybackState()),
+        return Output(updateEntry: track.asDriver(onErrorJustReturn: nil),
+                      playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
                       isHeart: heartSubject.asDriver(onErrorJustReturn: false))
@@ -208,37 +208,55 @@ final class MusicPlayerViewModel: ViewModel {
         else { return false }
         return item.likeID.contains { $0 == id }
     }
-}
- 
-extension MusicPlayerViewModel {
-    //플레이어 상태 추적, 업데이트
-    func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange
-            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
-            .dropFirst() //처음 뷰 진입시 트랙 가지고옴
-            .sink { _ in
+    
+    func fetchCurrentEntry(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+        return Observable.create { observer in
             Task { [weak self] in
-                guard let self,
-                      let entry = try await musicPlayer.getCurrentEntry(),
-                      let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-                let track = Track.song(song)
-                trackSubject.onNext(track)
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    let bool = checkHeart()
-                    heartSubject.onNext(bool)
+                guard let self else { return }
+                do {
+                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    let track = Track.song(song)
+                    trackSubject.onNext(track)
+                    observer.onNext(track)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
                 }
             }
-        }.store(in: &cancellables)
-    }
-    
-    //음악 재생상태 추적, 업데이트
-    func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange
-            .sink { [weak self] _ in
-            guard let self else { return }
-            let state = musicPlayer.getPlaybackState()
-            playStateSubject.onNext(state)
-        }.store(in: &cancellables)
+            return Disposables.create()
+        }
     }
 }
+
+//extension MusicPlayerViewModel {
+    //플레이어 상태 추적, 업데이트
+//    func playerUpdateSink() {
+//        musicPlayer.getCurrentPlayer().queue.objectWillChange
+//            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
+//            .dropFirst() //처음 뷰 진입시 트랙 가지고옴
+//            .sink { _ in
+//                Task { [weak self] in
+//                    guard let self,
+//                          let entry = try await musicPlayer.getCurrentEntry(),
+//                          let song = try await musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
+//                    let track = Track.song(song)
+//                    trackSubject.onNext(track)
+//                    DispatchQueue.main.async { [weak self] in
+//                        guard let self else { return }
+//                        let bool = checkHeart()
+//                        heartSubject.onNext(bool)
+//                    }
+//                }
+//            }.store(in: &cancellables)
+//    }
+    
+    //    //음악 재생상태 추적, 업데이트
+    //    func playerStateUpdateSink() {
+    //        musicPlayer.getCurrentPlayer().state.objectWillChange
+    //            .sink { [weak self] _ in
+    //            guard let self else { return }
+    //            let state = musicPlayer.getPlaybackState()
+    //            playStateSubject.onNext(state)
+    //        }.store(in: &cancellables)
+    //    }
+//}
