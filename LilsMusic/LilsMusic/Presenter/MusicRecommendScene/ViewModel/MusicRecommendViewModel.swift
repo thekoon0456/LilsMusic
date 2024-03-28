@@ -45,9 +45,6 @@ final class MusicRecommendViewModel: ViewModel {
     private let likesRepository = UserRepository<UserLikeList>()
     private let albumsRepository = UserRepository<UserAlbumList>()
     let disposeBag = DisposeBag()
-    private var cancellable = Set<AnyCancellable>()
-//    private let trackSubject = BehaviorSubject<Track?>(value: nil)
-//    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
@@ -90,9 +87,11 @@ final class MusicRecommendViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, track in
                 Task {
-                    try await owner.musicPlayer.playTrack(track)
+                        try await owner.musicPlayer.playTrack(track)
+                    }
+                DispatchQueue.main.async {
+                    owner.coordinator?.presentMusicPlayer(track: track)
                 }
-                owner.coordinator?.presentMusicPlayer(track: track)
             }.disposed(by: disposeBag)
         
         let searchResult = input.searchText
@@ -146,10 +145,10 @@ final class MusicRecommendViewModel: ViewModel {
             .subscribe { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
-                    owner.musicPlayer.setPaused()
+                    owner.musicPlayer.pause()
                 } else {
                     Task {
-                        try await owner.musicPlayer.setPlaying()
+                        try await owner.musicPlayer.play()
                     }
                 }
             }.disposed(by: disposeBag)
@@ -159,7 +158,7 @@ final class MusicRecommendViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
-                    try await owner.musicPlayer.skipToPrevious()
+                        try await owner.musicPlayer.skipToPrevious()
                 }
             }.disposed(by: disposeBag)
         
@@ -169,7 +168,7 @@ final class MusicRecommendViewModel: ViewModel {
             .subscribe { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
-                    try await owner.musicPlayer.skipToNext()
+                        try await owner.musicPlayer.skipToNext()
                 }
             }.disposed(by: disposeBag)
         

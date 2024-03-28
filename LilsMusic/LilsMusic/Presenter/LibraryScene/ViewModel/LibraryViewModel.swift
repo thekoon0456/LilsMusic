@@ -134,10 +134,10 @@ final class LibraryViewModel: ViewModel {
             .subscribe { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
-                    owner.musicPlayer.setPaused()
+                    owner.musicPlayer.pause()
                 } else {
                     Task {
-                        try await owner.musicPlayer.setPlaying()
+                        try await owner.musicPlayer.play()
                     }
                 }
             }.disposed(by: disposeBag)

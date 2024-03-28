@@ -18,8 +18,8 @@ final class MusicPlayerViewModel: ViewModel {
         let chevronButtonTapped: ControlEvent<Void>
         let viewWillAppear: Observable<Void>
         let playButtonTapped: Observable<Void>
-        let previousButtonTapped: ControlEvent<Void>
-        let nextButtonTapped: ControlEvent<Void>
+        let previousButtonTapped: Observable<Void>
+        let nextButtonTapped: Observable<Void>
         let repeatButtonTapped: Observable<Void>
         let shuffleButtonTapped: Observable<Void>
         let heartButtonTapped: Observable<Bool>
@@ -50,16 +50,16 @@ final class MusicPlayerViewModel: ViewModel {
     
     init(coordinator: MusicPlayerCoordinator?, track: Track) {
         self.coordinator = coordinator
+        self.trackSubject.onNext(track)
     }
     
     func transform(_ input: Input) -> Output {
         let track = musicPlayer
             .currentEntrySubject
             .withUnretained(self)
-            .observe(on: MainScheduler.instance)
             .flatMap { owner, entry in
                 owner.fetchCurrentEntry(entry: entry)
-            }
+            }.asDriver(onErrorJustReturn: nil)
         
         input.viewWillAppear
             .map { [weak self] _ in
@@ -72,42 +72,38 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.chevronButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
-                owner.coordinator?.dismissViewController()
-                owner.tapImpact()
+                DispatchQueue.main.async {
+                    owner.coordinator?.dismissViewController()
+                    owner.tapImpact()
+                }
             }.disposed(by: disposeBag)
         
         input.playButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
-                    owner.musicPlayer.setPaused()
+                    owner.musicPlayer.pause()
                 } else {
                     Task {
-                        try await owner.musicPlayer.setPlaying()
+                        try await owner.musicPlayer.play()
                     }
                 }
                 owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.previousButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
-                    try await owner.musicPlayer.skipToPrevious()
-                }
+                        try await owner.musicPlayer.skipToPrevious()
+                    }
                 owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.nextButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 //큐에 한곡만 남았을때는 넘기지 않음.
@@ -171,7 +167,7 @@ final class MusicPlayerViewModel: ViewModel {
                 owner.coordinator?.finish()
             }.disposed(by: disposeBag)
         
-        return Output(updateEntry: track.asDriver(onErrorJustReturn: nil),
+        return Output(updateEntry: track,
                       playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
@@ -216,7 +212,6 @@ final class MusicPlayerViewModel: ViewModel {
                 do {
                     guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
                     let track = Track.song(song)
-                    trackSubject.onNext(track)
                     observer.onNext(track)
                     observer.onCompleted()
                 } catch {

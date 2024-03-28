@@ -177,6 +177,14 @@ final class MusicPlayerViewController: BaseViewController {
             .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
         
+        let previousButtonTapped = previousButton.rx.tap
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asObservable()
+        
+        let nextButtonTapped = nextButton.rx.tap
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asObservable()
+        
         let repeatButtonTapped = repeatButton.rx.tap
             .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
@@ -199,8 +207,8 @@ final class MusicPlayerViewController: BaseViewController {
         let input = MusicPlayerViewModel.Input(chevronButtonTapped: chevronButton.rx.tap,
                                                viewWillAppear: self.rx.viewWillAppear.map { _ in },
                                                playButtonTapped: playButtonTapped,
-                                               previousButtonTapped: previousButton.rx.tap,
-                                               nextButtonTapped: nextButton.rx.tap,
+                                               previousButtonTapped: previousButtonTapped,
+                                               nextButtonTapped: nextButtonTapped,
                                                repeatButtonTapped: repeatButtonTapped,
                                                shuffleButtonTapped: shuffleButtonTapped,
                                                heartButtonTapped: heartButtonTapped,

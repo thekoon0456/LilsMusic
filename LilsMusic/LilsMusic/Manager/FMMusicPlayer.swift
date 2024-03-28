@@ -120,6 +120,8 @@ final class FMMusicPlayer {
         try await player.skipToPreviousEntry()
     }
     
+    // MARK: - Mode
+    
     func setRepeatMode(mode: RepeatMode) {
         switch mode {
         case .all:
@@ -155,18 +157,6 @@ final class FMMusicPlayer {
     func getPlaybackState() -> ApplicationMusicPlayer.PlaybackStatus {
           player.state.playbackStatus
     }
-    
-    //현재 재생 여부
-    func setPaused() {
-        player.pause()
-    }
-    
-    //현재 재생 여부
-    func setPlaying() async throws {
-        Task {
-            try await player.play()
-        }
-    }
      
     //재생준비 상태
     func isPreparedToPlay() -> Bool {
@@ -176,6 +166,8 @@ final class FMMusicPlayer {
     func getCurrentPlayer() -> ApplicationMusicPlayer {
         player
     }
+    
+    // MARK: - Status
     
     func setCurrentEntrySubject() {
         player.queue.objectWillChange
