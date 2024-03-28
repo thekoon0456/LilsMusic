@@ -15,13 +15,13 @@ final class FMMusicPlayer {
     
     // MARK: - Properties
     static let shared = FMMusicPlayer()
-    
     private let player = ApplicationMusicPlayer.shared
     private let userDefaultsManager = UserDefaultsManager.shared
-    
     let currentEntrySubject = BehaviorSubject<MusicPlayer.Queue.Entry?>(value: nil)
     lazy var currentPlayStateSubject = BehaviorSubject<MusicPlayer.PlaybackStatus>(value: getPlaybackState())
     private var cancellable = Set<AnyCancellable>()
+    
+    // MARK: - Lifecycles
     
     private init() {
         setCurrentEntrySubject()
@@ -29,65 +29,9 @@ final class FMMusicPlayer {
         setRepeatMode(mode: userDefaultsManager.userSetting.repeatMode)
     }
     
-    // MARK: - Lifecycles
-    
-    func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
-        return player.queue.currentEntry
-    }
-    
-    // MARK: - Set Queue
-    
-    func getQueue() -> ApplicationMusicPlayer.Queue.Entries {
-        player.queue.entries
-    }
-    
-    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
-    }
-    
-    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
-    }
-    
-    func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
-    }
-    
-    func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
-    }
-    
-    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
-    }
-    
-    //한곡 재생
-    func playSong(_ song: Song) async throws {
-        player.queue = [song]
-        try await play()
-    }
-    
-    func playTrack(_ track: Track) async throws {
-        player.queue = [track]
-        try await play()
-    }
-    
-    func resetQueue() {
-        player.queue = []
-    }
-    
     // MARK: - Play
     
+    @MainActor
     func play() async throws {
         Task {
             do {
@@ -100,64 +44,149 @@ final class FMMusicPlayer {
         }
     }
     
-    func pause() {
-        player.pause()
-    }
-    
-    func stop() {
-        player.stop()
-    }
-    
-    func restart() {
-        player.restartCurrentEntry()
-    }
-    
+    @MainActor
     func skipToNext() async throws {
         try await player.skipToNextEntry()
     }
     
+    @MainActor
     func skipToPrevious() async throws  {
         try await player.skipToPreviousEntry()
+    }
+    
+    func pause() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            player.pause()
+        }
+    }
+    
+    func stop() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            player.stop()
+        }
+    }
+    
+    func restart() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            player.restartCurrentEntry()
+        }
+    }
+    
+    func getCurrentEntry() -> ApplicationMusicPlayer.Queue.Entry? {
+        return player.queue.currentEntry
+    }
+    
+    // MARK: - Set Queue
+    
+    func getQueue() -> ApplicationMusicPlayer.Queue.Entries {
+        player.queue.entries
+    }
+    
+    @MainActor
+    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    @MainActor
+    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    @MainActor
+    func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    @MainActor
+    func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    @MainActor
+    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
+        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+        player.queue = queue
+        try await play()
+    }
+    
+    @MainActor
+    func playSong(_ song: Song) async throws {
+        player.queue = [song]
+        try await play()
+    }
+    
+    @MainActor
+    func playTrack(_ track: Track) async throws {
+        player.queue = [track]
+        try await play()
+    }
+    
+    func resetQueue() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            player.queue = []
+        }
     }
     
     // MARK: - Mode
     
     func setRepeatMode(mode: RepeatMode) {
-        switch mode {
-        case .all:
-            player.state.repeatMode = .all
-        case .one:
-            player.state.repeatMode = .one
-        case .off:
-            player.state.repeatMode = .none
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            switch mode {
+            case .all:
+                player.state.repeatMode = .all
+            case .one:
+                player.state.repeatMode = .one
+            case .off:
+                player.state.repeatMode = .none
+            }
         }
     }
     
     func setShuffleMode(mode: ShuffleMode) {
-        switch mode {
-        case .on:
-            player.state.shuffleMode = .songs
-        case .off:
-            player.state.shuffleMode = .off
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            switch mode {
+            case .on:
+                player.state.shuffleMode = .songs
+            case .off:
+                player.state.shuffleMode = .off
+            }
         }
     }
 
     // MARK: - Player Status
+    
+    //현재 재생 여부
+    func getPlaybackState() -> ApplicationMusicPlayer.PlaybackStatus {
+          player.state.playbackStatus
+    }
     
     //현재 플레이타임
     func getPlayBackTime() -> TimeInterval {
         player.playbackTime
     }
     
+    @MainActor
     func setPlayBackTime(value: Double) {
-        player.playbackTime = TimeInterval(floatLiteral: value)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            player.playbackTime = TimeInterval(floatLiteral: value)
+        }
     }
     
-    //현재 재생 여부
-    func getPlaybackState() -> ApplicationMusicPlayer.PlaybackStatus {
-          player.state.playbackStatus
-    }
-     
     //재생준비 상태
     func isPreparedToPlay() -> Bool {
         player.isPreparedToPlay
@@ -185,7 +214,7 @@ final class FMMusicPlayer {
             .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
             .sink { [weak self] _ in
             guard let self else { return }
-            let state = getPlaybackState()
+            let state = player.state.playbackStatus
             currentPlayStateSubject.onNext(state)
         }.store(in: &cancellable)
     }

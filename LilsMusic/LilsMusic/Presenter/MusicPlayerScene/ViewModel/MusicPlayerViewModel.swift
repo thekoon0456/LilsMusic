@@ -58,7 +58,7 @@ final class MusicPlayerViewModel: ViewModel {
             .currentEntrySubject
             .withUnretained(self)
             .flatMap { owner, entry in
-                owner.fetchCurrentEntry(entry: entry)
+                owner.fetchCurrentEntryObservable(entry: entry)
             }.asDriver(onErrorJustReturn: nil)
         
         input.viewWillAppear
@@ -109,8 +109,9 @@ final class MusicPlayerViewModel: ViewModel {
                 //큐에 한곡만 남았을때는 넘기지 않음.
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
-                    try await owner.musicPlayer.skipToNext()
+                    try await owner.musicPlayer.skipToPrevious()
                 }
+
                 owner.tapImpact()
             }.disposed(by: disposeBag)
         
@@ -125,7 +126,7 @@ final class MusicPlayerViewModel: ViewModel {
             }
             .withUnretained(self)
             .flatMap { owner, mode in
-                return owner.setRepeatButton(mode: mode)
+                return owner.setRepeatButtonObservable(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
         let shuffleMode = input.shuffleButtonTapped
@@ -139,7 +140,7 @@ final class MusicPlayerViewModel: ViewModel {
             }
             .withUnretained(self)
             .flatMap { owner, mode in
-                return owner.setShuffleButton(mode: mode)
+                return owner.setShuffleButtonObservable(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
         input
@@ -174,7 +175,7 @@ final class MusicPlayerViewModel: ViewModel {
                       isHeart: heartSubject.asDriver(onErrorJustReturn: false))
     }
     
-    func setTrack(track: Track) -> Observable<Track> {
+    func setTrackObservable(track: Track) -> Observable<Track> {
         return Observable.create { observer in
             observer.onNext(track)
             observer.onCompleted()
@@ -182,7 +183,7 @@ final class MusicPlayerViewModel: ViewModel {
         }
     }
     
-    func setRepeatButton(mode: RepeatMode) -> Observable<RepeatMode> {
+    func setRepeatButtonObservable(mode: RepeatMode) -> Observable<RepeatMode> {
         return Observable.create { observer in
             observer.onNext(mode)
             observer.onCompleted()
@@ -190,7 +191,7 @@ final class MusicPlayerViewModel: ViewModel {
         }
     }
     
-    func setShuffleButton(mode: ShuffleMode) -> Observable<ShuffleMode> {
+    func setShuffleButtonObservable(mode: ShuffleMode) -> Observable<ShuffleMode> {
         return Observable.create { observer in
             observer.onNext(mode)
             observer.onCompleted()
@@ -205,7 +206,7 @@ final class MusicPlayerViewModel: ViewModel {
         return item.likeID.contains { $0 == id }
     }
     
-    func fetchCurrentEntry(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+    func fetchCurrentEntryObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
