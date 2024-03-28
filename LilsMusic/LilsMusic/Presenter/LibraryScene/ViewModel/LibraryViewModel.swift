@@ -40,7 +40,7 @@ final class LibraryViewModel: ViewModel {
     
     weak var coordinator: LibraryCoordinator?
     let disposeBag = DisposeBag()
-    private let musicPlayer = FMMusicPlayer()
+    private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
     private let playlistRepository = UserRepository<UserPlaylist>()
     private let artistRepository = UserRepository<UserArtistList>()

@@ -11,11 +11,12 @@ import MusicKit
 final class FMMusicPlayer {
     
     // MARK: - Properties
+    static let shared = FMMusicPlayer()
     
     private let player = ApplicationMusicPlayer.shared
     private let userDefaultsManager = UserDefaultsManager.shared
     
-    init() {
+    private init() {
         setRepeatMode(mode: userDefaultsManager.userSetting.repeatMode)
     }
     

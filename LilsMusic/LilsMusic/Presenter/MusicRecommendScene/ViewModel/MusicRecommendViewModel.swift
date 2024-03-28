@@ -39,7 +39,7 @@ final class MusicRecommendViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicRecommendCoordinator?
-    private let musicPlayer = FMMusicPlayer()
+    private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
     private let artistRepository = UserRepository<UserArtistList>()
     private let likesRepository = UserRepository<UserLikeList>()
