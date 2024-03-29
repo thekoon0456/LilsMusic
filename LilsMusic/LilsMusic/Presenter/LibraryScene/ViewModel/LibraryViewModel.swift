@@ -149,7 +149,7 @@ final class LibraryViewModel: ViewModel {
         input.miniPlayerPreviousButtonTapped
             .subscribe(with: self) { owner, _ in
                 Task {
-                        try await owner.musicPlayer.skipToPrevious()
+                    try await owner.musicPlayer.skipToPrevious()
                 }
             }.disposed(by: disposeBag)
         
@@ -157,7 +157,7 @@ final class LibraryViewModel: ViewModel {
             .subscribe(with: self) { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
-                        try await owner.musicPlayer.skipToNext()
+                    try await owner.musicPlayer.skipToNext()
                 }
             }.disposed(by: disposeBag)
         
@@ -305,30 +305,5 @@ final class LibraryViewModel: ViewModel {
             }
             return Disposables.create()
         }
-    }}
-//
-//extension LibraryViewModel {
-//    //플레이어 상태 추적, 업데이트
-//    func playerUpdateSink() {
-//        musicPlayer.getCurrentPlayer().queue.objectWillChange
-//            .sink { _  in
-//            Task { [weak self] in
-//                guard let self,
-//                      let entry = try await musicPlayer.getCurrentEntry(),
-//                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-//                let track = Track.song(song)
-//                trackSubject.onNext(track)
-//            }
-//        }.store(in: &cancellables)
-//    }
-//    
-//    //음악 재생상태 추적, 업데이트
-//    func playerStateUpdateSink() {
-//        musicPlayer.getCurrentPlayer().state.objectWillChange
-//            .sink { [weak self] _ in
-//            guard let self else { return }
-//            let state = musicPlayer.getPlaybackState()
-//            playStateSubject.onNext(state)
-//        }.store(in: &cancellables)
-//    }
-//}
+    }
+}

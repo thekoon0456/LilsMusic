@@ -54,15 +54,17 @@ final class MusicPlayerViewModel: ViewModel {
     }
     
     func transform(_ input: Input) -> Output {
-        musicPlayer
-            .currentEntrySubject
-            .withUnretained(self)
-            .flatMap { owner, entry in
-                owner.fetchCurrentEntryTrackObservable(entry: entry)
-            }
-            .subscribe(with: self) { owner, track in
-                owner.trackSubject.onNext(track)
-            }.disposed(by: disposeBag)
+//        musicPlayer
+//            .currentEntrySubject
+//            .withUnretained(self)
+//            .flatMap { owner, entry in
+//                owner.fetchCurrentEntryTrackObservable(entry: entry)
+//            }
+//            .subscribe(with: self) { owner, track in
+//                owner.trackSubject.onNext(track)
+//            }.disposed(by: disposeBag)
+        
+        let track = musicPlayer.trackSubject.asDriver(onErrorJustReturn: nil)
         
         input.viewWillAppear
             .map { [weak self] _ in
@@ -162,7 +164,7 @@ final class MusicPlayerViewModel: ViewModel {
                 owner.coordinator?.finish()
             }.disposed(by: disposeBag)
         
-        return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
+        return Output(updateEntry: track,
                       playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing),
                       repeatMode: repeatMode,
                       shuffleMode: shuffleMode,
