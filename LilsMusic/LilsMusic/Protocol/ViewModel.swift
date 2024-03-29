@@ -21,8 +21,10 @@ protocol ViewModel: AnyObject {
 extension ViewModel {
     
     func tapImpact() {
-        let feedbackGenerator = UIImpactFeedbackGenerator(style: .soft)
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
+        DispatchQueue.main.async {
+            let feedbackGenerator = UIImpactFeedbackGenerator(style: .soft)
+            feedbackGenerator.prepare()
+            feedbackGenerator.impactOccurred()
+        }
     }
 }

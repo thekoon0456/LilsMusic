@@ -69,7 +69,6 @@ final class MusicListViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.tapImpact()
-                //                owner.checkAppleMusicSubscriptionEligibility()
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
@@ -96,11 +95,8 @@ final class MusicListViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, item in
                 owner.tapImpact()
-                Task {
-                    guard let tracks = try await owner.fetchTracks() else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
-                    owner.checkAppleMusicSubscriptionEligibility(track: item.track)
-                }
+                owner.setQueue(index: item.index, track: item.track)
+                owner.checkAppleMusicSubscriptionEligibility(track: item.track)
             }.disposed(by: disposeBag)
         
         input.miniPlayerTapped
@@ -160,6 +156,23 @@ final class MusicListViewModel: ViewModel {
                       tracks: tracks,
                       currentPlaySong: currentTrack.asDriver(onErrorJustReturn: nil),
                       playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing))
+    }
+    
+    func setQueue(index: Int, track: Track) {
+        guard let musicItem = try? musicItem.value() else { return }
+        Task { [weak self] in
+            guard let self else { return }
+            switch musicItem {
+            case let playlist as Playlist:
+                let playlist = try await playlist.with(.entries)
+                guard let entry = playlist.entries?[index] else { return }
+                try await musicPlayer.setPlaylistQueue(item: playlist, startEntry: entry)
+            case let album as Album:
+                try await musicPlayer.setAlbumQueue(item: album, startTrack: track)
+            default:
+                return
+            }
+        }
     }
     
     func fetchTracksObservable() -> Observable<MusicItemCollection<Track>> {

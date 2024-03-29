@@ -50,16 +50,24 @@ final class LibraryViewController: BaseViewController {
         $0.textColor = .tintColor
     }
     
+    private let forYouEmptyLabel = UILabel().then {
+        $0.text = "An Apple Music account is required to use this app"
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .tintColor
+        $0.isHidden = true
+    }
+    
     private let likeLabel = UILabel().then {
         $0.text = "Liked Songs"
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .tintColor
     }
     
-    private let emptyLabel = UILabel().then {
+    private let likeEmptyLabel = UILabel().then {
         $0.text = "Press the heart for your favorite music"
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .tintColor
+        $0.isHidden = true
     }
     
     private lazy var playlistCollectionView: UICollectionView = {
@@ -133,6 +141,10 @@ final class LibraryViewController: BaseViewController {
                 layout.setCurrentPage(1)
             }.disposed(by: disposeBag)
         
+        output.mix.drive(with: self) { owner, value in
+            owner.updateForyouEmptyLabel(model: value)
+        }.disposed(by: disposeBag)
+        
         output.likeTracks.drive(with: self) { owner, tracks in
             owner.updateEmptyLabel(tracks: tracks)
             owner.updateSnapshot(tracks: tracks)
@@ -167,8 +179,12 @@ final class LibraryViewController: BaseViewController {
         }
     }
     
+    private func updateForyouEmptyLabel(model: MusicItemCollection<Playlist>) {
+        forYouEmptyLabel.isHidden = model.isEmpty ? false : true
+    }
+    
     private func updateEmptyLabel(tracks: MusicItemCollection<Track>) {
-        emptyLabel.isHidden = tracks.isEmpty ? false : true
+        likeEmptyLabel.isHidden = tracks.isEmpty ? false : true
     }
     
     private func updateMiniPlayer(track: Track?) {
@@ -188,8 +204,8 @@ final class LibraryViewController: BaseViewController {
     override func configureHierarchy() {
         view.addSubviews(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubviews(forYouLabel, playlistCollectionView,
-                                likeLabel, likeListCollectionView, emptyLabel, miniPlayerView)
+        contentView.addSubviews(forYouLabel, playlistCollectionView, forYouEmptyLabel,
+                                likeLabel, likeListCollectionView, likeEmptyLabel, miniPlayerView)
     }
     
     override func configureLayout() {
@@ -208,6 +224,11 @@ final class LibraryViewController: BaseViewController {
             make.leading.equalToSuperview().offset(12)
         }
         
+        forYouEmptyLabel.snp.makeConstraints { make in
+            make.top.equalTo(forYouLabel.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(12)
+        }
+        
         playlistCollectionView.snp.makeConstraints { make in
             make.top.equalTo(forYouLabel.snp.bottom).offset(8)
             make.width.equalTo(contentView.snp.width)
@@ -219,7 +240,7 @@ final class LibraryViewController: BaseViewController {
             make.leading.equalToSuperview().offset(12)
         }
         
-        emptyLabel.snp.makeConstraints { make in
+        likeEmptyLabel.snp.makeConstraints { make in
             make.top.equalTo(likeLabel.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(12)
         }

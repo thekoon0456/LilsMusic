@@ -5,7 +5,6 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
-import Combine
 import Foundation
 import MusicKit
 
@@ -46,7 +45,6 @@ final class LibraryViewModel: ViewModel {
     private let artistRepository = UserRepository<UserArtistList>()
     private let likesRepository = UserRepository<UserLikeList>()
     private let albumsRepository = UserRepository<UserAlbumList>()
-    private var cancellables = Set<AnyCancellable>()
     //사용자가 선택한 track
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     private lazy var userLikeSubject = likesRepository.userLikeSubject

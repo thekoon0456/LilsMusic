@@ -102,21 +102,22 @@ final class FMMusicPlayer {
     }
     
     @MainActor
-    func setAlbumQueue(item: MusicItemCollection<Album>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+    func setAlbumQueue(item: Album, startTrack: Track) async throws {
+        let queue = ApplicationMusicPlayer.Queue(album: item, startingAt: startTrack)
         player.queue = queue
         try await play()
     }
     
     @MainActor
-    func setPlaylistQueue(item: MusicItemCollection<Playlist>, startIndex: Int) async throws {
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+    func setPlaylistQueue(item: Playlist, startEntry: Playlist.Entry) async throws {
+        let queue = ApplicationMusicPlayer.Queue(playlist: item, startingAt: startEntry)
         player.queue = queue
         try await play()
     }
     
     @MainActor
     func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
+        print(#function)
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
@@ -144,8 +145,8 @@ final class FMMusicPlayer {
     // MARK: - Mode
     
     func setRepeatMode(mode: RepeatMode) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
+//        DispatchQueue.main.async { [weak self] in
+//            guard let self else { return }
             switch mode {
             case .all:
                 player.state.repeatMode = .all
@@ -154,19 +155,21 @@ final class FMMusicPlayer {
             case .off:
                 player.state.repeatMode = .none
             }
-        }
+//        }
     }
     
     func setShuffleMode(mode: ShuffleMode) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
+//        DispatchQueue.main.async { [weak self] in
+//            guard let self else { return }
+        print(#function)
+        print(mode)
             switch mode {
             case .on:
                 player.state.shuffleMode = .songs
             case .off:
                 player.state.shuffleMode = .off
             }
-        }
+//        }
     }
 
     // MARK: - Player Status
@@ -202,10 +205,6 @@ final class FMMusicPlayer {
     
     func setCurrentEntrySubject() {
         player.queue.objectWillChange
-            .drop(while: { [weak self] _ in
-                guard let self else { return false }
-                return player.queue.currentEntry?.id == (try? currentEntrySubject.value()?.id)
-            })
             .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
             .sink { [weak self] _  in
                 guard let self else { return }
@@ -213,13 +212,6 @@ final class FMMusicPlayer {
                 print("==============", entry?.item)
                 currentEntrySubject.onNext(entry)
         }.store(in: &cancellable)
-        
-//        player.queue.currentEntry.publisher.drop(while: { entry in
-//            entry.id == (try? currentEntrySubject.value()?.id ?? "")
-//        })
-//            .sink { entry in
-//            print(entry)
-//        }.store(in: &cancellable)
     }
     
     //음악 재생상태 추적, 업데이트
@@ -234,9 +226,6 @@ final class FMMusicPlayer {
     }
 }
 
-extension ApplicationMusicPlayer.Queue {
-    
-}
 
 // MARK: - Queue
 //

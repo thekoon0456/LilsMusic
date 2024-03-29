@@ -5,7 +5,6 @@
 //  Created by Deokhun KIM on 3/8/24.
 //
 
-import Combine
 import Foundation
 import MusicKit
 
@@ -43,7 +42,6 @@ final class MusicPlayerViewModel: ViewModel {
     private let userLikeRepository = UserRepository<UserLikeList>()
     private let setting = UserDefaultsManager.shared
     let disposeBag = DisposeBag()
-    private var cancellables = Set<AnyCancellable>()
     private let heartSubject = BehaviorSubject<Bool>(value: false)
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     // MARK: - Lifecycles
@@ -79,15 +77,13 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.chevronButtonTapped
-            .subscribe(with: self) { owner, _ in
-                DispatchQueue.main.async {
-                    owner.coordinator?.dismissViewController()
-                    owner.tapImpact()
-                }
+            .bind(with: self) { owner, _ in
+                owner.coordinator?.dismissViewController()
+                owner.tapImpact()
             }.disposed(by: disposeBag)
         
         input.playButtonTapped
-            .subscribe(with: self) { owner, _ in
+            .bind(with: self) { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
                     owner.musicPlayer.pause()
@@ -100,22 +96,19 @@ final class MusicPlayerViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.previousButtonTapped
-            .subscribe(with: self) { owner, _ in
-                Task {
-                        try await owner.musicPlayer.skipToPrevious()
-                    }
+            .bind(with: self) { owner, _ in
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
-        
-        input.nextButtonTapped
-            .subscribe(with: self) { owner, _ in
-                //큐에 한곡만 남았을때는 넘기지 않음.
-                guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
                     try await owner.musicPlayer.skipToPrevious()
                 }
-
+            }.disposed(by: disposeBag)
+        
+        input.nextButtonTapped
+            .bind(with: self) { owner, _ in
                 owner.tapImpact()
+                Task {
+                    try await owner.musicPlayer.skipToNext()
+                }
             }.disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
@@ -127,7 +120,7 @@ final class MusicPlayerViewModel: ViewModel {
                 return mode
             }
             .withUnretained(self)
-            .flatMap { owner, mode in
+            .flatMapLatest { owner, mode in
                 owner.setRepeatButtonObservable(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
@@ -136,12 +129,13 @@ final class MusicPlayerViewModel: ViewModel {
                 guard let self else { return .off }
                 setting.userSetting.shuffleMode.toggle()
                 let mode = setting.userSetting.shuffleMode
+                print(mode)
                 musicPlayer.setShuffleMode(mode: mode)
                 return mode
             }
             .withUnretained(self)
-            .flatMap { owner, mode in
-                return owner.setShuffleButtonObservable(mode: mode)
+            .flatMapLatest { owner, mode in
+                owner.setShuffleButtonObservable(mode: mode)
             }.asDriver(onErrorJustReturn: .off)
         
         input
