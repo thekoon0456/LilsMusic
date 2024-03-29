@@ -134,8 +134,8 @@ final class MusicRecommendViewController: BaseViewController {
             owner.updateSnapshot(withItems: albums, toSection: .album)
         }.disposed(by: disposeBag)
         
-        output.recommendMixList.drive(with: self) { owner, mostPlayed in
-              owner.updateSnapshot(withItems: mostPlayed, toSection: .mix)
+        output.cityTop25.drive(with: self) { owner, mostPlayed in
+              owner.updateSnapshot(withItems: mostPlayed, toSection: .cityTop25)
           }.disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, state in
@@ -162,7 +162,7 @@ final class MusicRecommendViewController: BaseViewController {
                     if case let .album(album) = item {
                         owner.itemSelected.onNext(album)
                     }
-                case .mix:
+                case .cityTop25:
                     guard let item = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
                     if case let .playlist(playlist) = item {
                         owner.itemSelected.onNext(playlist)
@@ -275,7 +275,7 @@ extension MusicRecommendViewController {
                     let cell = collectionView.dequeueConfiguredReusableCell(using: albumCellRegistration, for: indexPath, item: album)
                     return cell
                 }
-            case .mix:
+            case .cityTop25:
                 if case let .playlist(playlist) = itemIdentifier {
                     let cell = collectionView.dequeueConfiguredReusableCell(using: mixRegistration, for: indexPath, item: playlist)
                     return cell
@@ -329,7 +329,7 @@ extension MusicRecommendViewController {
         case top100
         case playlist
         case album
-        case mix
+        case cityTop25
         
         var title: String {
             switch self {
@@ -339,8 +339,8 @@ extension MusicRecommendViewController {
                 "Popular Playlist"
             case .album:
                 "Best Albums"
-            case .mix:
-                "For you"
+            case .cityTop25:
+                "City Top 25"
             }
         }
     }
@@ -400,7 +400,7 @@ extension MusicRecommendViewController {
                                                             alignment: .topLeading)]
                 section.orthogonalScrollingBehavior = .groupPagingCentered
                 return section
-            case .playlist, .mix:
+            case .playlist, .cityTop25:
                 let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
                                                       heightDimension: .fractionalHeight(1))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)

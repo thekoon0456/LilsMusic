@@ -5,13 +5,12 @@
 //  Created by Deokhun KIM on 3/8/24.
 //
 
-import Combine
 import Foundation
 import MusicKit
+import StoreKit
 
 import RxCocoa
 import RxSwift
-import StoreKit
 
 final class MusicListViewModel: ViewModel {
     
@@ -37,93 +36,71 @@ final class MusicListViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: MusicListCoordinator?
-    private let musicPlayer = FMMusicPlayer()
+    private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
     let disposeBag = DisposeBag()
-    private var cancellable = Set<AnyCancellable>()
-    private let trackSubject = BehaviorSubject<Track?>(value: nil)
-    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
     init(coordinator: MusicListCoordinator?, item: MusicItem) {
         self.coordinator = coordinator
         musicItem.onNext(item)
-        playerUpdateSink()
-        playerStateUpdateSink()
     }
     
     // MARK: - Helpers
     
     func transform(_ input: Input) -> Output {
+        
+        let currentTrack = musicPlayer
+            .currentEntrySubject
+            .withUnretained(self)
+            .flatMapLatest { owner, entry in
+                owner.fetchCurrentTrackObservable(entry: entry)
+            }
+        
         let tracks = input.viewDidLoad
             .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.getTracks()
+            .flatMapLatest { owner, _ in
+                owner.fetchTracksObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
         
-        input.viewDidLoad
-            .withUnretained(self)
-            .flatMap{ owner, void -> Observable<Track?> in
-                owner.getCurrentPlaySong()
-            }
-            .subscribe { [weak self] track in
-                guard let self else { return }
-                trackSubject.onNext(track)
-            }.disposed(by: disposeBag)
-        
         input.playButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.tapImpact()
-                owner.checkAppleMusicSubscriptionEligibility()
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
                     try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
-                    DispatchQueue.main.async {
-                        owner.coordinator?.presentMusicPlayer(track: firstItem)
-                    }
+                    owner.checkAppleMusicSubscriptionEligibility(track: firstItem)
                 }
             }.disposed(by: disposeBag)
         
         input.shuffleButtonTapped
-            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 owner.tapImpact()
+                UserDefaultsManager.shared.userSetting.shuffleMode = .on
+                owner.musicPlayer.setShuffleMode(mode: .on)
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
                     try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
-                    UserDefaultsManager.shared.userSetting.shuffleMode = .on
-                    owner.musicPlayer.setShuffleMode(mode: .on)
-                    DispatchQueue.main.async {
-                        owner.coordinator?.presentMusicPlayer(track: firstItem)
-                    }
+                    owner.checkAppleMusicSubscriptionEligibility(track: firstItem)
                 }
             }.disposed(by: disposeBag)
         
         input.itemSelected
-            .observe(on:MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, item in
-                owner.checkAppleMusicSubscriptionEligibility()
-                Task {
-                    guard let tracks = try await owner.fetchTracks() else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
-                    DispatchQueue.main.async {
-                        owner.coordinator?.presentMusicPlayer(track: item.track)
-                    }
-                }
                 owner.tapImpact()
+                owner.setQueue(index: item.index, track: item.track)
+                owner.checkAppleMusicSubscriptionEligibility(track: item.track)
             }.disposed(by: disposeBag)
         
         input.miniPlayerTapped
             .withUnretained(self)
-            .observe(on:MainScheduler.asyncInstance)
             .flatMap { owner, _ in
                 owner.getCurrentPlaySong()
             }.asDriver(onErrorJustReturn: nil)
@@ -138,10 +115,10 @@ final class MusicListViewModel: ViewModel {
             .subscribe { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
-                    owner.musicPlayer.setPaused()
+                    owner.musicPlayer.pause()
                 } else {
                     Task {
-                        try await owner.musicPlayer.setPlaying()
+                        try await owner.musicPlayer.play()
                     }
                 }
                 owner.tapImpact()
@@ -177,11 +154,28 @@ final class MusicListViewModel: ViewModel {
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
                       tracks: tracks,
-                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
-                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
+                      currentPlaySong: currentTrack.asDriver(onErrorJustReturn: nil),
+                      playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing))
     }
     
-    func getTracks() -> Observable<MusicItemCollection<Track>> {
+    func setQueue(index: Int, track: Track) {
+        guard let musicItem = try? musicItem.value() else { return }
+        Task { [weak self] in
+            guard let self else { return }
+            switch musicItem {
+            case let playlist as Playlist:
+                let playlist = try await playlist.with(.entries)
+                guard let entry = playlist.entries?[index] else { return }
+                try await musicPlayer.setPlaylistQueue(item: playlist, startEntry: entry)
+            case let album as Album:
+                try await musicPlayer.setAlbumQueue(item: album, startTrack: track)
+            default:
+                return
+            }
+        }
+    }
+    
+    func fetchTracksObservable() -> Observable<MusicItemCollection<Track>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
@@ -200,16 +194,12 @@ final class MusicListViewModel: ViewModel {
     
     func fetchTracks() async throws -> MusicItemCollection<Track>? {
         guard let item = try? musicItem.value() else { return nil }
-        do {
-            switch item {
-            case let playlist as Playlist:
-                return try await musicRepository.playlistToTracks(playlist)
-            case let album as Album:
-                return try await musicRepository.albumToTracks(album)
-            default:
-                return nil
-            }
-        } catch {
+        switch item {
+        case let playlist as Playlist:
+            return try await musicRepository.playlistToTracks(playlist)
+        case let album as Album:
+            return try await musicRepository.albumToTracks(album)
+        default:
             return nil
         }
     }
@@ -219,7 +209,7 @@ final class MusicListViewModel: ViewModel {
             Task { [weak self] in
                 do {
                     guard let self,
-                          let entry = try await musicPlayer.getCurrentEntry(),
+                          let entry = musicPlayer.getCurrentEntry(),
                           let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
@@ -240,49 +230,51 @@ final class MusicListViewModel: ViewModel {
             return Disposables.create()
         }
     }
-}
-
-// MARK: - 플레이어 상태 추적, 업데이트
-
-extension MusicListViewModel {
     
-    func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange
-            .sink { _  in
+    func fetchCurrentTrackObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+        return Observable.create { observer in
             Task { [weak self] in
-                guard let self,
-                      let entry = try await musicPlayer.getCurrentEntry(),
-                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-                let track = Track.song(song)
-                trackSubject.onNext(track)
+                guard let self else { return }
+                do {
+                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    let track = Track.song(song)
+                    observer.onNext(track)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        }.store(in: &cancellable)
-    }
-    
-    //음악 재생상태 추적, 업데이트
-    func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange
-            .sink { [weak self] _ in
-            guard let self else { return }
-            let state = musicPlayer.getPlaybackState()
-            playStateSubject.onNext(state)
-        }.store(in: &cancellable)
+            return Disposables.create()
+        }
     }
 }
 
+// MARK: - Apple뮤직 구독 유무 확인
+
+
 extension MusicListViewModel {
     
-    func checkAppleMusicSubscriptionEligibility() {
+    func checkAppleMusicSubscriptionEligibility(track: Track) {
         let controller = SKCloudServiceController()
-        controller.requestCapabilities { [weak self] (capabilities, error) in
+        controller.requestCapabilities { [weak self] capabilities, error in
             guard let self else { return }
             if let error {
                 print(error.localizedDescription)
                 return
             }
-
+            
             if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
-                coordinator?.presentAppleMusicSubscriptionOffer()
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    coordinator?.presentAppleMusicSubscriptionOffer()
+                }
+                return
+            } else {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    coordinator?.presentMusicPlayer(track: track)
+                }
+                return
             }
         }
     }

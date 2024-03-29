@@ -50,16 +50,24 @@ final class LibraryViewController: BaseViewController {
         $0.textColor = .tintColor
     }
     
+    private let forYouEmptyLabel = UILabel().then {
+        $0.text = "An Apple Music account is required to use this app"
+        $0.font = .systemFont(ofSize: 14)
+        $0.textColor = .tintColor
+        $0.isHidden = true
+    }
+    
     private let likeLabel = UILabel().then {
         $0.text = "Liked Songs"
         $0.font = .boldSystemFont(ofSize: 20)
         $0.textColor = .tintColor
     }
     
-    private let emptyLabel = UILabel().then {
+    private let likeEmptyLabel = UILabel().then {
         $0.text = "Press the heart for your favorite music"
         $0.font = .systemFont(ofSize: 14)
         $0.textColor = .tintColor
+        $0.isHidden = true
     }
     
     private lazy var playlistCollectionView: UICollectionView = {
@@ -103,6 +111,15 @@ final class LibraryViewController: BaseViewController {
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
             .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .asObservable()
+        
+        let previousButtonTapped = miniPlayerView.previousButton.rx.tap
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asObservable()
+        
+        let nextButtonTapped = miniPlayerView.nextButton.rx.tap
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asObservable()
+        
         let mixSelected = playlistCollectionView.rx.modelSelected(Playlist.self)
         
         let input = LibraryViewModel.Input(viewDidLoad: viewDidLoadTrigger,
@@ -112,8 +129,8 @@ final class LibraryViewController: BaseViewController {
                                            mixSelected: mixSelected,
                                            miniPlayerTapped: miniPlayerView.tap,
                                            miniPlayerPlayButtonTapped: miniPlayerPlayButtonTapped,
-                                           miniPlayerPreviousButtonTapped: miniPlayerView.previousButton.rx.tap,
-                                           miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
+                                           miniPlayerPreviousButtonTapped: previousButtonTapped,
+                                           miniPlayerNextButtonTapped: nextButtonTapped)
         let output = viewModel.transform(input)
         
         output.mix
@@ -123,6 +140,10 @@ final class LibraryViewController: BaseViewController {
                 //collectionView1번부터
                 layout.setCurrentPage(1)
             }.disposed(by: disposeBag)
+        
+        output.mix.drive(with: self) { owner, value in
+            owner.updateForyouEmptyLabel(model: value)
+        }.disposed(by: disposeBag)
         
         output.likeTracks.drive(with: self) { owner, tracks in
             owner.updateEmptyLabel(tracks: tracks)
@@ -158,8 +179,12 @@ final class LibraryViewController: BaseViewController {
         }
     }
     
+    private func updateForyouEmptyLabel(model: MusicItemCollection<Playlist>) {
+        forYouEmptyLabel.isHidden = model.isEmpty ? false : true
+    }
+    
     private func updateEmptyLabel(tracks: MusicItemCollection<Track>) {
-        emptyLabel.isHidden = tracks.isEmpty ? false : true
+        likeEmptyLabel.isHidden = tracks.isEmpty ? false : true
     }
     
     private func updateMiniPlayer(track: Track?) {
@@ -179,8 +204,8 @@ final class LibraryViewController: BaseViewController {
     override func configureHierarchy() {
         view.addSubviews(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubviews(forYouLabel, playlistCollectionView,
-                                likeLabel, likeListCollectionView, emptyLabel, miniPlayerView)
+        contentView.addSubviews(forYouLabel, playlistCollectionView, forYouEmptyLabel,
+                                likeLabel, likeListCollectionView, likeEmptyLabel, miniPlayerView)
     }
     
     override func configureLayout() {
@@ -199,6 +224,11 @@ final class LibraryViewController: BaseViewController {
             make.leading.equalToSuperview().offset(12)
         }
         
+        forYouEmptyLabel.snp.makeConstraints { make in
+            make.top.equalTo(forYouLabel.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(12)
+        }
+        
         playlistCollectionView.snp.makeConstraints { make in
             make.top.equalTo(forYouLabel.snp.bottom).offset(8)
             make.width.equalTo(contentView.snp.width)
@@ -210,7 +240,7 @@ final class LibraryViewController: BaseViewController {
             make.leading.equalToSuperview().offset(12)
         }
         
-        emptyLabel.snp.makeConstraints { make in
+        likeEmptyLabel.snp.makeConstraints { make in
             make.top.equalTo(likeLabel.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(12)
         }

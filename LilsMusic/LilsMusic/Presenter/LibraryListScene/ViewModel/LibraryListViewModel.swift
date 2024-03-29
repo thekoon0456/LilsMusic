@@ -5,7 +5,6 @@
 //  Created by Deokhun KIM on 3/22/24.
 //
 
-import Combine
 import Foundation
 import MusicKit
 
@@ -36,11 +35,10 @@ final class LibraryListViewModel: ViewModel {
     // MARK: - Properties
     
     weak var coordinator: LibraryListCoordinator?
-    private let musicPlayer = FMMusicPlayer()
+    private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
     let disposeBag = DisposeBag()
-    private var cancellable = Set<AnyCancellable>()
     private let trackSubject = BehaviorSubject<Track?>(value: nil)
     private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     private let tracks: MusicItemCollection<Track>
@@ -51,8 +49,6 @@ final class LibraryListViewModel: ViewModel {
         self.coordinator = coordinator
         self.tracks = tracks
         musicItem.onNext(tracks.first)
-        playerUpdateSink()
-        playerStateUpdateSink()
     }
     
     // MARK: - Helpers
@@ -132,10 +128,10 @@ final class LibraryListViewModel: ViewModel {
             .subscribe { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
-                    owner.musicPlayer.setPaused()
+                    owner.musicPlayer.pause()
                 } else {
                     Task {
-                        try await owner.musicPlayer.setPlaying()
+                        try await owner.musicPlayer.play()
                     }
                 }
             }.disposed(by: disposeBag)
@@ -188,33 +184,5 @@ final class LibraryListViewModel: ViewModel {
             }
             return Disposables.create()
         }
-    }
-}
-
-// MARK: - 플레이어 상태 추적, 업데이트
-
-extension LibraryListViewModel {
-    
-    func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange
-            .sink { _  in
-            Task { [weak self] in
-                guard let self,
-                      let entry = try await musicPlayer.getCurrentEntry(),
-                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-                let track = Track.song(song)
-                trackSubject.onNext(track)
-            }
-        }.store(in: &cancellable)
-    }
-    
-    //음악 재생상태 추적, 업데이트
-    func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange
-            .sink { [weak self] _ in
-            guard let self else { return }
-            let state = musicPlayer.getPlaybackState()
-            playStateSubject.onNext(state)
-        }.store(in: &cancellable)
     }
 }

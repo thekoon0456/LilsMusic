@@ -5,7 +5,6 @@
 //  Created by Deokhun KIM on 3/10/24.
 //
 
-import Combine
 import Foundation
 import MusicKit
 
@@ -32,38 +31,42 @@ final class MusicRecommendViewModel: ViewModel {
         let recommendSongs: Driver<MusicItemCollection<Playlist>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
-        let recommendMixList: Driver<MusicItemCollection<Playlist>>
+        let cityTop25: Driver<MusicItemCollection<Playlist>>
         let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
     }
     
     // MARK: - Properties
     
     weak var coordinator: MusicRecommendCoordinator?
-    private let musicPlayer = FMMusicPlayer()
+    private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
     private let artistRepository = UserRepository<UserArtistList>()
     private let likesRepository = UserRepository<UserLikeList>()
     private let albumsRepository = UserRepository<UserAlbumList>()
     let disposeBag = DisposeBag()
-    private var cancellable = Set<AnyCancellable>()
-    private let trackSubject = BehaviorSubject<Track?>(value: nil)
-    private lazy var playStateSubject = BehaviorSubject<ApplicationMusicPlayer.PlaybackStatus>(value: musicPlayer.getPlaybackState())
     
     // MARK: - Lifecycles
     
     init(coordinator: MusicRecommendCoordinator?) {
         self.coordinator = coordinator
-        playerUpdateSink()
-        playerStateUpdateSink()
     }
     
     func transform(_ input: Input) -> Output {
         
+        let currentEntry = musicPlayer
+            .currentEntrySubject
+            .withUnretained(self)
+            .flatMapLatest { owner, entry in
+                owner.fetchCurrentEntryTrackObservable(entry: entry)
+            }
+        
+        let playState = musicPlayer
+            .currentPlayStateSubject
+        
         //realm 없으면 처음에 한번 생성
         input
             .viewDidLoad
-            .withUnretained(self)
-            .subscribe{ owner, _ in
+            .subscribe(with: self) { owner, _ in
                 if owner.artistRepository.fetch().isEmpty {
                     owner.artistRepository.createItem(UserArtistList())
                 }
@@ -77,45 +80,47 @@ final class MusicRecommendViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.searchModelSelected
-            .withUnretained(self)
-            .subscribe { owner, track in
+            .subscribe(with: self) { owner, track in
                 Task {
-                    try await owner.musicPlayer.playTrack(track)
+                        try await owner.musicPlayer.playTrack(track)
+                    }
+                DispatchQueue.main.async {
+                    owner.coordinator?.presentMusicPlayer(track: track)
                 }
-                owner.coordinator?.presentMusicPlayer(track: track)
             }.disposed(by: disposeBag)
         
         let searchResult = input.searchText
             .withUnretained(self)
-            .flatMap { owner, text in
-                owner.fetchSearchResult(text: text)
+            .flatMapLatest { owner, text in
+                owner.fetchSearchResultObservable(text: text)
             }.asDriver(onErrorJustReturn: [])
         
         let songs = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
-                owner.fetchRecommendSongs()
+                owner.fetchRecommendSongsObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         let playlists = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
-                owner.fetchRecommendPlaylists()
+                owner.fetchRecommendPlaylistsObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         let albums = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
-                owner.fetchRecommendAlbums()
+                owner.fetchRecommendAlbumsObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
-        let mix = input.viewDidLoad
+        let cityTop25 = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
-                owner.fetchRecommendMix()
+                owner.fetchCityTopObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
-        input.itemSelected.withUnretained(self).subscribe { owner, item in
+        input.itemSelected
+            .subscribe(with: self) { owner, item in
             DispatchQueue.main.async {
                 owner.coordinator?.pushToList(item: item)
             }
@@ -124,7 +129,7 @@ final class MusicRecommendViewModel: ViewModel {
         input.miniPlayerTapped
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.getCurrentPlaySong()
+                owner.getCurrentPlaySongObservable()
             }.asDriver(onErrorJustReturn: nil)
             .drive(with: self) { owner, track in
                 guard let track else { return }
@@ -132,48 +137,43 @@ final class MusicRecommendViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerPlayButtonTapped
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 let state = owner.musicPlayer.getPlaybackState()
                 if state == .playing {
-                    owner.musicPlayer.setPaused()
+                    owner.musicPlayer.pause()
                 } else {
                     Task {
-                        try await owner.musicPlayer.setPlaying()
+                        try await owner.musicPlayer.play()
                     }
                 }
             }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 Task {
-                    try await owner.musicPlayer.skipToPrevious()
+                        try await owner.musicPlayer.skipToPrevious()
                 }
             }.disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
-            .withUnretained(self)
-            .subscribe { owner, _ in
+            .subscribe(with: self) { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
-                    try await owner.musicPlayer.skipToNext()
+                        try await owner.musicPlayer.skipToNext()
                 }
             }.disposed(by: disposeBag)
         
         return Output(searchResult: searchResult.asDriver(onErrorJustReturn: []),
-                      currentPlaySong: trackSubject.asDriver(onErrorJustReturn: nil),
+                      currentPlaySong: currentEntry.asDriver(onErrorJustReturn: nil),
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
-                      recommendMixList: mix,
-                      playState: playStateSubject.asDriver(onErrorJustReturn: .playing))
+                      cityTop25: cityTop25,
+                      playState: playState.asDriver(onErrorJustReturn: .playing))
     }
     
     
-    private func fetchSearchResult(text: String) -> Observable<[Track]> {
+    private func fetchSearchResultObservable(text: String) -> Observable<[Track]> {
         return Observable.create { [weak self] observer in
             guard let self,
                   !text.isEmpty
@@ -188,12 +188,12 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func getCurrentPlaySong() -> Observable<Track?> {
+    func getCurrentPlaySongObservable() -> Observable<Track?> {
         return Observable.create { observer in
             Task { [weak self] in
                 do {
                     guard let self,
-                          let entry = try await musicPlayer.getCurrentEntry(),
+                          let entry = musicPlayer.getCurrentEntry(),
                           let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
@@ -207,7 +207,7 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendSongs() -> Observable<MusicItemCollection<Playlist>> {
+    func fetchRecommendSongsObservable() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
@@ -223,7 +223,7 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendPlaylists() -> Observable<MusicItemCollection<Playlist>> {
+    func fetchRecommendPlaylistsObservable() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
@@ -239,7 +239,7 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendAlbums() -> Observable<MusicItemCollection<Album>> {
+    func fetchRecommendAlbumsObservable() -> Observable<MusicItemCollection<Album>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
@@ -255,12 +255,12 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendMix() -> Observable<MusicItemCollection<Playlist>> {
+    func fetchCityTopObservable() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let stations = try await musicRepository.requestCatalogMostPlayedCharts()
+                    let stations = try await musicRepository.requestCatalogCityTop25Charts()
                     observer.onNext(stations)
                     observer.onCompleted()
                 } catch {
@@ -271,39 +271,28 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func setPlayButton(isSelected: Bool) -> Observable<Bool> {
+    func setPlayButtonObservable(isSelected: Bool) -> Observable<Bool> {
         return Observable.create { observer in
             observer.onNext(isSelected)
             observer.onCompleted()
             return Disposables.create()
         }
     }
-}
-
-// MARK: - 플레이어 상태 추적, 업데이트
-
-extension MusicRecommendViewModel {
     
-    func playerUpdateSink() {
-        musicPlayer.getCurrentPlayer().queue.objectWillChange
-            .sink { _  in
+    func fetchCurrentEntryTrackObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+        return Observable.create { observer in
             Task { [weak self] in
-                guard let self,
-                      let entry = try await musicPlayer.getCurrentEntry(),
-                      let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id) else { return }
-                let track = Track.song(song)
-                trackSubject.onNext(track)
+                guard let self else { return }
+                do {
+                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    let track = Track.song(song)
+                    observer.onNext(track)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        }.store(in: &cancellable)
-    }
-    
-    //음악 재생상태 추적, 업데이트
-    func playerStateUpdateSink() {
-        musicPlayer.getCurrentPlayer().state.objectWillChange
-            .sink { [weak self] _ in
-            guard let self else { return }
-            let state = musicPlayer.getPlaybackState()
-            playStateSubject.onNext(state)
-        }.store(in: &cancellable)
+            return Disposables.create()
+        }
     }
 }

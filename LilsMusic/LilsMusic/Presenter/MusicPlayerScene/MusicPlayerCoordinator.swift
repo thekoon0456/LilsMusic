@@ -23,6 +23,10 @@ final class MusicPlayerCoordinator: Coordinator {
         self.track = track
     }
     
+    deinit {
+        print("MusicPlayerCoordinator Deinit")
+    }
+    
     func start() {
         let vm = MusicPlayerViewModel(coordinator: self, track: track)
         let vc = MusicPlayerViewController(viewModel: vm)

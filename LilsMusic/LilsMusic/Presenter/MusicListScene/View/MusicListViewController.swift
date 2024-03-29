@@ -177,7 +177,6 @@ final class MusicListViewController: BaseViewController {
         navigationItem.backButtonDisplayMode = .minimal
         //커스텀 백버튼 뒤로가기 제스처 추가
         navigationItem.leftBarButtonItem = backBarButton
-        
     }
 }
 
