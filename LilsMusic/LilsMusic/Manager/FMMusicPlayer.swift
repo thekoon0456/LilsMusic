@@ -145,31 +145,29 @@ final class FMMusicPlayer {
     // MARK: - Mode
     
     func setRepeatMode(mode: RepeatMode) {
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             switch mode {
             case .all:
                 player.state.repeatMode = .all
             case .one:
                 player.state.repeatMode = .one
             case .off:
-                player.state.repeatMode = .none
+                player.state.repeatMode = MusicPlayer.RepeatMode.none
             }
-//        }
+        }
     }
     
     func setShuffleMode(mode: ShuffleMode) {
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self else { return }
-        print(#function)
-        print(mode)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             switch mode {
             case .on:
                 player.state.shuffleMode = .songs
             case .off:
                 player.state.shuffleMode = .off
             }
-//        }
+        }
     }
 
     // MARK: - Player Status
