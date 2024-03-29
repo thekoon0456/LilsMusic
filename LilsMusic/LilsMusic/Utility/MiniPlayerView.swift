@@ -78,7 +78,7 @@ final class MiniPlayerView: BaseView {
     var tap: Observable<Void> {
         return self.rx.tapGesture()
             .when(.recognized)
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
             .map { _ in return }
     }

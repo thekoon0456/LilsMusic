@@ -125,7 +125,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 Task {
@@ -135,7 +135,7 @@ final class MusicListViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }

@@ -100,7 +100,7 @@ final class MusicRecommendViewController: BaseViewController {
         let modelSelected = libraryCollectionViewController.collectionView.rx.modelSelected(Track.self)
         
         let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
         
         let input = MusicRecommendViewModel.Input(viewDidLoad: viewDidLoadTrigger,

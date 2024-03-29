@@ -179,34 +179,34 @@ final class MusicPlayerViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         let playButtonTapped = playButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
         
         let previousButtonTapped = previousButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
         
         let nextButtonTapped = nextButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
         
         let repeatButtonTapped = repeatButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
         
         let shuffleButtonTapped = shuffleButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .asObservable()
         
         let heartButtonTapped = heartButton.rx.tap
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { [weak self] _ -> Bool in
                 guard let self else { return false }
                 return heartButton.isSelected
             }
         
         let playlistButtonTapped = playlistButton.menuSelectionSubject
-            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map { $0 }
         
         let input = MusicPlayerViewModel.Input(chevronButtonTapped: chevronButton.rx.tap,

@@ -60,7 +60,7 @@
 //        super.bind()
 //        
 //        let miniPlayerPlayButtonTapped = miniPlayerView.playButton.rx.tap
-//            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
+//            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
 //            .map { [weak self] _ -> Bool in
 //                guard let self else { return true }
 //                return !miniPlayerView.playButton.isSelected
