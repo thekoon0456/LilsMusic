@@ -205,11 +205,10 @@ final class FMMusicPlayer {
     
     func setCurrentEntrySubject() {
         player.queue.objectWillChange
-            .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .sink { [weak self] _  in
                 guard let self else { return }
                 let entry = player.queue.currentEntry
-                print("==============", entry?.item)
                 currentEntrySubject.onNext(entry)
         }.store(in: &cancellable)
     }
