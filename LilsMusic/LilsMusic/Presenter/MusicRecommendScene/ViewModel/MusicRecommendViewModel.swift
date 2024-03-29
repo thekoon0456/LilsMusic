@@ -32,7 +32,7 @@ final class MusicRecommendViewModel: ViewModel {
         let recommendSongs: Driver<MusicItemCollection<Playlist>>
         let recommendPlaylists: Driver<MusicItemCollection<Playlist>>
         let recommendAlbums: Driver<MusicItemCollection<Album>>
-        let recommendMixList: Driver<MusicItemCollection<Playlist>>
+        let cityTop25: Driver<MusicItemCollection<Playlist>>
         let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
     }
     
@@ -114,10 +114,10 @@ final class MusicRecommendViewModel: ViewModel {
                 owner.fetchRecommendAlbumsObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
-        let mix = input.viewDidLoad
+        let cityTop25 = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
-                owner.fetchRecommendMixObservable()
+                owner.fetchCityTopObservable()
             }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         input.itemSelected
@@ -169,7 +169,7 @@ final class MusicRecommendViewModel: ViewModel {
                       recommendSongs: songs,
                       recommendPlaylists: playlists,
                       recommendAlbums: albums,
-                      recommendMixList: mix,
+                      cityTop25: cityTop25,
                       playState: playState.asDriver(onErrorJustReturn: .playing))
     }
     
@@ -256,12 +256,12 @@ final class MusicRecommendViewModel: ViewModel {
         }
     }
     
-    func fetchRecommendMixObservable() -> Observable<MusicItemCollection<Playlist>> {
+    func fetchCityTopObservable() -> Observable<MusicItemCollection<Playlist>> {
         return Observable.create { observer in
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let stations = try await musicRepository.requestCatalogMostPlayedCharts()
+                    let stations = try await musicRepository.requestCatalogCityTop25Charts()
                     observer.onNext(stations)
                     observer.onCompleted()
                 } catch {
