@@ -19,7 +19,6 @@ final class FMMusicPlayer {
     private let userDefaultsManager = UserDefaultsManager.shared
     private let musicRepository = MusicRepository()
     let currentEntrySubject = BehaviorSubject<MusicPlayer.Queue.Entry?>(value: nil)
-    let trackSubject = BehaviorSubject<Track?>(value: nil)
     lazy var currentPlayStateSubject = BehaviorSubject<MusicPlayer.PlaybackStatus>(value: getPlaybackState())
     private var cancellable = Set<AnyCancellable>()
     
@@ -203,18 +202,24 @@ final class FMMusicPlayer {
     
     func setCurrentEntrySubject() {
         player.queue.objectWillChange
+            .drop(while: { [weak self] _ in
+                guard let self else { return false }
+                return player.queue.currentEntry?.id == (try? currentEntrySubject.value()?.id)
+            })
             .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
             .sink { [weak self] _  in
                 guard let self else { return }
                 let entry = player.queue.currentEntry
-                print(entry?.item)
+                print("==============", entry?.item)
                 currentEntrySubject.onNext(entry)
-                Task {
-                    guard let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
-                    let track = Track.song(song)
-                    self.trackSubject.onNext(track)
-                }
         }.store(in: &cancellable)
+        
+//        player.queue.currentEntry.publisher.drop(while: { entry in
+//            entry.id == (try? currentEntrySubject.value()?.id ?? "")
+//        })
+//            .sink { entry in
+//            print(entry)
+//        }.store(in: &cancellable)
     }
     
     //음악 재생상태 추적, 업데이트

@@ -47,29 +47,6 @@ final class MusicListCoordinator: NSObject, Coordinator, CoordinatorDelegate {
     }
 }
 
-extension MusicListCoordinator {
-    
-    func checkAppleMusicSubscriptionEligibility(track: Track) {
-        let controller = SKCloudServiceController()
-        controller.requestCapabilities { [weak self] capabilities, error in
-            guard let self else { return }
-            if let error {
-                print(error.localizedDescription)
-                return
-            }
-
-            if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
-                presentAppleMusicSubscriptionOffer()
-                return
-            } else {
-                presentMusicPlayer(track: track)
-                return
-            }
-        }
-    }
-}
-
-
 extension MusicListCoordinator: SKCloudServiceSetupViewControllerDelegate {
     //애플뮤직 가입권유화면
     func presentAppleMusicSubscriptionOffer() {

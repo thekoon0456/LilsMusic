@@ -18,7 +18,6 @@ final class MusicPlayerViewController: BaseViewController {
     // MARK: - Properties
     
     private let viewModel: MusicPlayerViewModel
-    private var timer: Timer?
     
     // MARK: - UI
     
@@ -157,14 +156,12 @@ final class MusicPlayerViewController: BaseViewController {
     }
     
     deinit {
-        timer?.invalidate()
-        timer = nil
+        print("MusicPlayerViewController Deinit")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setProgressBarTimer()
         setDismissGesture()
     }
     
@@ -172,6 +169,14 @@ final class MusicPlayerViewController: BaseViewController {
     
     override func bind() {
         super.bind()
+        
+        //타이머 rx
+        Observable<Int>
+            .interval(RxTimeInterval.seconds(1), scheduler: MainScheduler.instance)
+            .subscribe(with: self) { owner, _ in
+                owner.updateProgressBar()
+            }
+            .disposed(by: disposeBag)
         
         let playButtonTapped = playButton.rx.tap
             .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
@@ -241,7 +246,7 @@ final class MusicPlayerViewController: BaseViewController {
     
     // MARK: - Selectors
     
-    @objc func updateProgressBar() {
+    func updateProgressBar() {
         let playbackTime = viewModel.musicPlayer.getPlayBackTime()
         playTimeLabel.text = formatDuration(playbackTime)
         let progress = playbackTime / Double(progressSlider.maximumValue)
@@ -353,19 +358,6 @@ final class MusicPlayerViewController: BaseViewController {
         view.layer.cornerRadius = 20
         view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         view.clipsToBounds = true
-    }
-}
-
-// MARK: - ProgressBar
-
-extension MusicPlayerViewController {
-    
-    private func setProgressBarTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 1,
-                                     target: self,
-                                     selector: #selector(updateProgressBar),
-                                     userInfo: nil,
-                                     repeats: true)
     }
 }
 
