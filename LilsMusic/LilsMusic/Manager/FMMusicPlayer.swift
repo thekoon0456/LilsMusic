@@ -37,11 +37,10 @@ final class FMMusicPlayer {
     func play() async throws {
         Task {
             do {
-                try await player.prepareToPlay()
                 try await player.play()
             } catch {
                 print("playError: ", error.localizedDescription)
-                try await player.play()
+                try await play()
             }
         }
     }

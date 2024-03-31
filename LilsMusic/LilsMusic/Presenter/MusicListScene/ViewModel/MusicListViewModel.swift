@@ -39,6 +39,7 @@ final class MusicListViewModel: ViewModel {
     private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
+
     let disposeBag = DisposeBag()
     
     // MARK: - Lifecycles
@@ -251,11 +252,11 @@ final class MusicListViewModel: ViewModel {
 
 // MARK: - Apple뮤직 구독 유무 확인
 
-
 extension MusicListViewModel {
     
     func checkAppleMusicSubscriptionEligibility(track: Track) {
         let controller = SKCloudServiceController()
+        
         controller.requestCapabilities { [weak self] capabilities, error in
             guard let self else { return }
             if let error {
