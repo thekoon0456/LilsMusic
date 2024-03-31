@@ -20,7 +20,7 @@
 |<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/e2310b70-0b10-4c95-b161-731807d37950"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/967715c2-63cb-4ab7-87c8-d65c09dda3a0"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/a0107164-28f7-416d-863a-2241aa12e7c3"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/41fc960e-83c0-4d95-88eb-27f4923ecfa2"></img>|
 |:-:|:-:|:-:|:-:|
 |`음악 플레이어`|`뮤직비디오`|`미니 플레이어`|`라이브러리`|
-|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/e2310b70-0b10-4c95-b161-731807d37950"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/87b36b00-853f-4ee3-843d-70c24fe81649"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/a0107164-28f7-416d-863a-2241aa12e7c3"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/8ea72a73-8d2f-47d0-9d54-511bed03d909"></img>|
+|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/f2947546-f61d-4d93-a6bc-3e76b9ba4eb2"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/87b36b00-853f-4ee3-843d-70c24fe81649"></img>|<img src="https://github.com/thekoon0456/WeatherI_Refactor/assets/106993057/a0107164-28f7-416d-863a-2241aa12e7c3"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/8ea72a73-8d2f-47d0-9d54-511bed03d909"></img>|
 |`음ㅇ아악악악ㅍㅍ`|`뮤직비디오`|`권한 요청`|`구독 제안`|
 <br>
 
