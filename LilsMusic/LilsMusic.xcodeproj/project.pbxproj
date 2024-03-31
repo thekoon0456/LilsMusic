@@ -409,7 +409,6 @@
 			children = (
 				7CF60D722B9EE60E001769BD /* UserLibrary.swift */,
 				7C446E612BA5B7D800AAC5CB /* UserSetting.swift */,
-				7CE9CA5F2BB94605006A2B91 /* SubscriptionManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -434,6 +433,7 @@
 			children = (
 				7C813DEE2B9AE3B200CDFF1D /* FMMusicPlayer.swift */,
 				7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */,
+				7CE9CA5F2BB94605006A2B91 /* SubscriptionManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";

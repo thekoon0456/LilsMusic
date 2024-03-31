@@ -35,6 +35,7 @@ final class FMMusicPlayer {
     
     @MainActor
     func play() async throws {
+        Task {
             do {
                 try await player.prepareToPlay()
                 if player.isPreparedToPlay == true {
@@ -43,6 +44,7 @@ final class FMMusicPlayer {
             } catch {
                 print("playError: ", error.localizedDescription)
             }
+        }
     }
     
     @MainActor
@@ -167,12 +169,12 @@ final class FMMusicPlayer {
             }
         }
     }
-
+    
     // MARK: - Player Status
     
     //현재 재생 여부
     func getPlaybackState() -> ApplicationMusicPlayer.PlaybackStatus {
-          player.state.playbackStatus
+        player.state.playbackStatus
     }
     
     //현재 플레이타임
@@ -206,7 +208,7 @@ final class FMMusicPlayer {
                 guard let self else { return }
                 let entry = player.queue.currentEntry
                 currentEntrySubject.onNext(entry)
-        }.store(in: &cancellable)
+            }.store(in: &cancellable)
     }
     
     //음악 재생상태 추적, 업데이트
@@ -214,10 +216,10 @@ final class FMMusicPlayer {
         player.state.objectWillChange
             .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-            guard let self else { return }
-            let state = player.state.playbackStatus
-            currentPlayStateSubject.onNext(state)
-        }.store(in: &cancellable)
+                guard let self else { return }
+                let state = player.state.playbackStatus
+                currentPlayStateSubject.onNext(state)
+            }.store(in: &cancellable)
     }
 }
 

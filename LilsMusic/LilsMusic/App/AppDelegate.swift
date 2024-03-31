@@ -15,13 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         FirebaseApp.configure()
-        
-        //유저 구독 체크
-//        SubscriptionManager.shared.checkAppleMusicSubscriptionEligibility { bool in
-//            print("유저 구독\(bool)")
-//            UserDefaultsManager.shared.userSubscription.isSubscribe = bool
-//        }
-        
         return true
     }
 
