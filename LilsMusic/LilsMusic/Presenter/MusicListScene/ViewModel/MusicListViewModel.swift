@@ -38,6 +38,7 @@ final class MusicListViewModel: ViewModel {
     weak var coordinator: MusicListCoordinator?
     private let musicPlayer = FMMusicPlayer.shared
     private let musicRepository = MusicRepository()
+    private let isUserSubscription = UserDefaultsManager.shared.userSubscription.isSubscribe
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
 
     let disposeBag = DisposeBag()
@@ -74,7 +75,11 @@ final class MusicListViewModel: ViewModel {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
                     try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
-                    owner.checkAppleMusicSubscriptionEligibility(track: firstItem)
+                    DispatchQueue.main.async {
+                        owner.isUserSubscription
+                        ? owner.coordinator?.presentMusicPlayer(track: firstItem)
+                        : owner.coordinator?.presentAppleMusicSubscriptionOffer()
+                    }
                 }
             }.disposed(by: disposeBag)
         
@@ -88,7 +93,11 @@ final class MusicListViewModel: ViewModel {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
                     try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
-                    owner.checkAppleMusicSubscriptionEligibility(track: firstItem)
+                    DispatchQueue.main.async {
+                        owner.isUserSubscription
+                        ? owner.coordinator?.presentMusicPlayer(track: firstItem)
+                        : owner.coordinator?.presentAppleMusicSubscriptionOffer()
+                    }
                 }
             }.disposed(by: disposeBag)
         
@@ -97,7 +106,11 @@ final class MusicListViewModel: ViewModel {
             .subscribe { owner, item in
                 owner.tapImpact()
                 owner.setQueue(index: item.index, track: item.track)
-                owner.checkAppleMusicSubscriptionEligibility(track: item.track)
+                    DispatchQueue.main.async {
+                        owner.isUserSubscription
+                        ? owner.coordinator?.presentMusicPlayer(track: item.track)
+                        : owner.coordinator?.presentAppleMusicSubscriptionOffer()
+                    }
             }.disposed(by: disposeBag)
         
         input.miniPlayerTapped
@@ -246,37 +259,6 @@ final class MusicListViewModel: ViewModel {
                 }
             }
             return Disposables.create()
-        }
-    }
-}
-
-// MARK: - Apple뮤직 구독 유무 확인
-
-extension MusicListViewModel {
-    
-    func checkAppleMusicSubscriptionEligibility(track: Track) {
-        let controller = SKCloudServiceController()
-        
-        controller.requestCapabilities { [weak self] capabilities, error in
-            guard let self else { return }
-            if let error {
-                print(error.localizedDescription)
-                return
-            }
-            
-            if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    coordinator?.presentAppleMusicSubscriptionOffer()
-                }
-                return
-            } else {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    coordinator?.presentMusicPlayer(track: track)
-                }
-                return
-            }
         }
     }
 }

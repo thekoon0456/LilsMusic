@@ -35,14 +35,14 @@ final class FMMusicPlayer {
     
     @MainActor
     func play() async throws {
-        Task {
             do {
-                try await player.play()
+                try await player.prepareToPlay()
+                if player.isPreparedToPlay == true {
+                    try await player.play()
+                }
             } catch {
                 print("playError: ", error.localizedDescription)
-                try await play()
             }
-        }
     }
     
     @MainActor
@@ -88,6 +88,7 @@ final class FMMusicPlayer {
     
     @MainActor
     func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
+        stop()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
@@ -95,6 +96,7 @@ final class FMMusicPlayer {
     
     @MainActor
     func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
+        stop()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
@@ -102,6 +104,7 @@ final class FMMusicPlayer {
     
     @MainActor
     func setAlbumQueue(item: Album, startTrack: Track) async throws {
+        stop()
         let queue = ApplicationMusicPlayer.Queue(album: item, startingAt: startTrack)
         player.queue = queue
         try await play()
@@ -109,6 +112,7 @@ final class FMMusicPlayer {
     
     @MainActor
     func setPlaylistQueue(item: Playlist, startEntry: Playlist.Entry) async throws {
+        stop()
         let queue = ApplicationMusicPlayer.Queue(playlist: item, startingAt: startEntry)
         player.queue = queue
         try await play()
@@ -116,7 +120,7 @@ final class FMMusicPlayer {
     
     @MainActor
     func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
-        print(#function)
+        stop()
         let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
         player.queue = queue
         try await play()
@@ -124,21 +128,16 @@ final class FMMusicPlayer {
     
     @MainActor
     func playSong(_ song: Song) async throws {
+        stop()
         player.queue = [song]
         try await play()
     }
     
     @MainActor
     func playTrack(_ track: Track) async throws {
+        stop()
         player.queue = [track]
         try await play()
-    }
-    
-    func resetQueue() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            player.queue = []
-        }
     }
     
     // MARK: - Mode

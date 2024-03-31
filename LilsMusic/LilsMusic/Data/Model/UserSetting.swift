@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct UserSubscription: Codable {
+    static let key: String = "UserSubscription"
+    var isSubscribe: Bool
+}
+
 struct UserSetting: Codable {
     static let key: String = "UserSetting"
     var shuffleMode: ShuffleMode

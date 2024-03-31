@@ -17,6 +17,9 @@ final class UserDefaultsManager {
     @UserDefault(key: UserSetting.key, defaultValue: UserSetting(shuffleMode: .off,
                                                                  repeatMode: .all))
     var userSetting: UserSetting
+    
+    @UserDefault(key: UserSubscription.key, defaultValue: UserSubscription(isSubscribe: false))
+    var userSubscription: UserSubscription
 }
 
 @propertyWrapper

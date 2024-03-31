@@ -32,7 +32,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneWillResignActive(_ scene: UIScene) { }
 
-    func sceneWillEnterForeground(_ scene: UIScene) { }
+    func sceneWillEnterForeground(_ scene: UIScene) {
+        SubscriptionManager.shared.checkAppleMusicSubscriptionEligibility { bool in
+            print("유저 구독\(bool)")
+            UserDefaultsManager.shared.userSubscription.isSubscribe = bool
+        }
+    }
 
     func sceneDidEnterBackground(_ scene: UIScene) { }
 }

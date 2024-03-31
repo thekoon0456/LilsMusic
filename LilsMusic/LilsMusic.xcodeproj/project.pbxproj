@@ -84,6 +84,7 @@
 		7C916E102B9D9FF500C5F6C0 /* ReelsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C916E0F2B9D9FF500C5F6C0 /* ReelsViewModel.swift */; };
 		7C916E122B9DA00100C5F6C0 /* ReelsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C916E112B9DA00100C5F6C0 /* ReelsViewController.swift */; };
 		7C916E142B9DA01200C5F6C0 /* ReelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C916E132B9DA01200C5F6C0 /* ReelsCell.swift */; };
+		7CE9CA602BB94605006A2B91 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE9CA5F2BB94605006A2B91 /* SubscriptionManager.swift */; };
 		7CF60D732B9EE60E001769BD /* UserLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D722B9EE60E001769BD /* UserLibrary.swift */; };
 		7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF64B872BA064640040E416 /* PaddingLabel.swift */; };
 /* End PBXBuildFile section */
@@ -157,6 +158,7 @@
 		7C916E0F2B9D9FF500C5F6C0 /* ReelsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelsViewModel.swift; sourceTree = "<group>"; };
 		7C916E112B9DA00100C5F6C0 /* ReelsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelsViewController.swift; sourceTree = "<group>"; };
 		7C916E132B9DA01200C5F6C0 /* ReelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelsCell.swift; sourceTree = "<group>"; };
+		7CE9CA5F2BB94605006A2B91 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
 		7CF60D722B9EE60E001769BD /* UserLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLibrary.swift; sourceTree = "<group>"; };
 		7CF64B872BA064640040E416 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -407,6 +409,7 @@
 			children = (
 				7CF60D722B9EE60E001769BD /* UserLibrary.swift */,
 				7C446E612BA5B7D800AAC5CB /* UserSetting.swift */,
+				7CE9CA5F2BB94605006A2B91 /* SubscriptionManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -719,6 +722,7 @@
 				7CF60D732B9EE60E001769BD /* UserLibrary.swift in Sources */,
 				7C813DFD2B9B13AB00CDFF1D /* UIVIewController+.swift in Sources */,
 				7C916E092B9D9BC000C5F6C0 /* Coordinator.swift in Sources */,
+				7CE9CA602BB94605006A2B91 /* SubscriptionManager.swift in Sources */,
 				7C131C542BA44387004B3FF2 /* MusicRepository.swift in Sources */,
 				7C03F7CC2BA177FA00FB748C /* UserPlaylistRepository.swift in Sources */,
 				7C813DD72B9AE2B800CDFF1D /* Then+.swift in Sources */,
