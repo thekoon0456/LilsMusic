@@ -35,16 +35,8 @@ final class FMMusicPlayer {
     
     @MainActor
     func play() async throws {
-        Task {
-            do {
-                try await player.prepareToPlay()
-                if player.isPreparedToPlay == true {
-                    try await player.play()
-                }
-            } catch {
-                print("playError: ", error.localizedDescription)
-            }
-        }
+        try await player.prepareToPlay()
+        try await player.play()
     }
     
     @MainActor
@@ -82,6 +74,13 @@ final class FMMusicPlayer {
         return player.queue.currentEntry
     }
     
+    func replaceQueue(item: ApplicationMusicPlayer.Queue) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            player.queue = []
+        }
+    }
+    
     // MARK: - Set Queue
     
     func getQueue() -> ApplicationMusicPlayer.Queue.Entries {
@@ -89,57 +88,99 @@ final class FMMusicPlayer {
     }
     
     @MainActor
-    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) async throws {
-        stop()
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
+    func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) {
+        Task {
+            do {
+                player.stop()
+                let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+                player.queue = queue
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     @MainActor
-    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) async throws {
-        stop()
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
+    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) {
+        Task {
+            do {
+                player.stop()
+                let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+                player.queue = queue
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     @MainActor
-    func setAlbumQueue(item: Album, startTrack: Track) async throws {
-        stop()
-        let queue = ApplicationMusicPlayer.Queue(album: item, startingAt: startTrack)
-        player.queue = queue
-        try await play()
+    func setAlbumQueue(item: Album, startTrack: Track) {
+        Task {
+            do {
+                player.stop()
+                let queue = ApplicationMusicPlayer.Queue(album: item, startingAt: startTrack)
+                player.queue = queue
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     @MainActor
-    func setPlaylistQueue(item: Playlist, startEntry: Playlist.Entry) async throws {
-        stop()
-        let queue = ApplicationMusicPlayer.Queue(playlist: item, startingAt: startEntry)
-        player.queue = queue
-        try await play()
+    func setPlaylistQueue(item: Playlist, startEntry: Playlist.Entry) {
+        Task {
+            do {
+                player.stop()
+                let queue = ApplicationMusicPlayer.Queue(playlist: item, startingAt: startEntry)
+                player.queue = queue
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     @MainActor
-    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) async throws {
-        stop()
-        let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
-        player.queue = queue
-        try await play()
+    func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) {
+        Task {
+            do {
+                player.stop()
+                let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+                player.queue = queue
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     @MainActor
     func playSong(_ song: Song) async throws {
-        stop()
-        player.queue = [song]
-        try await play()
+        Task {
+            do {
+                player.stop()
+                player.queue = [song]
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     @MainActor
     func playTrack(_ track: Track) async throws {
-        stop()
-        player.queue = [track]
-        try await play()
+        Task {
+            do {
+                player.stop()
+                player.queue = [track]
+                try await play()
+            } catch {
+                try await play()
+            }
+        }
     }
     
     // MARK: - Mode

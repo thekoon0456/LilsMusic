@@ -166,8 +166,6 @@ final class ReelsCell: BaseCollectionViewCell {
             guard let self else { return }
             DisplayVideoFromAssets(asset: asset, view: musicVideoView)
             setPlayerStatus(status: status)
-//            pause()
-//            play()
         }
         
         musicLabel.text = data.title
@@ -198,7 +196,6 @@ final class ReelsCell: BaseCollectionViewCell {
                 switch playerItem.status {
                 case .readyToPlay:
                     stopLoadingIndicator()
-                    
 //                    player?.play()
                 case .failed, .unknown:
                     print("Failed to load the video")
