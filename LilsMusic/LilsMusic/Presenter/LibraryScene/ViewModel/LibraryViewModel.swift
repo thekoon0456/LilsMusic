@@ -31,6 +31,7 @@ final class LibraryViewModel: ViewModel {
         let artists: Driver<MusicItemCollection<Artist>>
         let albums: Driver<MusicItemCollection<Album>>
         let likeTracks: Driver<MusicItemCollection<Track>>
+        let recentlyPlayTracks: Driver<MusicItemCollection<Track>>
         let currentPlaySong: Driver<Track?>
         let playState: Driver<ApplicationMusicPlayer.PlaybackStatus>
     }
@@ -81,21 +82,28 @@ final class LibraryViewModel: ViewModel {
             .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchPlaylist()
+                owner.fetchPlaylistObservable()
             }.asDriver(onErrorJustReturn: [])
         
         let artist = input
             .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchArtistList()
+                owner.fetchArtistListObservable()
             }.asDriver(onErrorJustReturn: [])
         
         let albums = input
             .viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchAlbumList()
+                owner.fetchAlbumListObservable()
+            }.asDriver(onErrorJustReturn: [])
+        
+        let recentlyPlayed = input
+            .viewDidLoad
+            .withUnretained(self)
+            .flatMapLatest { owner, _ in
+                owner.fetchRecentlyPlayListObservable()
             }.asDriver(onErrorJustReturn: [])
         
         input.mixSelected
@@ -112,7 +120,7 @@ final class LibraryViewModel: ViewModel {
                 Task {
                     do {
                         let tracks = try await self.musicRepository.requestLikeList(ids: likeID)
-                        try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
+                        await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
                         DispatchQueue.main.async {
                             owner.coordinator?.presentMusicPlayer(track: item.track)
                         }
@@ -164,6 +172,7 @@ final class LibraryViewModel: ViewModel {
                       artists: artist,
                       albums: albums,
                       likeTracks: likeTracks,
+                      recentlyPlayTracks: recentlyPlayed,
                       currentPlaySong: currentEntry.asDriver(onErrorJustReturn: nil),
                       playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing))
     }
@@ -201,12 +210,23 @@ final class LibraryViewModel: ViewModel {
         }
     }
     
-    private func fetchRecentlyPlayList() async throws -> MusicItemCollection<Track> {
-        let result = try await self.musicRepository.requestRecentlyPlayed()
-        return result
+    private func fetchRecentlyPlayListObservable() -> Observable<MusicItemCollection<Track>> {
+        return Observable.create { [weak self] observer in
+            guard let self else { return Disposables.create() }
+            Task {
+                do { 
+                    let result = try await self.musicRepository.requestRecentlyPlayed()
+                    observer.onNext(result)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create()
+        }
     }
     
-    private func fetchPlaylist() -> Observable<[(title: String, item: MusicItemCollection<Track>)]> {
+    private func fetchPlaylistObservable() -> Observable<[(title: String, item: MusicItemCollection<Track>)]> {
         return Observable.create { [weak self] observer in
             guard let self else { return Disposables.create() }
             let playlists = playlistRepository.fetchArr()
@@ -228,7 +248,7 @@ final class LibraryViewModel: ViewModel {
         }
     }
     
-    private func fetchArtistList() -> Observable<MusicItemCollection<Artist>> {
+    private func fetchArtistListObservable() -> Observable<MusicItemCollection<Artist>> {
         return Observable.create { [weak self] observer in
             guard let self,
                   let artist = artistRepository.fetchArr().first
@@ -251,7 +271,7 @@ final class LibraryViewModel: ViewModel {
         return Array(likes.likeID)
     }
     
-    private func fetchAlbumList() -> Observable<MusicItemCollection<Album>> {
+    private func fetchAlbumListObservable() -> Observable<MusicItemCollection<Album>> {
         return Observable.create { [weak self] observer in
             guard let self,
                   let albums = albumsRepository.fetchArr().first

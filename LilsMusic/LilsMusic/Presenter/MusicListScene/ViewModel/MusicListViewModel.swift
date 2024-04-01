@@ -74,7 +74,7 @@ final class MusicListViewModel: ViewModel {
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
                     DispatchQueue.main.async {
                         owner.isUserSubscription
                         ? owner.coordinator?.presentMusicPlayer(track: firstItem)
@@ -92,7 +92,7 @@ final class MusicListViewModel: ViewModel {
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
-                    try await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
                     DispatchQueue.main.async {
                         owner.isUserSubscription
                         ? owner.coordinator?.presentMusicPlayer(track: firstItem)
@@ -180,9 +180,9 @@ final class MusicListViewModel: ViewModel {
             case let playlist as Playlist:
                 let playlist = try await playlist.with(.entries)
                 guard let entry = playlist.entries?[index] else { return }
-                try await musicPlayer.setPlaylistQueue(item: playlist, startEntry: entry)
+                await musicPlayer.setPlaylistQueue(item: playlist, startEntry: entry)
             case let album as Album:
-                try await musicPlayer.setAlbumQueue(item: album, startTrack: track)
+                await musicPlayer.setAlbumQueue(item: album, startTrack: track)
             default:
                 return
             }

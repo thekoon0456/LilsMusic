@@ -73,13 +73,6 @@ final class FMMusicPlayer {
         return player.queue.currentEntry
     }
     
-    func replaceQueue(item: ApplicationMusicPlayer.Queue) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            player.queue = []
-        }
-    }
-    
     // MARK: - Set Queue
     
     func getQueue() -> ApplicationMusicPlayer.Queue.Entries {
@@ -90,7 +83,6 @@ final class FMMusicPlayer {
     func setSongQueue(item: MusicItemCollection<Song>, startIndex: Int) {
         Task {
             do {
-                player.stop()
                 let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
                 player.queue = queue
                 try await play()
@@ -104,7 +96,6 @@ final class FMMusicPlayer {
     func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) {
         Task {
             do {
-                player.stop()
                 let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
                 player.queue = queue
                 try await play()
@@ -118,7 +109,6 @@ final class FMMusicPlayer {
     func setAlbumQueue(item: Album, startTrack: Track) {
         Task {
             do {
-                player.stop()
                 let queue = ApplicationMusicPlayer.Queue(album: item, startingAt: startTrack)
                 player.queue = queue
                 try await play()
@@ -132,7 +122,6 @@ final class FMMusicPlayer {
     func setPlaylistQueue(item: Playlist, startEntry: Playlist.Entry) {
         Task {
             do {
-                player.stop()
                 let queue = ApplicationMusicPlayer.Queue(playlist: item, startingAt: startEntry)
                 player.queue = queue
                 try await play()
@@ -146,7 +135,6 @@ final class FMMusicPlayer {
     func setStationQueue(item: MusicItemCollection<Station>, startIndex: Int) {
         Task {
             do {
-                player.stop()
                 let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
                 player.queue = queue
                 try await play()
@@ -160,7 +148,6 @@ final class FMMusicPlayer {
     func playSong(_ song: Song) async throws {
         Task {
             do {
-                player.stop()
                 player.queue = [song]
                 try await play()
             } catch {
@@ -173,7 +160,6 @@ final class FMMusicPlayer {
     func playTrack(_ track: Track) async throws {
         Task {
             do {
-                player.stop()
                 player.queue = [track]
                 try await play()
             } catch {

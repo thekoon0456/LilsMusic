@@ -10,6 +10,7 @@ import MusicKit
 
 import RxSwift
 import RxCocoa
+import UIKit
 
 final class MusicPlayerViewModel: ViewModel {
     

@@ -145,6 +145,10 @@ final class LibraryViewController: BaseViewController {
             owner.updateForyouEmptyLabel(model: value)
         }.disposed(by: disposeBag)
         
+        output.recentlyPlayTracks.drive(with: self) { owner, tracks in
+            //추가
+        }.disposed(by: disposeBag)
+        
         output.likeTracks.drive(with: self) { owner, tracks in
             owner.updateEmptyLabel(tracks: tracks)
             owner.updateSnapshot(tracks: tracks)
@@ -210,6 +214,62 @@ final class LibraryViewController: BaseViewController {
     
     override func configureLayout() {
         super.configureLayout()
+        setLayout()
+    }
+    
+    override func configureView() {
+        super.configureView()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: iconView)
+        navigationItem.backButtonDisplayMode = .minimal
+    }
+}
+
+
+// MARK: - LikeListCollectionView
+
+extension LibraryViewController {
+    
+    enum Section: Int, CaseIterable {
+        case main
+    }
+    
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
+            cell.configureCell(itemIdentifier)
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource(collectionView: likeListCollectionView) { collectionView, indexPath, itemIdentifier in
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+            return cell
+        }
+    }
+    
+    private func updateSnapshot(tracks: MusicItemCollection<Track>) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Track>()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(Array(tracks), toSection: .main)
+        dataSource?.apply(snapshot)
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { (sectionIndex, environment) -> NSCollectionLayoutSection? in
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                  heightDimension: .fractionalHeight(1.0))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                   heightDimension: .absolute(60))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                           subitems: [item])
+            let section = NSCollectionLayoutSection(group: group)
+            return section
+        }
+        return layout
+    }
+}
+
+extension LibraryViewController {
+    
+    private func setLayout() {
         scrollView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
@@ -263,55 +323,6 @@ final class LibraryViewController: BaseViewController {
             make.trailing.equalToSuperview().offset(-12)
             make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-12)
         }
-    }
-    
-    override func configureView() {
-        super.configureView()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: iconView)
-        navigationItem.backButtonDisplayMode = .minimal
-    }
-}
-
-
-// MARK: - LikeListCollectionView
-
-extension LibraryViewController {
-    
-    enum Section: Int, CaseIterable {
-        case main
-    }
-    
-    private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
-            cell.configureCell(itemIdentifier)
-        }
-        
-        dataSource = UICollectionViewDiffableDataSource(collectionView: likeListCollectionView) { collectionView, indexPath, itemIdentifier in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-            return cell
-        }
-    }
-    
-    private func updateSnapshot(tracks: MusicItemCollection<Track>) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Track>()
-        snapshot.appendSections(Section.allCases)
-        snapshot.appendItems(Array(tracks), toSection: .main)
-        dataSource?.apply(snapshot)
-    }
-    
-    private func createLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { (sectionIndex, environment) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                  heightDimension: .fractionalHeight(1.0))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                   heightDimension: .absolute(60))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
-                                                           subitems: [item])
-            let section = NSCollectionLayoutSection(group: group)
-            return section
-        }
-        return layout
     }
 }
 
