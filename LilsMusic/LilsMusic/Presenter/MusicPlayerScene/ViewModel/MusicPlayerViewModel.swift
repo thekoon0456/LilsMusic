@@ -61,7 +61,7 @@ final class MusicPlayerViewModel: ViewModel {
         musicPlayer.currentEntrySubject
             .asObservable()
             .withUnretained(self)
-            .delaySubscription(.seconds(1), scheduler: MainScheduler.instance) //처음 진입했을때는 track으로 그리고, 1초 뒤부터 구독
+            .delaySubscription(.milliseconds(1500), scheduler: MainScheduler.instance) //처음 진입했을때는 track으로 그리고, 1초 뒤부터 구독
             .flatMapLatest { owner, entry in
                 owner.fetchCurrentEntryTrackObservable(entry: entry)
             }
