@@ -39,6 +39,7 @@
 		7C446E642BA5E20900AAC5CB /* BaseCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E632BA5E20900AAC5CB /* BaseCollectionView.swift */; };
 		7C446E662BA6150E00AAC5CB /* PlaylistMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */; };
 		7C446E682BA623AB00AAC5CB /* ArtworkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C446E672BA623AB00AAC5CB /* ArtworkHeaderView.swift */; };
+		7C46F49C2BBB239900AC9960 /* TrendingFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C46F49B2BBB239900AC9960 /* TrendingFooterView.swift */; };
 		7C66F05C2BB15AC800530C27 /* UINavigationController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C66F05B2BB15AC800530C27 /* UINavigationController+.swift */; };
 		7C66F05F2BB1C09800530C27 /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 7C66F05E2BB1C09800530C27 /* MarqueeLabel */; };
 		7C6B06DA2BA1FE8000726AD0 /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 7C6B06D92BA1FE8000726AD0 /* CollectionViewPagingLayout */; };
@@ -115,6 +116,7 @@
 		7C446E632BA5E20900AAC5CB /* BaseCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCollectionView.swift; sourceTree = "<group>"; };
 		7C446E652BA6150E00AAC5CB /* PlaylistMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMenuButton.swift; sourceTree = "<group>"; };
 		7C446E672BA623AB00AAC5CB /* ArtworkHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkHeaderView.swift; sourceTree = "<group>"; };
+		7C46F49B2BBB239900AC9960 /* TrendingFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingFooterView.swift; sourceTree = "<group>"; };
 		7C66F05B2BB15AC800530C27 /* UINavigationController+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+.swift"; sourceTree = "<group>"; };
 		7C6B06DB2BA2012D00726AD0 /* LibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCell.swift; sourceTree = "<group>"; };
 		7C6EE4D72BAEE6D600087EF2 /* UIControl+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+.swift"; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			isa = PBXGroup;
 			children = (
 				7C39276E2BA341BA0074F87E /* TrendingHeaderView.swift */,
+				7C46F49B2BBB239900AC9960 /* TrendingFooterView.swift */,
 				7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */,
 				7C3927742BA34FF60074F87E /* PlaylistCell.swift */,
 				7C3927702BA3420C0074F87E /* AlbumArtCell.swift */,
@@ -750,6 +753,7 @@
 				7C77400E2B9DA44C00B2E6E7 /* UserViewModel.swift in Sources */,
 				7C131C592BA4730A004B3FF2 /* UserDefaultsManager.swift in Sources */,
 				7C7740032B9DA18700B2E6E7 /* MusicListCoordinator.swift in Sources */,
+				7C46F49C2BBB239900AC9960 /* TrendingFooterView.swift in Sources */,
 				7C916E142B9DA01200C5F6C0 /* ReelsCell.swift in Sources */,
 				7C044BF42BADA71F007E910E /* LibraryListViewController.swift in Sources */,
 				7C916E102B9D9FF500C5F6C0 /* ReelsViewModel.swift in Sources */,

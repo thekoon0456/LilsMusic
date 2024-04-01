@@ -86,6 +86,9 @@ final class LibraryViewController: BaseViewController {
         $0.register(TrendingHeaderView.self,
                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                     withReuseIdentifier: TrendingHeaderView.identifier)
+        $0.register(TrendingFooterView.self,
+                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                    withReuseIdentifier: TrendingFooterView.identifier)
     }
     
     private let miniPlayerView = MiniPlayerView().then {
@@ -252,6 +255,15 @@ extension LibraryViewController {
                 "Liked Songs"
             }
         }
+        
+        var emptyDescription: String {
+            switch self {
+            case .recentlyPlayed:
+                "Play your music"
+            case .likedSongs:
+                "Press the heart for your favorite music"
+            }
+        }
     }
     
     private func configureDataSource() {
@@ -277,13 +289,20 @@ extension LibraryViewController {
         }
         
         dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
-            guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TrendingHeaderView.identifier, for: indexPath) as? TrendingHeaderView,
-                  let section = Section(rawValue: indexPath.section)
-            else {
-                return UICollectionReusableView()
+            guard let section = Section(rawValue: indexPath.section) else { return UICollectionReusableView() }
+            var itemCount = 0
+            
+            if kind == UICollectionView.elementKindSectionHeader {
+                guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TrendingHeaderView.identifier, for: indexPath) as? TrendingHeaderView else { return UICollectionReusableView() }
+                headerView.setTitle(section.title)
+                return headerView
+            } else if kind == UICollectionView.elementKindSectionFooter {
+                guard let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TrendingFooterView.identifier, for: indexPath) as? TrendingFooterView else { return UICollectionReusableView() }
+                    footerView.setTitle(section.emptyDescription)
+                    return footerView
             }
-            headerView.setTitle(section.title)
-            return headerView
+            
+            return UICollectionReusableView()
         }
     }
     
@@ -291,14 +310,27 @@ extension LibraryViewController {
         let snapshot = NSDiffableDataSourceSnapshot<Section, Track>().then {
             $0.appendSections(Section.allCases)
         }
-        dataSource?.apply(snapshot) //이전의 reloadData 역할
+        
+        hideFooter()
+
+        dataSource?.apply(snapshot)
     }
     
     private func updateRecentlyPlayedSongsSnapshot(tracks: MusicItemCollection<Track>) {
         let snapshot = NSDiffableDataSourceSectionSnapshot<Track>().then {
             $0.append(Array(tracks))
         }
+        
+        hideFooter()
+        
         dataSource?.apply(snapshot, to: .recentlyPlayed)
+    }
+    
+    func hideFooter() {
+        let compLayout = musicListCollectionView.collectionViewLayout as? UICollectionViewCompositionalLayout
+        UIView.animate(withDuration: 0.4) {
+            compLayout?.configuration.boundarySupplementaryItems = []
+        }
     }
     
     private func updateLikedSongsSnapshot(tracks: MusicItemCollection<Track>) {
@@ -321,13 +353,18 @@ extension LibraryViewController {
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 0,
-                                                              bottom: 12,
-                                                              trailing: 12)
+                                                              bottom: 8,
+                                                              trailing: 8)
                 let section = NSCollectionLayoutSection(group: group)
-                section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),
+                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
                                                                               heightDimension: .absolute(50)),
                                                             elementKind:  UICollectionView.elementKindSectionHeader,
-                                                            alignment: .topLeading)]
+                                                            alignment: .topLeading)
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
+                                                                              heightDimension: .absolute(50)),
+                                                            elementKind:  UICollectionView.elementKindSectionFooter,
+                                                            alignment: .bottomLeading)
+                section.boundarySupplementaryItems = [header, footer]
                 section.orthogonalScrollingBehavior = .groupPaging
                 return section
             case .likedSongs:
@@ -339,10 +376,15 @@ extension LibraryViewController {
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
                                                                subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
-                section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),
+                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
                                                                               heightDimension: .absolute(50)),
                                                             elementKind:  UICollectionView.elementKindSectionHeader,
-                                                            alignment: .topLeading)]
+                                                            alignment: .topLeading)
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
+                                                                              heightDimension: .absolute(50)),
+                                                            elementKind:  UICollectionView.elementKindSectionFooter,
+                                                            alignment: .bottomLeading)
+                section.boundarySupplementaryItems = [header, footer]
                 return section
             }
         }
@@ -379,23 +421,12 @@ extension LibraryViewController {
             make.height.equalTo(220)
         }
         
-//        likeEmptyLabel.snp.makeConstraints { make in
-//            make.top.equalTo(likeLabel.snp.bottom).offset(12)
-//            make.leading.equalToSuperview().offset(12)
-//        }
-        
         musicListCollectionView.snp.makeConstraints { make in
             make.top.equalTo(playlistCollectionView.snp.bottom).offset(8)
             make.height.equalTo(view.bounds.height * 0.7)
             make.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-        
-        //        albumCollectionView.snp.makeConstraints { make in
-        //            make.top.equalTo(playlistCollectionView.snp.bottom).offset(20)
-        //            make.horizontalEdges.equalToSuperview()
-        //            make.bottom.equalToSuperview()
-        //        }
         
         miniPlayerView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
@@ -404,45 +435,3 @@ extension LibraryViewController {
         }
     }
 }
-
-
-
-// MARK: - AlbumCollectionView
-
-//extension LibraryViewController {
-
-
-//    private lazy var albumCollectionView = UICollectionView(frame: .zero,
-//                                                            collectionViewLayout: createLayout())
-//    private var dataSource: UICollectionViewDiffableDataSource<Section, Album>?
-//        private var album: MusicItemCollection<Album>?
-
-//
-//    enum Section: Int, CaseIterable {
-//        case album
-//    }
-//
-//    private func configureDataSource() {
-//        let cellRegistration = UICollectionView.CellRegistration<AlbumArtCell, Album> { cell, indexPath, itemIdentifier in
-//            cell.configureCell(itemIdentifier)
-//        }
-//
-//        dataSource = UICollectionViewDiffableDataSource(collectionView: albumCollectionView) { collectionView, indexPath, itemIdentifier in
-//            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-//            return cell
-//        }
-//    }
-//
-//    private func createLayout() -> UICollectionViewCompositionalLayout {
-//        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalWidth(0.5))
-//        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-//        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0)
-//        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalWidth(0.5))
-//        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-//        group.interItemSpacing = .fixed(10)
-//        let section = NSCollectionLayoutSection(group: group)
-//        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
-//        let layout = UICollectionViewCompositionalLayout(section: section)
-//        return layout
-//    }
-//}
