@@ -17,7 +17,7 @@ final class LibraryViewModel: ViewModel {
         let viewDidLoad: Observable<Void>
         let viewWillAppear: Observable<Void>
         let playlistItemSelected: Observable<MusicItem>
-        let likeItemSelected: Observable<(index: Int, track: Track)>
+        let likeItemSelected: Observable<(index: IndexPath, track: Track)>
         let mixSelected: ControlEvent<Playlist>
         let miniPlayerTapped: Observable<Void>
         let miniPlayerPlayButtonTapped: Observable<Void>
@@ -116,16 +116,34 @@ final class LibraryViewModel: ViewModel {
             .observe(on: MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, item in
-                let likeID = owner.fetchLikeList()
-                Task {
-                    do {
-                        let tracks = try await self.musicRepository.requestLikeList(ids: likeID)
-                        await owner.musicPlayer.setTrackQueue(item: tracks, startIndex:item.index)
-                        DispatchQueue.main.async {
-                            owner.coordinator?.presentMusicPlayer(track: item.track)
+                guard let section = LibraryViewController.Section(rawValue: item.index.section) else { return }
+                switch section {
+                case .recentlyPlayed:
+                    Task {
+                        do {
+                            let tracks = try await owner.musicRepository.requestRecentlyPlayed()
+                            let selectedTrack = tracks[item.index.item]
+                            await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: selectedTrack)
+                            DispatchQueue.main.async {
+                                owner.coordinator?.presentMusicPlayer(track: selectedTrack)
+                            }
+                        } catch {
+                            print(error)
                         }
-                    } catch {
-                        print(error)
+                    }
+                case .likedSongs:
+                    let likeID = owner.fetchLikeList()
+                    Task {
+                        do {
+                            let tracks = try await owner.musicRepository.requestLikeList(ids: likeID)
+                            let selectedTrack = tracks[item.index.item]
+                            await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: selectedTrack)
+                            DispatchQueue.main.async {
+                                owner.coordinator?.presentMusicPlayer(track: selectedTrack)
+                            }
+                        } catch {
+                            print(error)
+                        }
                     }
                 }
             }.disposed(by: disposeBag)

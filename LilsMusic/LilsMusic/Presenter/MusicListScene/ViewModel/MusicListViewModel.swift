@@ -74,7 +74,7 @@ final class MusicListViewModel: ViewModel {
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
-                    await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: firstItem)
                     DispatchQueue.main.async {
                         owner.isUserSubscription
                         ? owner.coordinator?.presentMusicPlayer(track: firstItem)
@@ -92,7 +92,7 @@ final class MusicListViewModel: ViewModel {
                 Task {
                     guard let tracks = try await owner.fetchTracks(),
                           let firstItem = tracks.first else { return }
-                    await owner.musicPlayer.setTrackQueue(item: tracks, startIndex: 0)
+                    await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: firstItem)
                     DispatchQueue.main.async {
                         owner.isUserSubscription
                         ? owner.coordinator?.presentMusicPlayer(track: firstItem)

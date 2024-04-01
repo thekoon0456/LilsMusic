@@ -222,7 +222,6 @@ final class MusicRecommendViewController: BaseViewController {
         super.configureView()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: iconView)
         navigationItem.backButtonDisplayMode = .minimal
-        
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
     }

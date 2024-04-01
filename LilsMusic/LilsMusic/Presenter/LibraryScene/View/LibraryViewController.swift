@@ -20,7 +20,7 @@ final class LibraryViewController: BaseViewController {
     private let viewModel: LibraryViewModel
     private let layout = CollectionViewPagingLayout()
     private let playlistItemSelected = PublishSubject<MusicItem>()
-    private let likeItemSelected = PublishSubject<(index: Int, track: Track)>()
+    private let likeItemSelected = PublishSubject<(index: IndexPath, track: Track)>()
     private let viewDidLoadTrigger = PublishSubject<Void>()
     private let playlistSubject = BehaviorSubject< MusicItemCollection<Playlist>>(value: [])
     private var dataSource: UICollectionViewDiffableDataSource<Section, Track>?
@@ -83,6 +83,9 @@ final class LibraryViewController: BaseViewController {
                                                                collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
         $0.contentInsetAdjustmentBehavior = .never
+        $0.register(TrendingHeaderView.self,
+                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                    withReuseIdentifier: TrendingHeaderView.identifier)
     }
     
     private let miniPlayerView = MiniPlayerView().then {
@@ -101,7 +104,7 @@ final class LibraryViewController: BaseViewController {
         super.viewDidLoad()
         
         configureDataSource()
-        updateSnapshot(tracks: [])
+        updateSnapshot()
         viewDidLoadTrigger.onNext(())
     }
     
@@ -146,12 +149,12 @@ final class LibraryViewController: BaseViewController {
         }.disposed(by: disposeBag)
         
         output.recentlyPlayTracks.drive(with: self) { owner, tracks in
-            //추가
+            owner.updateRecentlyPlayedSongsSnapshot(tracks: tracks)
         }.disposed(by: disposeBag)
         
         output.likeTracks.drive(with: self) { owner, tracks in
             owner.updateEmptyLabel(tracks: tracks)
-            owner.updateSnapshot(tracks: tracks)
+            owner.updateLikedSongsSnapshot(tracks: tracks)
         }.disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
@@ -165,8 +168,15 @@ final class LibraryViewController: BaseViewController {
         likeListCollectionView.rx.itemSelected
             .withUnretained(self)
             .subscribe { owner, indexPath in
-                guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
-                owner.likeItemSelected.onNext((index: indexPath.item, track: track))
+                guard let section = Section(rawValue: indexPath.section) else { return }
+                switch section {
+                case .recentlyPlayed:
+                    guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                    owner.likeItemSelected.onNext((index: indexPath, track: track))
+                case .likedSongs:
+                    guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
+                    owner.likeItemSelected.onNext((index: indexPath, track: track))
+                }
             }.disposed(by: disposeBag)
     }
     
@@ -209,8 +219,9 @@ final class LibraryViewController: BaseViewController {
         view.addSubviews(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(forYouLabel, playlistCollectionView, forYouEmptyLabel,
-                                likeLabel, likeListCollectionView, likeEmptyLabel, miniPlayerView)
+                                likeListCollectionView, likeEmptyLabel, miniPlayerView)
     }
+    
     
     override func configureLayout() {
         super.configureLayout()
@@ -230,39 +241,112 @@ final class LibraryViewController: BaseViewController {
 extension LibraryViewController {
     
     enum Section: Int, CaseIterable {
-        case main
+        case recentlyPlayed
+        case likedSongs
+        
+        var title: String {
+            switch self {
+            case .recentlyPlayed:
+                "Recently Played Songs"
+            case .likedSongs:
+                "Liked Songs"
+            }
+        }
     }
     
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
+        let recentlyPlayedCellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> {  cell, indexPath, itemIdentifier in
+            cell.configureCell(itemIdentifier)
+        }
+        
+        let likedCellRegistration = UICollectionView.CellRegistration<MusicListCell, Track> { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier)
         }
         
         dataSource = UICollectionViewDiffableDataSource(collectionView: likeListCollectionView) { collectionView, indexPath, itemIdentifier in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-            return cell
+            
+            guard let section = Section(rawValue: indexPath.section) else { return UICollectionViewCell() }
+            switch section {
+            case .recentlyPlayed:
+                let cell = collectionView.dequeueConfiguredReusableCell(using: recentlyPlayedCellRegistration, for: indexPath, item: itemIdentifier)
+                return cell
+            case .likedSongs:
+                let cell = collectionView.dequeueConfiguredReusableCell(using: likedCellRegistration, for: indexPath, item: itemIdentifier)
+                return cell
+            }
+        }
+        
+        dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TrendingHeaderView.identifier, for: indexPath) as? TrendingHeaderView,
+                  let section = Section(rawValue: indexPath.section)
+            else {
+                return UICollectionReusableView()
+            }
+            headerView.setTitle(section.title)
+            return headerView
         }
     }
     
-    private func updateSnapshot(tracks: MusicItemCollection<Track>) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Track>()
-        snapshot.appendSections(Section.allCases)
-        snapshot.appendItems(Array(tracks), toSection: .main)
-        dataSource?.apply(snapshot)
+    private func updateSnapshot() {
+        let snapshot = NSDiffableDataSourceSnapshot<Section, Track>().then {
+            $0.appendSections(Section.allCases)
+        }
+        dataSource?.apply(snapshot) //이전의 reloadData 역할
+    }
+    
+    private func updateRecentlyPlayedSongsSnapshot(tracks: MusicItemCollection<Track>) {
+        let snapshot = NSDiffableDataSourceSectionSnapshot<Track>().then {
+            $0.append(Array(tracks))
+        }
+        dataSource?.apply(snapshot, to: .recentlyPlayed)
+    }
+    
+    private func updateLikedSongsSnapshot(tracks: MusicItemCollection<Track>) {
+        let snapshot = NSDiffableDataSourceSectionSnapshot<Track>().then {
+            $0.append(Array(tracks))
+        }
+        dataSource?.apply(snapshot, to: .likedSongs)
     }
     
     private func createLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { (sectionIndex, environment) -> NSCollectionLayoutSection? in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                  heightDimension: .fractionalHeight(1.0))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                   heightDimension: .absolute(60))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
-                                                           subitems: [item])
-            let section = NSCollectionLayoutSection(group: group)
-            return section
+        let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in
+            guard let section = Section(rawValue: sectionIndex) else { return nil }
+            switch section {
+            case .recentlyPlayed:
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                      heightDimension: .absolute(60))
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.9),
+                                                       heightDimension: .absolute(180))
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+                group.contentInsets = NSDirectionalEdgeInsets(top: 0,
+                                                              leading: 0,
+                                                              bottom: 0,
+                                                              trailing: 12)
+                let section = NSCollectionLayoutSection(group: group)
+                section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),
+                                                                              heightDimension: .absolute(50)),
+                                                            elementKind:  UICollectionView.elementKindSectionHeader,
+                                                            alignment: .topLeading)]
+                section.orthogonalScrollingBehavior = .groupPaging
+                return section
+            case .likedSongs:
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                      heightDimension: .fractionalHeight(1.0))
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                       heightDimension: .absolute(60))
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                               subitems: [item])
+                let section = NSCollectionLayoutSection(group: group)
+                section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),
+                                                                              heightDimension: .absolute(50)),
+                                                            elementKind:  UICollectionView.elementKindSectionHeader,
+                                                            alignment: .topLeading)]
+                return section
+            }
         }
+        
         return layout
     }
 }
@@ -295,18 +379,13 @@ extension LibraryViewController {
             make.height.equalTo(220)
         }
         
-        likeLabel.snp.makeConstraints { make in
-            make.top.equalTo(playlistCollectionView.snp.bottom).offset(12)
-            make.leading.equalToSuperview().offset(12)
-        }
-        
-        likeEmptyLabel.snp.makeConstraints { make in
-            make.top.equalTo(likeLabel.snp.bottom).offset(12)
-            make.leading.equalToSuperview().offset(12)
-        }
+//        likeEmptyLabel.snp.makeConstraints { make in
+//            make.top.equalTo(likeLabel.snp.bottom).offset(12)
+//            make.leading.equalToSuperview().offset(12)
+//        }
         
         likeListCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(likeLabel.snp.bottom).offset(8)
+            make.top.equalTo(playlistCollectionView.snp.bottom).offset(8)
             make.height.equalTo(view.bounds.height * 0.6)
             make.width.equalToSuperview()
             make.bottom.equalToSuperview()

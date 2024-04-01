@@ -93,10 +93,10 @@ final class FMMusicPlayer {
     }
     
     @MainActor
-    func setTrackQueue(item: MusicItemCollection<Track>, startIndex: Int) {
+    func setTrackQueue(item: MusicItemCollection<Track>, startTrack: Track) {
         Task {
             do {
-                let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: item[startIndex])
+                let queue = ApplicationMusicPlayer.Queue(for: item, startingAt: startTrack)
                 player.queue = queue
                 try await play()
             } catch {
@@ -229,7 +229,7 @@ final class FMMusicPlayer {
     
     func setCurrentEntrySubject() {
         player.queue.objectWillChange
-            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
+            .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
             .sink { [weak self] _  in
                 guard let self else { return }
                 let entry = player.queue.currentEntry
