@@ -79,7 +79,7 @@ final class LibraryViewController: BaseViewController {
         return cv
     }()
     
-    private lazy var likeListCollectionView = UICollectionView(frame: .zero,
+    private lazy var musicListCollectionView = UICollectionView(frame: .zero,
                                                                collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
         $0.contentInsetAdjustmentBehavior = .never
@@ -165,7 +165,7 @@ final class LibraryViewController: BaseViewController {
             owner.setPlayButton(state: state)
         }.disposed(by: disposeBag)
         
-        likeListCollectionView.rx.itemSelected
+        musicListCollectionView.rx.itemSelected
             .withUnretained(self)
             .subscribe { owner, indexPath in
                 guard let section = Section(rawValue: indexPath.section) else { return }
@@ -219,7 +219,7 @@ final class LibraryViewController: BaseViewController {
         view.addSubviews(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(forYouLabel, playlistCollectionView, forYouEmptyLabel,
-                                likeListCollectionView, likeEmptyLabel, miniPlayerView)
+                                musicListCollectionView, likeEmptyLabel, miniPlayerView)
     }
     
     
@@ -263,7 +263,7 @@ extension LibraryViewController {
             cell.configureCell(itemIdentifier)
         }
         
-        dataSource = UICollectionViewDiffableDataSource(collectionView: likeListCollectionView) { collectionView, indexPath, itemIdentifier in
+        dataSource = UICollectionViewDiffableDataSource(collectionView: musicListCollectionView) { collectionView, indexPath, itemIdentifier in
             
             guard let section = Section(rawValue: indexPath.section) else { return UICollectionViewCell() }
             switch section {
@@ -317,11 +317,11 @@ extension LibraryViewController {
                                                       heightDimension: .absolute(60))
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.9),
-                                                       heightDimension: .absolute(180))
+                                                       heightDimension: .absolute(192))
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 group.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                               leading: 0,
-                                                              bottom: 0,
+                                                              bottom: 12,
                                                               trailing: 12)
                 let section = NSCollectionLayoutSection(group: group)
                 section.boundarySupplementaryItems = [.init(layoutSize: .init(widthDimension: .fractionalWidth(1),
@@ -384,9 +384,9 @@ extension LibraryViewController {
 //            make.leading.equalToSuperview().offset(12)
 //        }
         
-        likeListCollectionView.snp.makeConstraints { make in
+        musicListCollectionView.snp.makeConstraints { make in
             make.top.equalTo(playlistCollectionView.snp.bottom).offset(8)
-            make.height.equalTo(view.bounds.height * 0.6)
+            make.height.equalTo(view.bounds.height * 0.7)
             make.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }

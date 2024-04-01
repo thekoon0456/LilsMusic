@@ -113,7 +113,6 @@ final class LibraryViewModel: ViewModel {
             }.disposed(by: disposeBag)
         
         input.likeItemSelected
-            .observe(on: MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe { owner, item in
                 guard let section = LibraryViewController.Section(rawValue: item.index.section) else { return }
@@ -122,10 +121,9 @@ final class LibraryViewModel: ViewModel {
                     Task {
                         do {
                             let tracks = try await owner.musicRepository.requestRecentlyPlayed()
-                            let selectedTrack = tracks[item.index.item]
-                            await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: selectedTrack)
+                            await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: item.track)
                             DispatchQueue.main.async {
-                                owner.coordinator?.presentMusicPlayer(track: selectedTrack)
+                                owner.coordinator?.presentMusicPlayer(track: item.track)
                             }
                         } catch {
                             print(error)
