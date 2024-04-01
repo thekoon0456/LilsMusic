@@ -290,8 +290,6 @@ extension LibraryViewController {
         
         dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
             guard let section = Section(rawValue: indexPath.section) else { return UICollectionReusableView() }
-            var itemCount = 0
-            
             if kind == UICollectionView.elementKindSectionHeader {
                 guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TrendingHeaderView.identifier, for: indexPath) as? TrendingHeaderView else { return UICollectionReusableView() }
                 headerView.setTitle(section.title)
@@ -310,9 +308,6 @@ extension LibraryViewController {
         let snapshot = NSDiffableDataSourceSnapshot<Section, Track>().then {
             $0.appendSections(Section.allCases)
         }
-        
-        hideFooter()
-
         dataSource?.apply(snapshot)
     }
     
@@ -320,24 +315,24 @@ extension LibraryViewController {
         let snapshot = NSDiffableDataSourceSectionSnapshot<Track>().then {
             $0.append(Array(tracks))
         }
-        
-        hideFooter()
-        
+
+        setHideFooter(itemCount: snapshot.items.count, section: 0)
         dataSource?.apply(snapshot, to: .recentlyPlayed)
-    }
-    
-    func hideFooter() {
-        let compLayout = musicListCollectionView.collectionViewLayout as? UICollectionViewCompositionalLayout
-        UIView.animate(withDuration: 0.4) {
-            compLayout?.configuration.boundarySupplementaryItems = []
-        }
     }
     
     private func updateLikedSongsSnapshot(tracks: MusicItemCollection<Track>) {
         let snapshot = NSDiffableDataSourceSectionSnapshot<Track>().then {
             $0.append(Array(tracks))
         }
+        
+        setHideFooter(itemCount: snapshot.items.count, section: 1)
         dataSource?.apply(snapshot, to: .likedSongs)
+    }
+    
+    func setHideFooter(itemCount: Int, section: Int) {
+        musicListCollectionView
+            .supplementaryView(forElementKind: UICollectionView.elementKindSectionFooter, at: IndexPath(item: 0, section: section))?
+            .isHidden = itemCount == 0 ? false : true
     }
     
     private func createLayout() -> UICollectionViewLayout {
@@ -361,7 +356,7 @@ extension LibraryViewController {
                                                             elementKind:  UICollectionView.elementKindSectionHeader,
                                                             alignment: .topLeading)
                 let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                              heightDimension: .absolute(50)),
+                                                                              heightDimension: .absolute(20)),
                                                             elementKind:  UICollectionView.elementKindSectionFooter,
                                                             alignment: .bottomLeading)
                 section.boundarySupplementaryItems = [header, footer]
@@ -381,7 +376,7 @@ extension LibraryViewController {
                                                             elementKind:  UICollectionView.elementKindSectionHeader,
                                                             alignment: .topLeading)
                 let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                              heightDimension: .absolute(50)),
+                                                                              heightDimension: .absolute(20)),
                                                             elementKind:  UICollectionView.elementKindSectionFooter,
                                                             alignment: .bottomLeading)
                 section.boundarySupplementaryItems = [header, footer]
@@ -427,7 +422,7 @@ extension LibraryViewController {
             make.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-        
+
         miniPlayerView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
             make.trailing.equalToSuperview().offset(-12)
