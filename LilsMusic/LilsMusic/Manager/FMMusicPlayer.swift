@@ -35,7 +35,6 @@ final class FMMusicPlayer {
     
     @MainActor
     func play() async throws {
-        try await player.prepareToPlay()
         try await player.play()
     }
     
