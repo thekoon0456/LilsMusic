@@ -27,7 +27,7 @@
 ## 📝 핵심 키워드
 ![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
 ![UIKit](https://img.shields.io/badge/UIkit-2396F3?style=for-the-badge&logo=UIKit&logoColor=white)
-![RxSwift](https://img.shields.io/badge/RxSwift-fa4db3?style=for-the-badge&logo=ReactiveX&logoColor=white)
+![RxSwift](https://img.shields.io/badge/RxSwift-fa4db3?style=for-the-badge&logo=ReactiveX&logoColor=white)<br>
 ![MusicKit](https://img.shields.io/badge/MusicKit-FA243C?style=for-the-badge&logo=MusicKit&logoColor=white)
 ![AVFoundation](https://img.shields.io/badge/AVFoundation-FA243C?style=for-the-badge&logo=AVFoundation&logoColor=white)
 ![AVKit](https://img.shields.io/badge/AVKit-FA243C?style=for-the-badge&logo=AVKit&logoColor=white)<br>
