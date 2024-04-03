@@ -3,10 +3,15 @@
 `UIKit + MVVM-C + RxSwift + MusicKit + Swift Concurrency`
 <br>
 
+
+
 ## 🔗 Links
 ### [📱 AppStore](https://apps.apple.com/app/lilsmusic/id6480001911)
 ### [🧑🏻‍💻 Blog 회고](https://thekoon0456.tistory.com/search/lils)
 <br>
+
+## 📱스크린샷
+|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/137d699f-695e-4e8c-9f30-89480a32b375"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5730a407-8cc6-4f88-a066-296e2cf3fcb3"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5564fdd2-1aa4-40e7-b213-91b52c561280"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5fd3b214-5672-47c6-8118-11b7f92a78c9"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/7f31beab-e393-435a-a396-cd27827d6ff4"></img>|
 
 ## 📌 주요 기능
 - 최신 인기 음악과 개인화된 추천 음악 제공
@@ -22,6 +27,13 @@
 |`음악 플레이어`|`뮤직비디오`|`미니 플레이어`|`라이브러리`|
 |<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/16848413-a69e-4322-9687-6a06b43c9d7d"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/dd07a402-1764-45e5-bf78-5ef3dee0e1f1"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/41c368bd-4ee6-476e-8ca0-8b5e10a4c10b"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/d1b98bdb-ef1c-4181-ba7c-ebe83df1a042"></img>|
 |`홈 화면`|`음악 검색`|`권한 설정`|`구독 제안`|
+<br>
+
+## 💻 앱 개발 환경
+
+- 최소 지원 버전: iOS 16.4+
+- Xcode Version 15.0.0
+- iPhone 15 Pro에서 최적화됨, iPhone SE3까지 호환 가능
 <br>
 
 ## 📝 핵심 키워드
@@ -86,11 +98,11 @@
 <br>
 
 ## ✅ 트러블 슈팅
-### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
+### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 UIFreezing이 발생하는 문제
 <div markdown="1">
-MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩이 발생하는 문제가 있었습니다.<br>
-기존에는 AVQueuePlayer에 재생할 URL들을 Queue에 넣은 뒤에 cell을 넘길때마다 하나하나 요청해서 재생했습니다.<br>
-로딩이 걸리는 문제를 해결하고자, 각 Cell마다 configure시점에 URL을 넣고, 일시정지 시킨 뒤<br>
+MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩으로 인해 UIFreezing이 발생하는 문제가 있었습니다.<br>
+기존에는 AVQueuePlayer에 재생할 URL들을 Queue에 넣은 뒤에 cell을 넘길때마다 하나하나 요청해서 재생했지만<br>
+UIFreezing 문제를 해결하고자, 각 Cell마다 configure시점에 URL을 넣고, 일시정지 시킨 뒤<br>
 Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니다.<br>
 
 ```swift
@@ -153,7 +165,7 @@ Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니�
 </div>
 <br>
 
-### 애플뮤직 권한 요청 -> 사용자의 구독권장까지의 분기처리
+### Coordinator를 활용해 애플뮤직 권한 요청과 사용자의 구독 권장까지의 흐름 처리
 <div markdown="1">
 처음 앱을 시작하면<br>
 1. 애플뮤직 권한 요청 
@@ -233,12 +245,3 @@ Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니�
 ```
 </div>
 <br>
-
-
-## 💻 앱 개발 환경
-
-- 최소 지원 버전: iOS 16.4+
-- Xcode Version 15.0.0
-- iPhone 15 Pro에서 최적화됨, iPhone SE3까지 호환 가능
-<br>
- 
