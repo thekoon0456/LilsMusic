@@ -24,16 +24,10 @@
 <br>
 
 ## 📱시연 영상
-|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/cb2ceb18-776c-460c-b5dc-9ea4cbcbe82d" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/967715c2-63cb-4ab7-87c8-d65c09dda3a0" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5a8338c5-1f49-4f16-b71d-b7bdd1d140ad" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/4c7ff5d9-bb76-48f6-b1df-e1d0d7c56b44" width="150"></img>|
+|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/cb2ceb18-776c-460c-b5dc-9ea4cbcbe82d" width="150"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/967715c2-63cb-4ab7-87c8-d65c09dda3a0" width="150"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5a8338c5-1f49-4f16-b71d-b7bdd1d140ad" width="150"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/4c7ff5d9-bb76-48f6-b1df-e1d0d7c56b44" width="150"></img>|
 |:-:|:-:|:-:|:-:|
 |`음악 플레이어`|`뮤직비디오`|`미니 플레이어`|`라이브러리`|
-|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/16848413-a69e-4322-9687-6a06b43c9d7d" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/dd07a402-1764-45e5-bf78-5ef3dee0e1f1" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/41c368bd-4ee6-476e-8ca0-8b5e10a4c10b" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/d1b98bdb-ef1c-4181-ba7c-ebe83df1a042" width="150"></img>|
+|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/16848413-a69e-4322-9687-6a06b43c9d7d" width="150"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/dd07a402-1764-45e5-bf78-5ef3dee0e1f1" width="150"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/41c368bd-4ee6-476e-8ca0-8b5e10a4c10b" width="150"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/d1b98bdb-ef1c-4181-ba7c-ebe83df1a042" width="150"></img>|
 |`홈 화면`|`음악 검색`|`권한 설정`|`구독 제안`|
 <br>
 
