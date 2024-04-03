@@ -5,7 +5,7 @@
 
 ## 🔗 Links
 ### [📱 AppStore](https://추가하기)
-### [🧑🏻‍💻 Blog 회고](https://thekoon0456.tistory.com/127)
+### [🧑🏻‍💻 Blog 회고](https://thekoon0456.tistory.com/search/lils)
 <br>
 
 ## 📌 주요 기능
@@ -47,23 +47,23 @@
 ### Coordinator 패턴
 - 사용자 인증, 음악 플레이어 재생과 같은 화면 전환 코드가 비대해지는 문제를 해결하기 위해 뷰 컨트롤러와 화면 전환 로직을 분리
 - Coordinator 생성 -> ViewModel 생성 -> ViewController 생성하는 패턴으로 의존성 주입
-- viewController에서 화면전환 input -> ViewModel을 통해 Coordinator로 전달하여 화면전환
+- viewController에서 화면전환 input -> ViewModel을 통해 Coordinator로 전달하여 화면 전환
 <br>
 
 ### RxSwift
 - 앱 내의 비동기 시퀀스 및 이벤트 기반의 데이터 흐름을 관리
-- 사용자의 탭과 같은 Input은 Observable로, UI바인딩하는 Ouptup은 Driver를 활용하여 안정적인 데이터 흐름과 UI바인딩 구현
+- 사용자의 탭과 같은 Input은 Observable로, UI바인딩하는 Ouptup은 Driver를 활용하여 일관된 데이터 흐름과 UI바인딩 구현
 <br>
 
 ### MusicKit
 - Apple의 MusicKit 프레임워크를 활용해 음악 플레이어 구현
-- SwiftUI의 프레임워크인 MusicKit을 UIKit에서 구현
+- SwiftUI의 프레임워크인 MusicKit을 UIKit에 최적화하여 구현
 <br>
 
 ### AVFoundation, AVKit
 - AVQueuePlayer의 인스턴스를 하나만 생성하고 재생할 Item을 미리 배열로 넣어놔서 사용했지만 화면 이동시에 딜레이 발생
 - 각 Cell마다 AVPlayer 인스턴스를 생생하고, cell이 configure될때 미리 재생하도록 설정해서 딜레이 줄임
-- observeValue() 함수를 통해 플레이어의 상태를 옵저빙하고, 로딩준비 완료시에 로딩 인디케이터 해제
+- observeValue() 함수를 통해 AVPlayer의 상태를 옵저빙하고, 로딩 준비 완료시에 로딩 인디케이터 해제
 <br>
 
 ### SwiftConcurrency
@@ -90,11 +90,12 @@
 
 ### MusicVideo타입에 연관된 Song타입을 제공해주지 않아서 뮤직비디오의 노래를 못 찾는 문제
 <div markdown="1">   
-```
+
+MusicKit에 대한 자료와 레퍼런스가 많이 없어서 하나하나 기능을 구현하는 것이 쉽지 않았습니다. 
 뮤직비디오를 보다가 좋아하는 노래를 누르면 해당 뮤직비디오의 노래를 플레이리스트에 저장해야하는데
 MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 nil만 리턴을 받았습니다.
 그래서 뮤직비디오의 아티스트와 노래 이름으로 MusicKit의 Song을 검색한 뒤, 둘 다 일치하는 이름이 있는 Song이 있으면 반환하도록 구현했습니다.
-```
+<br>
 
 ```swift
     //MusicKit의 요청 방식으로 MusicVideo타입의 Song을 요청해도 nil만 리턴
@@ -124,8 +125,6 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 
 ### 애플뮤직 권한 요청 -> 사용자의 구독권장까지의 분기처리
 <div markdown="1">
-        
-```
 처음 앱을 시작하면 
 1. 애플뮤직 권한 요청 
     -> 권한 승인시 -> 앱을 사용하다가 노래 재생버튼을 눌렀을 때 -> 애플뮤직 구독 확인
@@ -135,103 +134,56 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
     -> 구독자라면 노래 재생. 구독자 추천 플레이리스트 가져오기
     -> 구독자가 아니라면 구독 제안 화면 Present
 의 분기처리를 Coordinator를 통해 구현했습니다.
-    
-```
+<br>
 
 ```swift
-//AppCoordinator
-    func requestMusicAuthorization() {
-        SKCloudServiceController.requestAuthorization { [weak self] status in
-            guard let self else { return }
-            switch status {
-            case .authorized:
-                print("승인됨")
-                makeTabbar() //탭바 만들고, 앱 시작
-                break
-            default:
-                moveToUserSetting() //아이폰의 세팅 설정으로
-                break
-            }
-        }
-    }
-
-    //아이폰의 세팅 설정으로 이동을 유도하는 Alert
-    func moveToUserSetting() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            let alert = UIAlertController(title: "Access to Apple Music is required to use the app.",
-                                          message: 
-                                            "Please allow permission in settings to access the music library.",
-                                          preferredStyle: .alert)
-            alert.view.tintColor = .label
-            
-            let primaryButton = UIAlertAction(title: "Go to Settings", style: .default) { _ in
-                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                    return
-                }
-                if UIApplication.shared.canOpenURL(settingsUrl) {
-                    UIApplication.shared.open(settingsUrl, completionHandler: nil)
-                }
-            }
-            
-            alert.addAction(primaryButton)
-            navigationController?.present(alert, animated: true)
-        }
-    }
-```
-
-```Swift
-//MusicPlayerViewModel에서 노래 클릭시
-    //StoreKit을 활용해 구독 확인 
-    func checkAppleMusicSubscriptionEligibility() {
+//StoreKit을 활용해 구독 관리
+//SubscriptionManager
+    func checkAppleMusicSubscriptionEligibility(completion: @escaping (Bool) -> Void) {
         let controller = SKCloudServiceController()
-        controller.requestCapabilities { [weak self] (capabilities, error) in
-            guard let self else { return }
+        
+        controller.requestCapabilities { capabilities, error in
             if let error {
                 print(error.localizedDescription)
                 return
             }
             
-            //구독자가 아니라면 애플뮤직 가입 권유화면 present
             if capabilities.contains(.musicCatalogSubscriptionEligible) && !capabilities.contains(.musicCatalogPlayback) {
-                coordinator?.presentAppleMusicSubscriptionOffer()
+                completion(false)
+                return
+            } else {
+                completion(true)
+                return
             }
         }
     }
-    
-    //MusicListCoordinator의 애플뮤직 가입권유화면
-    func presentAppleMusicSubscriptionOffer() {
-        var options: [SKCloudServiceSetupOptionsKey: Any] = [.action: SKCloudServiceSetupAction.subscribe]
-        options[.messageIdentifier] = SKCloudServiceSetupMessageIdentifier.addMusic
-        
-        let setupViewController = SKCloudServiceSetupViewController()
-        setupViewController.delegate = self
-        
-        setupViewController.load(options: options) { (result, error) in
-            if result {
-                DispatchQueue.main.async {  [weak self] in
-                    guard let self else { return }
-                    navigationController?.present(setupViewController, animated: true)
+
+//앱 진입시 UserDefaults에 구독여부 저장
+//SceneDelegate
+    func sceneWillEnterForeground(_ scene: UIScene) {
+        SubscriptionManager.shared.checkAppleMusicSubscriptionEligibility { bool in
+            print("유저 구독\(bool)")
+            UserDefaultsManager.shared.userSubscription.isSubscribe = bool
+        }
+    }
+
+//노래 재생시 구독여부에 따라 구독제안 혹은 음악 플레이어 present
+//MusicListViewModel
+        input.playButtonTapped
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                owner.tapImpact()
+                Task {
+                    guard let tracks = try await owner.fetchTracks(),
+                          let firstItem = tracks.first else { return }
+                    await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: firstItem)
+                    DispatchQueue.main.async {
+                        owner.isUserSubscription
+                        ? owner.coordinator?.presentMusicPlayer(track: firstItem)
+                        : owner.coordinator?.presentAppleMusicSubscriptionOffer()
+                    }
                 }
-            } else if let error = error {
-                print("Error presenting Apple Music subscription offer: \(error.localizedDescription)")
-            }
-        }
-    }
-```
-</div>
-<br>
-
-
-### Swift Concurrency, Combine과 RxSwift를 함께 연동하며 스레드, 비동기 시점 문제
-<div markdown="1">
-        
-```
-설명
-```
-
-```swift
-코드
+            }.disposed(by: disposeBag)
 ```
 </div>
 <br>
@@ -240,57 +192,74 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 ### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
 <div markdown="1">
         
-```
-설명
-```
+MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩이 발생하는 문제가 있었습니다.
+기존에는 AVQueuePlayer에 재생할 URL들을 Queue에 넣은 뒤에 cell을 넘길때마다 하나하나 요청해서 재생했습니다.
+로딩이 걸리는 문제를 해결하고자, 각 Cell마다 configure시점에 URL을 넣고, 일시정지 시킨 뒤
+Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니다.
 
 ```swift
-코드
-```
-</div>
-<br>
-
-### Cell이 재사용될때 UIBinding이 제대로 되지 않던 현상 발생
-<div markdown="1">
+//ReelsCell
+//cell을 구성할때 AVPlayer의 인스턴스를 Cell마다 각각 생성하고, URL을 넣고 일시정지 상태로 대기시킴
+    func configureCell(_ data: MusicVideo, status: AVPlayer.TimeControlStatus) {
+        //cell재사용할때 bind
+        bind()
+        mvSubject.onNext(data)
         
-```
-설명
-```
-
-```swift
-코드
-```
-</div>
-<br>
-
-
-### 뮤직비디오 로딩시점을 파악해 인디케이터 표시해주기
-<div markdown="1">
+        guard let url = data.previewAssets?.first?.hlsURL else { return }
+        let asset = AVURLAsset(url: url)
         
-```
-설명
-```
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            DisplayVideoFromAssets(asset: asset, view: musicVideoView)
+            setPlayerStatus(status: status)
+        }
+        ...
+    }
 
-```swift
-코드
-```
-</div>
-<br>
-
-### realm에 좋아요 누른 데이터가 저장되거나 삭제될때 화면의 새로고침
-<div markdown="1">
+    //로딩 인디케이터와 재생 완료시 반복하는 Noficifation 생성
+    func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
+        startLoadingIndicator()
         
-```
-설명
-```
+        let playerItem = AVPlayerItem(asset: asset)
+        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
+        player = AVPlayer(playerItem: playerItem).then {
+            $0.isMuted = true
+        }
+        
+        let playerLayer = AVPlayerLayer(player: player)
+        ...
+        
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+                                               object: player?.currentItem,
+                                               queue: .main) { [weak self] _ in
+            guard let self else { return }
+            player?.seek(to: .zero)
+            player?.play()
+        }
+    }
 
-```swift
-코드
+    //AVPlayer의 상태를 추적하고, readyToPlay시점에서 로딩인디케이터 해제
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "status" {
+            if let playerItem = object as? AVPlayerItem {
+                switch playerItem.status {
+                case .readyToPlay:
+                    stopLoadingIndicator()
+                case .failed, .unknown:
+                    print("Failed to load the video")
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+
+
 ```
 </div>
 <br>
 
-### 코디네이터 해제 시점 조절 
+### Swift Concurrency, Combine과 RxSwift를 함께 연동하며 스레드, 비동기 시점 문제
 <div markdown="1">
         
 ```
@@ -320,7 +289,7 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 - MusicKit의 Swift Concurrency와 Combine을 UIKit, RxSwift로 구현했다는 점입니다.
   
 아쉬운 점
-- 중간에 아파서 약 5일간 개발을 하지 못했던 점... ㅠㅠ 건강이 최고입니다!!
+- 중간에 아파서 약 5일간 개발을 하지 못했던 점. 건강관리 중요.
 - 처음에 기획했던 다양한 플레이리스트를 추가 하지 못했습니다.
 - 검색이 현재 개별 곡만 검색되고 앨범이나 아티스트 전체가 검색되지 않습니다.
 - 사용자의 취향을 파악하고, Charts를 통해 그래프로 표현하려했지만 덜어냈고, 애플뮤직의 사용자 추천 플레이리스트로 대체했습니다.
