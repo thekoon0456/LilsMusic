@@ -4,7 +4,7 @@
 <br>
 
 ## 🔗 Links
-### [📱 AppStore](https://추가하기)
+### [📱 AppStore](https://apps.apple.com/app/lilsmusic/id6480001911)
 ### [🧑🏻‍💻 Blog 회고](https://thekoon0456.tistory.com/search/lils)
 <br>
 
@@ -43,34 +43,41 @@
 - 뷰컨트롤러의 로직을 뷰와 분리하고, Input, Output 패턴을 활용해 데이터의 흐름을 일관성있게 구현
 - ViewModel Protocol을 활용해 구조적으로 일관된 뷰모델 구성 
 <br>
+
 ### Coordinator 패턴
 - 사용자 인증, 음악 플레이어 재생과 같은 화면 전환 코드가 비대해지는 문제를 해결하기 위해 뷰 컨트롤러와 화면 전환 로직을 분리
 - Coordinator 생성 -> ViewModel 생성 -> ViewController 생성하는 패턴으로 의존성 주입
 - viewController에서 화면전환 input -> ViewModel을 통해 Coordinator로 전달하여 화면 전환
 <br>
+
 ### RxSwift
 - 앱 내의 비동기 시퀀스 및 이벤트 기반의 데이터 흐름을 관리
 - 사용자의 탭과 같은 Input은 Observable로, UI바인딩하는 Ouptup은 Driver를 활용하여 일관된 데이터 흐름과 UI바인딩 구현
 <br>
+
 ### MusicKit
 - Apple의 MusicKit 프레임워크를 활용해 음악 플레이어 구현
 - SwiftUI의 프레임워크인 MusicKit을 UIKit에 최적화하여 구현
 <br>
+
 ### AVFoundation, AVKit
 - AVQueuePlayer의 인스턴스를 하나만 생성하고 재생할 Item을 미리 배열로 넣어놔서 사용했지만 화면 이동시에 딜레이 발생
 - 각 Cell마다 AVPlayer 인스턴스를 생생하고, cell이 configure될때 미리 재생하도록 설정해서 딜레이 줄임
 - observeValue() 함수를 통해 AVPlayer의 상태를 옵저빙하고, 로딩 준비 완료시에 로딩 인디케이터 해제
 <br>
+
 ### SwiftConcurrency
-- 최신 API인 MusicKit의 비동기 방식
+- 최신 API인 MusicKit의 async/await 함수 활용
 - RxSwift와 SwiftConcurrency, Combine을 연동. 스레드 관리 일관화
 <br>
+
 ### ModernCollectionView
 - 추천화면의 다채로운 Layout을 구현하기 위해 UICollectionView CompositionalLayout활용
 - MusicVideo탭의 Cell이 화면을 가득 채우고, 페이징 스크롤 구현
 - List 화면에서 Item 로드시 애니메이션을 사용하기 위해 UICollectionView CompositionalLayout의 List 활용
 - 다양한 레이아웃과 애니메이션 구현
 <br>
+
 ### Realm
 - Repository 패턴을 사용해 데이터 계층 추상화
 - Repository Protocol을 활용해 일관성있는 Repository 구조 구현
@@ -79,7 +86,6 @@
 <br>
 
 ## ✅ 트러블 슈팅
-
 ### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
 <div markdown="1">
 MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩이 발생하는 문제가 있었습니다.<br>
