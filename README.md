@@ -3,19 +3,17 @@
 `UIKit + MVVM-C + RxSwift + MusicKit + Swift Concurrency`
 <br>
 
-
-
-## 🔗 Links
-### [📱 AppStore](https://apps.apple.com/app/lilsmusic/id6480001911)
-### [🧑🏻‍💻 Blog 회고](https://thekoon0456.tistory.com/search/lils)
-<br>
-
 ## 📱스크린샷
 |<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/137d699f-695e-4e8c-9f30-89480a32b375" width="150"></img>|
 <img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5fd3b214-5672-47c6-8118-11b7f92a78c9" width="150"></img>|
 <img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5730a407-8cc6-4f88-a066-296e2cf3fcb3" width="150"></img>|
-<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5564fdd2-1aa4-40e7-b213-91b52c561280" width="150"></img>|
 <img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/7f31beab-e393-435a-a396-cd27827d6ff4" width="150"></img>|
+<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5564fdd2-1aa4-40e7-b213-91b52c561280" width="150"></img>|
+
+## 🔗 Links
+### [📱 AppStore](https://apps.apple.com/app/lilsmusic/id6480001911)
+### [🧑🏻‍💻 Blog](https://thekoon0456.tistory.com/search/lils)
+<br>
 
 ## 📌 주요 기능
 - 최신 인기 음악과 개인화된 추천 음악 제공
