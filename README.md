@@ -88,36 +88,69 @@
 
 ## ✅ 트러블 슈팅
 
-### MusicVideo타입에 연관된 Song타입을 제공해주지 않아서 뮤직비디오의 노래를 못 찾는 문제
-<div markdown="1">   
-
-MusicKit에 대한 자료와 레퍼런스가 많이 없어서 하나하나 기능을 구현하는 것이 쉽지 않았습니다. 
-뮤직비디오를 보다가 좋아하는 노래를 누르면 해당 뮤직비디오의 노래를 플레이리스트에 저장해야하는데
-MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 nil만 리턴을 받았습니다.
-그래서 뮤직비디오의 아티스트와 노래 이름으로 MusicKit의 Song을 검색한 뒤, 둘 다 일치하는 이름이 있는 Song이 있으면 반환하도록 구현했습니다.
+### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
+<div markdown="1">
 <br>
+MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩이 발생하는 문제가 있었습니다.<br>
+기존에는 AVQueuePlayer에 재생할 URL들을 Queue에 넣은 뒤에 cell을 넘길때마다 하나하나 요청해서 재생했습니다.<br>
+로딩이 걸리는 문제를 해결하고자, 각 Cell마다 configure시점에 URL을 넣고, 일시정지 시킨 뒤<br>
+Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니다.<br>
 
 ```swift
-    //MusicKit의 요청 방식으로 MusicVideo타입의 Song을 요청해도 nil만 리턴
-    func requestSearchMVIDCatalog(id: MusicItemID?) async throws -> Song? {
-        guard let id else { return nil }
-        let response = try await MusicCatalogResourceRequest<MusicVideo>(matching: \.id, equalTo: id).response()
-        guard let item = response.items.first else { return nil }
-        let songs = try await item.with(.songs).songs
-        let song = songs?.first
-        return song
+//ReelsCell
+//cell을 구성할때 AVPlayer의 인스턴스를 Cell마다 각각 생성하고, URL을 넣고 일시정지 상태로 대기시킴
+    func configureCell(_ data: MusicVideo, status: AVPlayer.TimeControlStatus) {
+        //cell재사용할때 bind
+        bind()
+        mvSubject.onNext(data)
+        
+        guard let url = data.previewAssets?.first?.hlsURL else { return }
+        let asset = AVURLAsset(url: url)
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            DisplayVideoFromAssets(asset: asset, view: musicVideoView)
+            setPlayerStatus(status: status)
+        }
+        ...
     }
-    
-    => 뮤직비디오의 아티스트와 노래 이름으로 Song을 검색한 뒤, 일치하는 이름이 있는 Song이 있으면 반환
-    func MusicVideoToSong(_ item: MusicVideo) async throws -> Song? {
-        let song = try await requestMVToSongCatalog(term: "\(item.artistName), \(item.title)")
-        return song
+
+    //로딩 인디케이터와 재생 완료시 반복하는 Noficifation 생성
+    func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
+        startLoadingIndicator()
+        
+        let playerItem = AVPlayerItem(asset: asset)
+        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
+        player = AVPlayer(playerItem: playerItem).then {
+            $0.isMuted = true
+        }
+        
+        let playerLayer = AVPlayerLayer(player: player)
+        ...
+        
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+                                               object: player?.currentItem,
+                                               queue: .main) { [weak self] _ in
+            guard let self else { return }
+            player?.seek(to: .zero)
+            player?.play()
+        }
     }
-    
-    func requestMVToSongCatalog(term: String) async throws -> Song? {
-        let songs = try await MusicCatalogSearchRequest(term: term, types: [Song.self]).response().songs
-        let result = songs.filter { term.contains($0.title) && term.contains($0.artistName) }.first
-        return result
+
+    //AVPlayer의 상태를 추적하고, readyToPlay시점에서 로딩인디케이터 해제
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "status" {
+            if let playerItem = object as? AVPlayerItem {
+                switch playerItem.status {
+                case .readyToPlay:
+                    stopLoadingIndicator()
+                case .failed, .unknown:
+                    print("Failed to load the video")
+                @unknown default:
+                    break
+                }
+            }
+        }
     }
 ```
 </div>
@@ -125,11 +158,11 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 
 ### 애플뮤직 권한 요청 -> 사용자의 구독권장까지의 분기처리
 <div markdown="1">
-처음 앱을 시작하면 
+처음 앱을 시작하면<br>
 1. 애플뮤직 권한 요청 
     -> 권한 승인시 -> 앱을 사용하다가 노래 재생버튼을 눌렀을 때 -> 애플뮤직 구독 확인
     -> 권한 거부시 -> 아이폰의 앱 권한설정 화면으로 이동
-    
+<br>
 2. 애플뮤직 구독 확인 후
     -> 구독자라면 노래 재생. 구독자 추천 플레이리스트 가져오기
     -> 구독자가 아니라면 구독 제안 화면 Present
@@ -189,75 +222,7 @@ MusicKit의 요청함수로 MusicVideo타입에 연관된 Song을 요청해도 n
 <br>
 
 
-### 뮤직비디오를 AVPlayer로 재생시에 cell을 넘길때마다 로딩이 발생하던 문제
-<div markdown="1">
-        
-MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩이 발생하는 문제가 있었습니다.
-기존에는 AVQueuePlayer에 재생할 URL들을 Queue에 넣은 뒤에 cell을 넘길때마다 하나하나 요청해서 재생했습니다.
-로딩이 걸리는 문제를 해결하고자, 각 Cell마다 configure시점에 URL을 넣고, 일시정지 시킨 뒤
-Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니다.
 
-```swift
-//ReelsCell
-//cell을 구성할때 AVPlayer의 인스턴스를 Cell마다 각각 생성하고, URL을 넣고 일시정지 상태로 대기시킴
-    func configureCell(_ data: MusicVideo, status: AVPlayer.TimeControlStatus) {
-        //cell재사용할때 bind
-        bind()
-        mvSubject.onNext(data)
-        
-        guard let url = data.previewAssets?.first?.hlsURL else { return }
-        let asset = AVURLAsset(url: url)
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            DisplayVideoFromAssets(asset: asset, view: musicVideoView)
-            setPlayerStatus(status: status)
-        }
-        ...
-    }
-
-    //로딩 인디케이터와 재생 완료시 반복하는 Noficifation 생성
-    func DisplayVideoFromAssets(asset: AVURLAsset, view: UIView) {
-        startLoadingIndicator()
-        
-        let playerItem = AVPlayerItem(asset: asset)
-        playerItem.addObserver(self, forKeyPath: "status", options: [.new, .old], context: nil)
-        player = AVPlayer(playerItem: playerItem).then {
-            $0.isMuted = true
-        }
-        
-        let playerLayer = AVPlayerLayer(player: player)
-        ...
-        
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-                                               object: player?.currentItem,
-                                               queue: .main) { [weak self] _ in
-            guard let self else { return }
-            player?.seek(to: .zero)
-            player?.play()
-        }
-    }
-
-    //AVPlayer의 상태를 추적하고, readyToPlay시점에서 로딩인디케이터 해제
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "status" {
-            if let playerItem = object as? AVPlayerItem {
-                switch playerItem.status {
-                case .readyToPlay:
-                    stopLoadingIndicator()
-                case .failed, .unknown:
-                    print("Failed to load the video")
-                @unknown default:
-                    break
-                }
-            }
-        }
-    }
-
-
-```
-</div>
-<br>
 
 ### Swift Concurrency, Combine과 RxSwift를 함께 연동하며 스레드, 비동기 시점 문제
 <div markdown="1">
