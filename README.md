@@ -1,6 +1,5 @@
 # LilsMusic
 `Simple, Beautiful Music App` <br>
-`UIKit + MVVM-C + RxSwift + MusicKit + Swift Concurrency`
 <br>
 
 ## 📱스크린샷
@@ -23,6 +22,15 @@
 - 다양한 애니메이션과 햅틱 반응
 <br>
 
+## 기술 스택
+- UIKit, MVVM-C, Input-Output, Singleton, Repository, CodeBasedUI
+- RxSwift, SwiftConcurrency
+- MusicKit, AVFoundation, AVKit, Realm
+- Compositional Layout, CollectionViewPagingLayout, DiffableDataSource,
+- Kingfisher, SnapKit
+- Firebase(Analytics, Crashlytics)
+<br>
+
 ## 📱시연 영상
 |<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/cb2ceb18-776c-460c-b5dc-9ea4cbcbe82d" width="200"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/967715c2-63cb-4ab7-87c8-d65c09dda3a0" width="200"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/5a8338c5-1f49-4f16-b71d-b7bdd1d140ad" width="200"></img>|<img src="https://github.com/thekoon0456/LilsMusic/assets/106993057/4c7ff5d9-bb76-48f6-b1df-e1d0d7c56b44" width="200"></img>|
 |:-:|:-:|:-:|:-:|
@@ -36,19 +44,6 @@
 - 최소 지원 버전: iOS 16.4+
 - Xcode Version 15.0.0
 - iPhone 15 Pro에서 최적화됨, iPhone SE3까지 호환 가능
-<br>
-
-## 📝 핵심 키워드
-![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
-![UIKit](https://img.shields.io/badge/UIkit-2396F3?style=for-the-badge&logo=UIKit&logoColor=white)
-![RxSwift](https://img.shields.io/badge/RxSwift-fa4db3?style=for-the-badge&logo=ReactiveX&logoColor=white)<br>
-![MusicKit](https://img.shields.io/badge/MusicKit-FA243C?style=for-the-badge&logo=MusicKit&logoColor=white)
-![AVFoundation](https://img.shields.io/badge/AVFoundation-FA243C?style=for-the-badge&logo=AVFoundation&logoColor=white)
-![AVKit](https://img.shields.io/badge/AVKit-FA243C?style=for-the-badge&logo=AVKit&logoColor=white)<br>
-![SwiftConcurrency](https://img.shields.io/badge/SwiftConcurrency-F54A2A?style=for-the-badge&logo=swift&logoColor=white)
-![ModernCollectionView](https://img.shields.io/badge/ModernCollectionView-F54A2A?style=for-the-badge&logo=swift&logoColor=white)<br>
-![Realm](https://img.shields.io/badge/realm-39477F?style=for-the-badge&logo=Realm&logoColor=white)
-![SnapKit](https://img.shields.io/badge/SnapKit-4285F4?style=for-the-badge&logo=SnapKit&logoColor=white)
 <br>
 
 ## 💡 기술 소개
