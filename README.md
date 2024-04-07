@@ -1,5 +1,10 @@
 # LilsMusic
-`Simple, Beautiful Music App` <br>
+Simple, Beautiful Music App <br>
+- Enjoy playlists and albums that fit your taste perfectly <br>
+- A beautiful and convenient mini player <br>
+- Watch the latest music videos and like your favorite songs <br>
+- Listen to only the music you like <br>
+- With Apple Music <br>
 <br>
 
 ## 📱스크린샷
