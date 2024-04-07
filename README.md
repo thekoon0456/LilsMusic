@@ -168,15 +168,15 @@ Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니�
 
 ### Coordinator를 활용해 애플뮤직 권한 요청과 사용자의 구독 권장까지의 흐름 처리
 <div markdown="1">
-처음 앱을 시작하면<br>
-1. 애플뮤직 권한 요청 
-    -> 권한 승인시 -> 앱을 사용하다가 노래 재생버튼을 눌렀을 때 -> 애플뮤직 구독 확인<br>
-    -> 권한 거부시 -> 아이폰의 앱 권한설정 화면으로 이동<br>
-<br>
+
+애플뮤직을 앱과 연동하기 위해서는 애플뮤직 권한 요청과, 애플뮤직 구독을 확인하는 과정이 필요했습니다.<br>
+1. 애플뮤직 권한을 요청하면
+    - 권한 거부시 아이폰의 앱 권한 설정 화면으로 이동해 권한 수정 요청<br>
+    - 권한 승인시 앱 사용. 재생버튼을 눌렀을 때 애플뮤직 구독 확인<br>
 2. 애플뮤직 구독 확인 후
-    -> 구독자라면 노래 재생. 구독자 추천 플레이리스트 가져오기<br>
-    -> 구독자가 아니라면 구독 제안 화면 Present<br>
-의 분기처리를 Coordinator를 통해 구현했습니다.<br>
+    - 구독자라면 노래 재생. 구독자 추천 플레이리스트 가져오기<br>
+    - 구독자가 아니라면 구독 제안 화면 Present<br>
+의 복잡한 분기처리를 Coordinator를 통해 해결했습니다.<br>
 <br>
 
 ```swift
@@ -234,12 +234,11 @@ Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니�
 ### Swift Concurrency, Combine과 RxSwift를 함께 연동하며 스레드, 비동기 시점 문제
 <div markdown="1">
 MusicKit은 SwiftUI를 대상으로 만든 최신 프레임위크이기 때문에<br>
-기존 UIKit의 CompletionHandler와 NotificationCenter가 아닌<br>
-SwiftConcurrency와 Combine API를 제공해주었는데<br>
+기존 UIKit의 CompletionHandler와 NotificationCenter가 아닌 SwiftConcurrency와 Combine API를 제공해주었는데<br>
 RxSwift의 Scheduler와 SwiftConcurrency의 Task간의 충돌이 있었습니다.<br>
 이를 해결하기 위해 RxSwift의 flatMapLatest함수를 활용해 Task로 반환한 결과를 다시 한번 Observable로 매핑하여<br>
 RxSwift의 Scheduler와 연동해 일관성있는 Thread관리를 할 수 있었습니다.<br>
-
+<br>
 
 ```swift
 //FMMusicPlayer
