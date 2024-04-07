@@ -43,7 +43,7 @@
 
 - 최소 지원 버전: iOS 16.4+
 - Xcode Version 15.0.0
-- iPhone 15 Pro, iPhone 15 Pro Max, iPhone SE3등 전 기종 호환 가능
+- iPhone SE3 ~ iPhone 15 Pro Max 전 기종 호환 가능
 <br>
 
 ## 💡 기술 소개
