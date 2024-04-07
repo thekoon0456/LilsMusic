@@ -104,6 +104,7 @@ MusicVideo 릴스 탭에서 Cell을 넘길때마다 MusicVideo의 로딩으로 �
 기존에는 AVQueuePlayer에 재생할 URL들을 Queue에 넣은 뒤에 cell을 넘길때마다 하나하나 요청해서 재생했지만<br>
 UIFreezing 문제를 해결하고자, 각 Cell마다 configure시점에 URL을 넣고, 일시정지 시킨 뒤<br>
 Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니다.<br>
+<br>
 
 ```swift
 //ReelsCell
@@ -230,18 +231,61 @@ Cell이 화면에 보일때 재생하는 방식으로 딜레이를 줄였습니�
 </div>
 <br>
 
-
-
-
 ### Swift Concurrency, Combine과 RxSwift를 함께 연동하며 스레드, 비동기 시점 문제
 <div markdown="1">
-        
-```
-설명
-```
+MusicKit은 SwiftUI를 대상으로 만든 최신 프레임위크이기 때문에<br>
+기존 UIKit의 CompletionHandler와 NotificationCenter가 아닌<br>
+SwiftConcurrency와 Combine API를 제공해주었는데<br>
+RxSwift의 Scheduler와 SwiftConcurrency의 Task간의 충돌이 있었습니다.<br>
+이를 해결하기 위해 RxSwift의 flatMapLatest함수를 활용해 Task로 반환한 결과를 다시 한번 Observable로 매핑하여<br>
+RxSwift의 Scheduler와 연동해 일관성있는 Thread관리를 할 수 있었습니다.<br>
+
 
 ```swift
-코드
+//FMMusicPlayer
+let currentEntrySubject = BehaviorSubject<MusicPlayer.Queue.Entry?>(value: nil)
+
+func setCurrentEntrySubject() {
+    player.queue.objectWillChange
+        .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+        .sink { [weak self] _  in
+            guard let self else { return }
+            let entry = player.queue.currentEntry
+            currentEntrySubject.onNext(entry)
+        }.store(in: &cancellable)
+}
+//...
+
+//MusicPlayerViewModel
+musicPlayer.currentEntrySubject
+    .asObservable()
+    .withUnretained(self)
+    .delaySubscription(.milliseconds(1500), scheduler: MainScheduler.instance) //처음 진입했을때는 track으로 그리고, 1초 뒤부터 구독
+    .flatMapLatest { owner, entry in
+        owner.fetchCurrentEntryTrackObservable(entry: entry)
+    }
+    .subscribe(with: self) { owner, track in
+        owner.trackSubject.onNext(track)
+    }.disposed(by: disposeBag)
+
+//Task가 마친 결과물을 Observable로 변환해 사용
+func fetchCurrentEntryTrackObservable(entry: MusicPlayer.Queue.Entry?) -> Observable<Track?> {
+    return Observable.create { observer in
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                let track = Track.song(song)
+                observer.onNext(track)
+                observer.onCompleted()
+            } catch {
+                observer.onError(error)
+            }
+        }
+        return Disposables.create()
+    }
+}
 ```
+
 </div>
 <br>
