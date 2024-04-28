@@ -28,6 +28,4 @@ final class UserCoordinator: Coordinator {
                                      selectedImage: UIImage(systemName: FMDesign.Icon.user.fill))
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    
 }
