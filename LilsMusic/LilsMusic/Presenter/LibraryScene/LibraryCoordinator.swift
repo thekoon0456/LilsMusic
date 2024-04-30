@@ -51,8 +51,4 @@ final class LibraryCoordinator: Coordinator, CoordinatorDelegate {
         childCoordinators.append(coordinator)
         coordinator.start()
     }
-    
-    func didFinish(childCoordinator: any Coordinator) {
-        childCoordinators = []
-    }
 }

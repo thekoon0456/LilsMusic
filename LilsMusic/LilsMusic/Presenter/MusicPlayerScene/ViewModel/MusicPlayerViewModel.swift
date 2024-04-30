@@ -67,7 +67,8 @@ final class MusicPlayerViewModel: ViewModel {
             }
             .subscribe(with: self) { owner, track in
                 owner.trackSubject.onNext(track)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.viewWillAppear
             .map { [weak self] _ in
@@ -76,13 +77,15 @@ final class MusicPlayerViewModel: ViewModel {
             }
             .subscribe(with: self){ owner, bool in
                 owner.heartSubject.onNext(bool)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.chevronButtonTapped
             .bind(with: self) { owner, _ in
                 owner.coordinator?.dismissViewController()
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.playButtonTapped
             .bind(with: self) { owner, _ in
@@ -95,7 +98,8 @@ final class MusicPlayerViewModel: ViewModel {
                     }
                 }
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.previousButtonTapped
             .bind(with: self) { owner, _ in
@@ -103,7 +107,8 @@ final class MusicPlayerViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToPrevious()
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.nextButtonTapped
             .bind(with: self) { owner, _ in
@@ -111,7 +116,8 @@ final class MusicPlayerViewModel: ViewModel {
                 Task {
                     try await owner.musicPlayer.skipToNext()
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         let repeatMode = input.repeatButtonTapped
             .map { [weak self]  _ -> RepeatMode in
@@ -124,7 +130,8 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .flatMapLatest { owner, mode in
                 owner.setRepeatButtonObservable(mode: mode)
-            }.asDriver(onErrorJustReturn: .off)
+            }
+            .asDriver(onErrorJustReturn: .off)
         
         let shuffleMode = input.shuffleButtonTapped
             .map { [weak self]  _ -> ShuffleMode in
@@ -138,7 +145,8 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .flatMapLatest { owner, mode in
                 owner.setShuffleButtonObservable(mode: mode)
-            }.asDriver(onErrorJustReturn: .off)
+            }
+            .asDriver(onErrorJustReturn: .off)
         
         input
             .heartButtonTapped
@@ -156,12 +164,14 @@ final class MusicPlayerViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, bool in
                 owner.heartSubject.onNext(bool)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.viewWillDisappear
             .subscribe(with: self) { owner, _ in
                 owner.coordinator?.finish()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         return Output(updateEntry: trackSubject.asDriver(onErrorJustReturn: nil),
                       playState: musicPlayer.currentPlayStateSubject.asDriver(onErrorJustReturn: .playing),

@@ -38,11 +38,13 @@ final class ReelsViewModel: ViewModel {
     
     func transform(_ input: Input) -> Output {
         
-        let mvList = input.viewWillAppear
+        let mvList = input
+            .viewWillAppear
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.fetchMovieList()
-            }.asDriver(onErrorJustReturn: [])
+            }
+            .asDriver(onErrorJustReturn: [])
         
         return Output(mvList: mvList)
     }

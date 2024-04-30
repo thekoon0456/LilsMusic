@@ -80,7 +80,7 @@ final class LibraryViewController: BaseViewController {
     }()
     
     private lazy var musicListCollectionView = UICollectionView(frame: .zero,
-                                                               collectionViewLayout: createLayout()).then {
+                                                                collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .clear
         $0.contentInsetAdjustmentBehavior = .never
         $0.register(TrendingHeaderView.self,
@@ -145,28 +145,43 @@ final class LibraryViewController: BaseViewController {
                 cell.configureCell(model)
                 //collectionView1번부터
                 layout.setCurrentPage(1)
+            }
+            .disposed(by: disposeBag)
+        
+        output
+            .mix
+            .drive(with: self) { owner, value in
+                owner.updateForyouEmptyLabel(model: value)
             }.disposed(by: disposeBag)
         
-        output.mix.drive(with: self) { owner, value in
-            owner.updateForyouEmptyLabel(model: value)
-        }.disposed(by: disposeBag)
+        output
+            .recentlyPlayTracks
+            .drive(with: self) { owner, tracks in
+                owner.updateRecentlyPlayedSongsSnapshot(tracks: tracks)
+            }
+            .disposed(by: disposeBag)
         
-        output.recentlyPlayTracks.drive(with: self) { owner, tracks in
-            owner.updateRecentlyPlayedSongsSnapshot(tracks: tracks)
-        }.disposed(by: disposeBag)
+        output
+            .likeTracks
+            .drive(with: self) { owner, tracks in
+                owner.updateEmptyLabel(tracks: tracks)
+                owner.updateLikedSongsSnapshot(tracks: tracks)
+            }
+            .disposed(by: disposeBag)
         
-        output.likeTracks.drive(with: self) { owner, tracks in
-            owner.updateEmptyLabel(tracks: tracks)
-            owner.updateLikedSongsSnapshot(tracks: tracks)
-        }.disposed(by: disposeBag)
+        output
+            .currentPlaySong
+            .drive(with: self) { owner, track in
+                owner.updateMiniPlayer(track: track)
+            }
+            .disposed(by: disposeBag)
         
-        output.currentPlaySong.drive(with: self) { owner, track in
-            owner.updateMiniPlayer(track: track)
-        }.disposed(by: disposeBag)
-        
-        output.playState.drive(with: self) { owner, state in
-            owner.setPlayButton(state: state)
-        }.disposed(by: disposeBag)
+        output
+            .playState
+            .drive(with: self) { owner, state in
+                owner.setPlayButton(state: state)
+            }
+            .disposed(by: disposeBag)
         
         musicListCollectionView.rx.itemSelected
             .withUnretained(self)
@@ -180,7 +195,8 @@ final class LibraryViewController: BaseViewController {
                     guard let track = owner.dataSource?.itemIdentifier(for: indexPath) else { return }
                     owner.likeItemSelected.onNext((index: indexPath, track: track))
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func setPlayButton(state: MusicPlayer.PlaybackStatus) {
@@ -296,8 +312,8 @@ extension LibraryViewController {
                 return headerView
             } else if kind == UICollectionView.elementKindSectionFooter {
                 guard let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TrendingFooterView.identifier, for: indexPath) as? TrendingFooterView else { return UICollectionReusableView() }
-                    footerView.setTitle(section.emptyDescription)
-                    return footerView
+                footerView.setTitle(section.emptyDescription)
+                return footerView
             }
             
             return UICollectionReusableView()
@@ -315,7 +331,7 @@ extension LibraryViewController {
         let snapshot = NSDiffableDataSourceSectionSnapshot<Track>().then {
             $0.append(Array(tracks))
         }
-
+        
         setHideFooter(itemCount: snapshot.items.count, section: 0)
         dataSource?.apply(snapshot, to: .recentlyPlayed)
     }
@@ -352,13 +368,13 @@ extension LibraryViewController {
                                                               trailing: 8)
                 let section = NSCollectionLayoutSection(group: group)
                 let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                              heightDimension: .absolute(50)),
-                                                            elementKind:  UICollectionView.elementKindSectionHeader,
-                                                            alignment: .topLeading)
+                                                                                           heightDimension: .absolute(50)),
+                                                                         elementKind:  UICollectionView.elementKindSectionHeader,
+                                                                         alignment: .topLeading)
                 let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                              heightDimension: .absolute(20)),
-                                                            elementKind:  UICollectionView.elementKindSectionFooter,
-                                                            alignment: .bottomLeading)
+                                                                                           heightDimension: .absolute(20)),
+                                                                         elementKind:  UICollectionView.elementKindSectionFooter,
+                                                                         alignment: .bottomLeading)
                 section.boundarySupplementaryItems = [header, footer]
                 section.orthogonalScrollingBehavior = .groupPaging
                 return section
@@ -372,13 +388,13 @@ extension LibraryViewController {
                                                                subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
                 let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                              heightDimension: .absolute(50)),
-                                                            elementKind:  UICollectionView.elementKindSectionHeader,
-                                                            alignment: .topLeading)
+                                                                                           heightDimension: .absolute(50)),
+                                                                         elementKind:  UICollectionView.elementKindSectionHeader,
+                                                                         alignment: .topLeading)
                 let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                              heightDimension: .absolute(24)),
-                                                            elementKind:  UICollectionView.elementKindSectionFooter,
-                                                            alignment: .bottomLeading)
+                                                                                           heightDimension: .absolute(24)),
+                                                                         elementKind:  UICollectionView.elementKindSectionFooter,
+                                                                         alignment: .bottomLeading)
                 section.boundarySupplementaryItems = [header, footer]
                 return section
             }
@@ -422,7 +438,7 @@ extension LibraryViewController {
             make.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-
+        
         miniPlayerView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
             make.trailing.equalToSuperview().offset(-12)

@@ -45,8 +45,4 @@ final class MusicRecommendCoordinator: Coordinator, CoordinatorDelegate {
         childCoordinators.append(coordinator)
         coordinator.start()
     }
-    
-    func didFinish(childCoordinator: any Coordinator) {
-        childCoordinators = []
-    }
 }

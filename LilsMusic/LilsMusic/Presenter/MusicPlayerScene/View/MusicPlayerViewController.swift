@@ -221,27 +221,42 @@ final class MusicPlayerViewController: BaseViewController {
                                                viewWillDisappear: self.rx.viewWillDisappear.map { _ in })
         let output = viewModel.transform(input)
         
-        output.updateEntry.drive(with: self) { owner, track in
+        output
+            .updateEntry
+            .drive(with: self) { owner, track in
             guard let track else { return }
             owner.updateUI(track)
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
-        output.playState.drive(with: self) { owner, state in
+        output
+            .playState
+            .drive(with: self) { owner, state in
             owner.updatePlayButton(state: state)
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
         
         //버튼 UI 업데이트
-        output.repeatMode.drive(with: self) { owner, mode in
+        output
+            .repeatMode
+            .drive(with: self) { owner, mode in
             owner.setRepeatButton(mode)
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
         
-        output.shuffleMode.drive(with: self) { owner, mode in
+        output
+            .shuffleMode
+            .drive(with: self) { owner, mode in
             owner.setShuffleButton(mode)
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
         
-        output.isHeart.drive(with: self) { owner, bool in
+        output
+            .isHeart
+            .drive(with: self) { owner, bool in
             owner.heartButton.isSelected = bool
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Selectors
@@ -464,7 +479,7 @@ extension MusicPlayerViewController {
         view.addGestureRecognizer(panGesture)
     }
     
-    // 팬 제스처를 처리하는 메소드
+    //Modal 팬 제스처
     @objc func dismissGesture(sender: UIPanGestureRecognizer) {
         let translation = sender.translation(in: view)
         

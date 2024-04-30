@@ -40,7 +40,7 @@ final class MusicListViewModel: ViewModel {
     private let musicRepository = MusicRepository()
     private let isUserSubscription = UserDefaultsManager.shared.userSubscription.isSubscribe
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
-
+    
     let disposeBag = DisposeBag()
     
     // MARK: - Lifecycles
@@ -65,7 +65,8 @@ final class MusicListViewModel: ViewModel {
             .withUnretained(self)
             .flatMapLatest { owner, _ in
                 owner.fetchTracksObservable()
-            }.asDriver(onErrorJustReturn: MusicItemCollection<Track>())
+            }
+            .asDriver(onErrorJustReturn: MusicItemCollection<Track>())
         
         input.playButtonTapped
             .withUnretained(self)
@@ -81,7 +82,8 @@ final class MusicListViewModel: ViewModel {
                         : owner.coordinator?.presentAppleMusicSubscriptionOffer()
                     }
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.shuffleButtonTapped
             .withUnretained(self)
@@ -99,19 +101,21 @@ final class MusicListViewModel: ViewModel {
                         : owner.coordinator?.presentAppleMusicSubscriptionOffer()
                     }
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.itemSelected
             .withUnretained(self)
             .subscribe { owner, item in
                 owner.tapImpact()
                 owner.setQueue(index: item.index, track: item.track)
-                    DispatchQueue.main.async {
-                        owner.isUserSubscription
-                        ? owner.coordinator?.presentMusicPlayer(track: item.track)
-                        : owner.coordinator?.presentAppleMusicSubscriptionOffer()
-                    }
-            }.disposed(by: disposeBag)
+                DispatchQueue.main.async {
+                    owner.isUserSubscription
+                    ? owner.coordinator?.presentMusicPlayer(track: item.track)
+                    : owner.coordinator?.presentAppleMusicSubscriptionOffer()
+                }
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerTapped
             .withUnretained(self)
@@ -122,7 +126,8 @@ final class MusicListViewModel: ViewModel {
                 guard let track else { return }
                 owner.coordinator?.presentMusicPlayer(track: track)
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerPlayButtonTapped
             .withUnretained(self)
@@ -136,7 +141,8 @@ final class MusicListViewModel: ViewModel {
                     }
                 }
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -146,7 +152,8 @@ final class MusicListViewModel: ViewModel {
                     try await owner.musicPlayer.skipToPrevious()
                 }
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -157,14 +164,16 @@ final class MusicListViewModel: ViewModel {
                     try await owner.musicPlayer.skipToNext()
                 }
                 owner.tapImpact()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.popViewController
             .withUnretained(self)
             .subscribe{ owner, _ in
                 owner.coordinator?.popViewController()
                 owner.coordinator?.finish()
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         return Output(item: musicItem.asDriver(onErrorJustReturn: nil),
                       tracks: tracks,

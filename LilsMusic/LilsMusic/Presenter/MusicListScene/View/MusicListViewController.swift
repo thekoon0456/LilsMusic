@@ -104,19 +104,23 @@ final class MusicListViewController: BaseViewController {
         output.item.drive(with: self) { owner, item in
             guard let item else { return }
             owner.headerItem = item
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
         output.tracks.drive(with: self) { owner, tracks in
             owner.updateSnapshot(tracks: tracks)
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
         output.currentPlaySong.drive(with: self) { owner, track in
             owner.updateMiniPlayer(track: track)
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
         output.playState.drive(with: self) { owner, state in
             owner.setPlayButton(state: state)
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
             .withUnretained(self)
@@ -215,13 +219,15 @@ extension MusicListViewController {
                 .withUnretained(self)
                 .subscribe{ owner, _ in
                     owner.playButtonTapped.onNext(())
-                }.disposed(by: disposeBag)
+                }
+                .disposed(by: disposeBag)
             
             headerView.shuffleButton.rx.tap
                 .withUnretained(self)
                 .subscribe{ owner, _ in
                     owner.shuffleButtonTapped.onNext(())
-                }.disposed(by: disposeBag)
+                }
+                .disposed(by: disposeBag)
             return headerView
         }
     }

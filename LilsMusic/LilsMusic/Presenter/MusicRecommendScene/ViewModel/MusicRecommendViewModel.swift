@@ -77,54 +77,62 @@ final class MusicRecommendViewModel: ViewModel {
                     owner.albumsRepository.createItem(UserAlbumList())
                 }
                 print(owner.likesRepository.printURL())
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.searchModelSelected
             .subscribe(with: self) { owner, track in
                 Task {
-                        try await owner.musicPlayer.playTrack(track)
-                    }
+                    try await owner.musicPlayer.playTrack(track)
+                }
                 DispatchQueue.main.async {
                     owner.coordinator?.presentMusicPlayer(track: track)
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         let searchResult = input.searchText
             .withUnretained(self)
             .flatMapLatest { owner, text in
                 owner.fetchSearchResultObservable(text: text)
-            }.asDriver(onErrorJustReturn: [])
+            }
+            .asDriver(onErrorJustReturn: [])
         
         let songs = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendSongsObservable()
-            }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
+            }
+            .asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         let playlists = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendPlaylistsObservable()
-            }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
+            }
+            .asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         let albums = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchRecommendAlbumsObservable()
-            }.asDriver(onErrorJustReturn: MusicItemCollection<Album>())
+            }
+            .asDriver(onErrorJustReturn: MusicItemCollection<Album>())
         
         let cityTop25 = input.viewDidLoad
             .withUnretained(self)
             .flatMapLatest { owner, void in
                 owner.fetchCityTopObservable()
-            }.asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
+            }
+            .asDriver(onErrorJustReturn: MusicItemCollection<Playlist>())
         
         input.itemSelected
             .subscribe(with: self) { owner, item in
-            DispatchQueue.main.async {
-                owner.coordinator?.pushToList(item: item)
+                DispatchQueue.main.async {
+                    owner.coordinator?.pushToList(item: item)
+                }
             }
-        }.disposed(by: disposeBag)
+            .disposed(by: disposeBag)
         
         input.miniPlayerTapped
             .withUnretained(self)
@@ -134,7 +142,8 @@ final class MusicRecommendViewModel: ViewModel {
             .drive(with: self) { owner, track in
                 guard let track else { return }
                 owner.coordinator?.presentMusicPlayer(track: track)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerPlayButtonTapped
             .subscribe(with: self) { owner, _ in
@@ -146,22 +155,25 @@ final class MusicRecommendViewModel: ViewModel {
                         try await owner.musicPlayer.play()
                     }
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerPreviousButtonTapped
             .subscribe(with: self) { owner, _ in
                 Task {
-                        try await owner.musicPlayer.skipToPrevious()
+                    try await owner.musicPlayer.skipToPrevious()
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         input.miniPlayerNextButtonTapped
             .subscribe(with: self) { owner, _ in
                 guard owner.musicPlayer.getQueue().count > 1 else { return }
                 Task {
-                        try await owner.musicPlayer.skipToNext()
+                    try await owner.musicPlayer.skipToNext()
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         return Output(searchResult: searchResult.asDriver(onErrorJustReturn: []),
                       currentPlaySong: currentEntry.asDriver(onErrorJustReturn: nil),

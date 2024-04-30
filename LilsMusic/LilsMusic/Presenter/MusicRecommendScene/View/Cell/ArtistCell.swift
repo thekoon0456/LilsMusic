@@ -77,6 +77,5 @@ final class ArtistCell: BaseCollectionViewCell {
     
     override func configureView() {
         super.configureView()
-//        addShadow()
     }
 }

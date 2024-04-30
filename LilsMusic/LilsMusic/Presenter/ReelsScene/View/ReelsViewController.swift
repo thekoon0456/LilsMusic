@@ -72,22 +72,29 @@ final class ReelsViewController: BaseViewController {
         let input = ReelsViewModel.Input(viewWillAppear: self.rx.viewWillAppear.map { _ in })
         let output = viewModel.transform(input)
         
-        output.mvList.drive(with: self) { owner, mv in
-            owner.updateSnapshot(mv: Array(mv))
-        }.disposed(by: disposeBag)
+        output
+            .mvList
+            .drive(with: self) { owner, mv in
+                owner.updateSnapshot(mv: Array(mv))
+            }
+            .disposed(by: disposeBag)
         
-        collectionView.rx.itemSelected.subscribe(with: self) { owner, indexPath in
-            guard let currentStatus = try? owner.playStatusSubject.value() else { return }
-            owner.updatePlayButton(status: currentStatus)
-            owner.setPlayerStatus(status: currentStatus)
-        }.disposed(by: disposeBag)
+        collectionView.rx.itemSelected
+            .subscribe(with: self) { owner, indexPath in
+                guard let currentStatus = try? owner.playStatusSubject.value() else { return }
+                owner.updatePlayButton(status: currentStatus)
+                owner.setPlayerStatus(status: currentStatus)
+            }
+            .disposed(by: disposeBag)
         
-        playStatusSubject.subscribe(with: self) { owner, status in
-            guard let mv = try? owner.viewModel.mvSubject.value() else { return }
-            owner.configureDataSource(status: status)
-            owner.updateSnapshot(mv: Array(mv))
-            owner.updatePlayButton(status: status)
-        }.disposed(by: disposeBag)
+        playStatusSubject
+            .subscribe(with: self) { owner, status in
+                guard let mv = try? owner.viewModel.mvSubject.value() else { return }
+                owner.configureDataSource(status: status)
+                owner.updateSnapshot(mv: Array(mv))
+                owner.updatePlayButton(status: status)
+            }
+            .disposed(by: disposeBag)
     }
     
     func setPlayerStatus(status: AVPlayer.TimeControlStatus) {
@@ -209,24 +216,3 @@ extension ReelsViewController {
         return layout
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

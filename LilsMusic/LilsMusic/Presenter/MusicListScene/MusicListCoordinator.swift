@@ -41,10 +41,6 @@ final class MusicListCoordinator: NSObject, Coordinator, CoordinatorDelegate {
         childCoordinators.append(coordinator)
         coordinator.start()
     }
-    
-    func didFinish(childCoordinator: any Coordinator) {
-        childCoordinators = []
-    }
 }
 
 extension MusicListCoordinator: SKCloudServiceSetupViewControllerDelegate {

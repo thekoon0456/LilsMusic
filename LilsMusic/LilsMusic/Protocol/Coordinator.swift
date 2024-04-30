@@ -62,6 +62,10 @@ extension Coordinator {
         
         navigationController?.present(alertController, animated: true)
     }
+    
+    func didFinish(childCoordinator: any Coordinator) {
+        childCoordinators = []
+    }
 }
 
 // MARK: - SetNavigation

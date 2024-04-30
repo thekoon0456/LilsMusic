@@ -72,7 +72,8 @@ final class ReelsCellViewModel: ViewModel {
             .withUnretained(self)
             .subscribe { owner, bool in
                 owner.heartSubject.onNext(bool)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
         return Output(isHeart: heartSubject.asDriver(onErrorJustReturn: false))
     }

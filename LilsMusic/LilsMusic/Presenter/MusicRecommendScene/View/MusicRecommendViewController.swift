@@ -113,34 +113,54 @@ final class MusicRecommendViewController: BaseViewController {
                                                   miniPlayerNextButtonTapped: miniPlayerView.nextButton.rx.tap)
         let output = viewModel.transform(input)
         
-        output.searchResult
+        output
+            .searchResult
             .drive(libraryCollectionViewController.collectionView.rx.items(cellIdentifier: MusicListCell.identifier, cellType: MusicListCell.self)) { item, model, cell in
                 cell.configureCell(model)
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
         
-        output.currentPlaySong.drive(with: self) { owner, track in
+        output
+            .currentPlaySong
+            .drive(with: self) { owner, track in
             owner.updateMiniPlayer(track: track)
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
-        output.recommendSongs.drive(with: self) { owner, songs in
+        output
+            .recommendSongs
+            .drive(with: self) { owner, songs in
             owner.updateSnapshot(withItems: songs, toSection: .top100)
-        }.disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
         
-        output.recommendPlaylists.drive(with: self) { owner, playlist in
+        output
+            .recommendPlaylists
+            .drive(with: self) { owner, playlist in
             owner.updateSnapshot(withItems: playlist, toSection: .playlist)
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
         
-        output.recommendAlbums.drive(with: self) { owner, albums in
+        output
+            .recommendAlbums
+            .drive(with: self) { owner, albums in
             owner.updateSnapshot(withItems: albums, toSection: .album)
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
         
-        output.cityTop25.drive(with: self) { owner, mostPlayed in
+        output
+            .cityTop25
+            .drive(with: self) { owner, mostPlayed in
               owner.updateSnapshot(withItems: mostPlayed, toSection: .cityTop25)
-          }.disposed(by: disposeBag)
+          }
+            .disposed(by: disposeBag)
         
-        output.playState.drive(with: self) { owner, state in
+        output
+            .playState
+            .drive(with: self) { owner, state in
             owner.setPlayButton(state: state)
-        }.disposed(by: disposeBag)
+        }
+            .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
             .withUnretained(self)
@@ -168,7 +188,8 @@ final class MusicRecommendViewController: BaseViewController {
                         owner.itemSelected.onNext(playlist)
                     }
                 }
-            }.disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Configure
