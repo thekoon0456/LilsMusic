@@ -24,7 +24,7 @@ final class ReelsCellViewModel: ViewModel {
     
     // MARK: - Properties
     
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     private let userLikeRepository = UserRepository<UserLikeList>()
     let disposeBag = DisposeBag()
     private let mvSubject = BehaviorSubject<MusicVideo?>(value: nil)
@@ -86,7 +86,7 @@ final class ReelsCellViewModel: ViewModel {
     
     func getMusicID(item: MusicVideo?) async throws -> Track?  {
         guard let item,
-              let song = try await musicRepository.MusicVideoToSong(item)
+              let song = try await musicAPIManager.MusicVideoToSong(item)
         else { return nil }
         return Track.song(song)
     }

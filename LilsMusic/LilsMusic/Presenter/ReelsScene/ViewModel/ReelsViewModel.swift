@@ -25,7 +25,7 @@ final class ReelsViewModel: ViewModel {
     
     weak var coordinator: ReelsCoordinator?
     let disposeBag = DisposeBag()
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     let mvSubject = BehaviorSubject<MusicItemCollection<MusicVideo>>(value: [])
     
     // MARK: - Lifecycles
@@ -54,7 +54,7 @@ final class ReelsViewModel: ViewModel {
             guard let self else { return Disposables.create() }
             Task {
                 do {
-                    let result = try await self.musicRepository.requestCatalogMVCharts()
+                    let result = try await self.musicAPIManager.requestCatalogMVCharts()
                     observer.onNext(result)
                     observer.onCompleted()
                     self.mvSubject.onNext(result)

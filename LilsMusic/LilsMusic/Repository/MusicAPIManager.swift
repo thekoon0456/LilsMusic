@@ -1,5 +1,5 @@
 //
-//  MusicRepository.swift
+//  MusicAPIManager.swift
 //  FlowMusic
 //
 //  Created by Deokhun KIM on 3/15/24.
@@ -8,7 +8,11 @@
 import Foundation
 import MusicKit
 
-final class MusicRepository {
+final class MusicAPIManager {
+    
+    static let shared = MusicAPIManager()
+    
+    private init() { }
     
     // MARK: - RequestNextBatch
     
@@ -226,7 +230,7 @@ final class MusicRepository {
 
 //// MARK: - Library Request
 //
-//extension MusicRepository {
+//extension MusicAPIManager {
 //    
 //    func requestLibraryAlbum() async throws -> MusicItemCollection<Album> {
 //        try await MusicLibraryRequest<Album>().response().items

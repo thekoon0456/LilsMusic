@@ -17,7 +17,7 @@ final class FMMusicPlayer {
     static let shared = FMMusicPlayer()
     private let player = ApplicationMusicPlayer.shared
     private let userDefaultsManager = UserDefaultsManager.shared
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     let currentEntrySubject = BehaviorSubject<MusicPlayer.Queue.Entry?>(value: nil)
     lazy var currentPlayStateSubject = BehaviorSubject<MusicPlayer.PlaybackStatus>(value: getPlaybackState())
     private var cancellable = Set<AnyCancellable>()

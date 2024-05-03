@@ -39,7 +39,7 @@ final class MusicPlayerViewModel: ViewModel {
     
     weak var coordinator: MusicPlayerCoordinator?
     let musicPlayer = FMMusicPlayer.shared
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     private let userLikeRepository = UserRepository<UserLikeList>()
     private let setting = UserDefaultsManager.shared
     let disposeBag = DisposeBag()
@@ -208,7 +208,7 @@ final class MusicPlayerViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    guard let song = try await musicAPIManager.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
                     observer.onCompleted()

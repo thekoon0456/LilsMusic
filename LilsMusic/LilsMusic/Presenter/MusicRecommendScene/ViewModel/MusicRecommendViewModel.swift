@@ -39,7 +39,7 @@ final class MusicRecommendViewModel: ViewModel {
     
     weak var coordinator: MusicRecommendCoordinator?
     private let musicPlayer = FMMusicPlayer.shared
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     private let artistRepository = UserRepository<UserArtistList>()
     private let likesRepository = UserRepository<UserLikeList>()
     private let albumsRepository = UserRepository<UserAlbumList>()
@@ -191,7 +191,7 @@ final class MusicRecommendViewModel: ViewModel {
                   !text.isEmpty
             else { return Disposables.create() }
             Task {
-                let result = try await self.musicRepository.requestSearchSongCatalog(term: text)
+                let result = try await self.musicAPIManager.requestSearchSongCatalog(term: text)
                 let tracks = result.map { Track.song($0) }
                 observer.onNext(tracks)
                 observer.onCompleted()
@@ -206,7 +206,7 @@ final class MusicRecommendViewModel: ViewModel {
                 do {
                     guard let self,
                           let entry = musicPlayer.getCurrentEntry(),
-                          let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
+                          let song = try await self.musicAPIManager.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
@@ -224,7 +224,7 @@ final class MusicRecommendViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let songs = try await musicRepository.requestCatalogTop100Charts()
+                    let songs = try await musicAPIManager.requestCatalogTop100Charts()
                     observer.onNext(songs)
                     observer.onCompleted()
                 } catch {
@@ -240,7 +240,7 @@ final class MusicRecommendViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let playlists = try await musicRepository.requestCatalogPlaylistCharts()
+                    let playlists = try await musicAPIManager.requestCatalogPlaylistCharts()
                     observer.onNext(playlists)
                     observer.onCompleted()
                 } catch {
@@ -256,7 +256,7 @@ final class MusicRecommendViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let albums = try await musicRepository.requestCatalogAlbumCharts()
+                    let albums = try await musicAPIManager.requestCatalogAlbumCharts()
                     observer.onNext(albums)
                     observer.onCompleted()
                 } catch {
@@ -272,7 +272,7 @@ final class MusicRecommendViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let stations = try await musicRepository.requestCatalogCityTop25Charts()
+                    let stations = try await musicAPIManager.requestCatalogCityTop25Charts()
                     observer.onNext(stations)
                     observer.onCompleted()
                 } catch {
@@ -296,7 +296,7 @@ final class MusicRecommendViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    guard let song = try await musicAPIManager.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
                     observer.onCompleted()

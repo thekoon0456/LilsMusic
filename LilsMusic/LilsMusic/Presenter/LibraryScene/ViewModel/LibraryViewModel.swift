@@ -41,7 +41,7 @@ final class LibraryViewModel: ViewModel {
     weak var coordinator: LibraryCoordinator?
     let disposeBag = DisposeBag()
     private let musicPlayer = FMMusicPlayer.shared
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     private let playlistRepository = UserRepository<UserPlaylist>()
     private let artistRepository = UserRepository<UserArtistList>()
     private let likesRepository = UserRepository<UserLikeList>()
@@ -127,7 +127,7 @@ final class LibraryViewModel: ViewModel {
                 case .recentlyPlayed:
                     Task {
                         do {
-                            let tracks = try await owner.musicRepository.requestRecentlyPlayed()
+                            let tracks = try await owner.musicAPIManager.requestRecentlyPlayed()
                             await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: item.track)
                             DispatchQueue.main.async {
                                 owner.coordinator?.presentMusicPlayer(track: item.track)
@@ -140,7 +140,7 @@ final class LibraryViewModel: ViewModel {
                     let likeID = owner.fetchLikeList()
                     Task {
                         do {
-                            let tracks = try await owner.musicRepository.requestLikeList(ids: likeID)
+                            let tracks = try await owner.musicAPIManager.requestLikeList(ids: likeID)
                             let selectedTrack = tracks[item.index.item]
                             await owner.musicPlayer.setTrackQueue(item: tracks, startTrack: selectedTrack)
                             DispatchQueue.main.async {
@@ -211,7 +211,7 @@ final class LibraryViewModel: ViewModel {
             let likeID = fetchLikeList()
             Task {
                 do {
-                    let result = try await self.musicRepository.requestLikeList(ids: likeID)
+                    let result = try await self.musicAPIManager.requestLikeList(ids: likeID)
                     observer.onNext(result)
                     observer.onCompleted()
                 } catch {
@@ -227,7 +227,7 @@ final class LibraryViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    let playlist = try await musicRepository.requestCatalogMostPlayedCharts()
+                    let playlist = try await musicAPIManager.requestCatalogMostPlayedCharts()
                     observer.onNext(playlist)
                     observer.onCompleted()
                 } catch {
@@ -243,7 +243,7 @@ final class LibraryViewModel: ViewModel {
             guard let self else { return Disposables.create() }
             Task {
                 do { 
-                    let result = try await self.musicRepository.requestRecentlyPlayed()
+                    let result = try await self.musicAPIManager.requestRecentlyPlayed()
                     observer.onNext(result)
                     observer.onCompleted()
                 } catch {
@@ -263,7 +263,7 @@ final class LibraryViewModel: ViewModel {
                     var result = [(title: String, item: MusicItemCollection<Track>)]()
                     for list in playlists {
                         let title = list.title
-                        let track = try await self.musicRepository.requestPlaylist(ids: Array(list.playlistID))
+                        let track = try await self.musicAPIManager.requestPlaylist(ids: Array(list.playlistID))
                         result.append((title: title, item: track))
                     }
                     observer.onNext(result)
@@ -283,7 +283,7 @@ final class LibraryViewModel: ViewModel {
             else { return Disposables.create() }
             Task {
                 do {
-                    let result = try await self.musicRepository.requestArtistList(ids: Array(artist.artistID))
+                    let result = try await self.musicAPIManager.requestArtistList(ids: Array(artist.artistID))
                     observer.onNext(result)
                     observer.onCompleted()
                 } catch {
@@ -306,7 +306,7 @@ final class LibraryViewModel: ViewModel {
             else { return Disposables.create() }
             Task {
                 do {
-                    let result = try await self.musicRepository.requestAlbumList(ids: Array(albums.albumID))
+                    let result = try await self.musicAPIManager.requestAlbumList(ids: Array(albums.albumID))
                     observer.onNext(result)
                     observer.onCompleted()
                 } catch {
@@ -323,7 +323,7 @@ final class LibraryViewModel: ViewModel {
                 do {
                     guard let self,
                           let entry = musicPlayer.getCurrentEntry(),
-                          let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
+                          let song = try await self.musicAPIManager.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
@@ -341,7 +341,7 @@ final class LibraryViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    guard let song = try await musicAPIManager.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
                     observer.onCompleted()

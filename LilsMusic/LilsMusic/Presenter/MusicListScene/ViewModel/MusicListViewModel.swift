@@ -37,7 +37,7 @@ final class MusicListViewModel: ViewModel {
     
     weak var coordinator: MusicListCoordinator?
     private let musicPlayer = FMMusicPlayer.shared
-    private let musicRepository = MusicRepository()
+    private let musicAPIManager = MusicAPIManager.shared
     private let isUserSubscription = UserDefaultsManager.shared.userSubscription.isSubscribe
     private let musicItem = BehaviorSubject<MusicItem?>(value: nil)
     
@@ -219,9 +219,9 @@ final class MusicListViewModel: ViewModel {
         guard let item = try? musicItem.value() else { return nil }
         switch item {
         case let playlist as Playlist:
-            return try await musicRepository.playlistToTracks(playlist)
+            return try await musicAPIManager.playlistToTracks(playlist)
         case let album as Album:
-            return try await musicRepository.albumToTracks(album)
+            return try await musicAPIManager.albumToTracks(album)
         default:
             return nil
         }
@@ -233,7 +233,7 @@ final class MusicListViewModel: ViewModel {
                 do {
                     guard let self,
                           let entry = musicPlayer.getCurrentEntry(),
-                          let song = try await self.musicRepository.requestSearchSongIDCatalog(id: entry.item?.id)
+                          let song = try await self.musicAPIManager.requestSearchSongIDCatalog(id: entry.item?.id)
                     else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
@@ -259,7 +259,7 @@ final class MusicListViewModel: ViewModel {
             Task { [weak self] in
                 guard let self else { return }
                 do {
-                    guard let song = try await musicRepository.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
+                    guard let song = try await musicAPIManager.requestSearchSongIDCatalog(id: entry?.item?.id) else { return }
                     let track = Track.song(song)
                     observer.onNext(track)
                     observer.onCompleted()
