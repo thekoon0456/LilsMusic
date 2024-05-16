@@ -54,20 +54,24 @@ Simple, Beautiful Music App <br>
 ## 💡 기술 소개
 
 ### MVVM
-- 사용자 입력 및 뷰의 로직과 비즈니스에 관련된 로직을 분리하기 위해 MVVM을 도입
-- Input, Output 패턴을 활용해 데이터의 흐름을 전달받을 값과, 전달할 값을 명확하게 나누고 관리
-- ViewModel Protocol을 활용해 구조적으로 일관된 뷰모델 구성
+- 뷰의 로직과 비즈니스 로직을 분리하고 관리하기 위해 MVVM 아키텍처를 도입
+- Input, Output 패턴을 활용해 뷰의 이벤트들을 Input에 바인딩하고, 뷰에 보여질 데이터를 Output에 바인딩
+- 데이터의 흐름을 단방향으로 구성하고 뷰모델의 코드 가독성 향상
+- ViewModel Protocol을 활용해 구조적화된 뷰모델 구성
 <br>
 
 ### Coordinator 패턴
-- 사용자 인증 화면, 음악 플레이어 재생 화면등 화면 전환 코드가 복잡해지고 비대해지는 문제를 해결하기 위해 뷰 컨트롤러와 화면 전환 로직을 분리
+- CodeBasedUI로 UI구성, Storyboard에 비해 화면 전환의 흐름을 직관적으로 파악하기 힘든 단점
+- 사용자 인증 화면, 음악 플레이어 재생 화면등 화면 전환 코드가 복잡해지고 비대해지는 문제를 해결하기 위해 뷰 컨트롤러와 화면 전환 로직을 분리해서 관리
 - Coordinator 생성, ViewModel 생성, ViewController 생성하는 패턴으로 의존성 주입
 - ViewController의 Input이 ViewModel의 Coordinator로 전달하여 화면 전환
 <br>
 
 ### RxSwift
-- 음악 앱의 특성상 네트워크 요청이 많고, 비동기적으로 작동하기 때문에 비동기 처리와 Thread 관리가 중요
-- RxSwift를 활용해 앱 내의 일관성 있는 비동기 처리와 Traits를 활용하여 Thread 관리
+- RxSwift를 활용해 앱 내의 일관성 있는 비동기 처리
+- 연속된 escaping closure를 피하고, 선언형 프로그래밍을 통한 코드 가독성을 높임
+- Traits을 활용해 일관된 Thread 관리
+- 데이터가 발생하는 시점에서부터 뷰에 그려지기까지 하나의 스트림으로 데이터 바인딩
 <br>
 
 ### MusicKit
