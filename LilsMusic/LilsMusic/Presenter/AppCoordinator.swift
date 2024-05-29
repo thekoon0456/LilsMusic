@@ -29,7 +29,6 @@ final class AppCoordinator: NSObject, Coordinator {
     func start() {
         presentLaunch()
         requestMusicAuthorization()
-//        makeTabbar()
     }
     
     func makeTabbar() {
@@ -50,11 +49,6 @@ final class AppCoordinator: NSObject, Coordinator {
         let libraryCoordinator = LibraryCoordinator(navigationController: libraryNav)
         childCoordinators.append(libraryCoordinator)
         libraryCoordinator.start()
-        
-//        let userNav = UINavigationController()
-//        let userCoordinator = UserCoordinator(navigationController: userNav)
-//        childCoordinators.append(userCoordinator)
-//        userCoordinator.start()
         
         tabBarController.viewControllers = [recommendNav, reelsNav, libraryNav]
         navigationController?.setViewControllers([tabBarController], animated: false)
@@ -83,15 +77,4 @@ extension AppCoordinator: SKCloudServiceSetupViewControllerDelegate {
             }
         }
     }
-    
-//    func requestMusicAuthorization() async throws {
-//        let status = await MusicAuthorization.request()
-//        switch status {
-//        case .authorized:
-//            print("승인됨")
-//        default:
-//            moveToUserSetting()
-//            print("승인안됨. 재요청")
-//        }
-//    }
 }

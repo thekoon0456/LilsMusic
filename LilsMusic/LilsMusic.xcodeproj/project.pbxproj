@@ -48,9 +48,6 @@
 		7C7740052B9DA19100B2E6E7 /* MusicPlayerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7740042B9DA19100B2E6E7 /* MusicPlayerCoordinator.swift */; };
 		7C7740072B9DA19E00B2E6E7 /* ReelsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7740062B9DA19E00B2E6E7 /* ReelsCoordinator.swift */; };
 		7C7740092B9DA1DB00B2E6E7 /* MusicRecommendCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7740082B9DA1DB00B2E6E7 /* MusicRecommendCoordinator.swift */; };
-		7C77400E2B9DA44C00B2E6E7 /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C77400D2B9DA44C00B2E6E7 /* UserViewModel.swift */; };
-		7C7740102B9DA45400B2E6E7 /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C77400F2B9DA45400B2E6E7 /* UserViewController.swift */; };
-		7C7740122B9DA45B00B2E6E7 /* UserCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7740112B9DA45B00B2E6E7 /* UserCoordinator.swift */; };
 		7C7740142B9DA62F00B2E6E7 /* FMDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7740132B9DA62F00B2E6E7 /* FMDesign.swift */; };
 		7C813DAC2B9ADFEF00CDFF1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DAB2B9ADFEF00CDFF1D /* AppDelegate.swift */; };
 		7C813DAE2B9ADFEF00CDFF1D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DAD2B9ADFEF00CDFF1D /* SceneDelegate.swift */; };
@@ -118,9 +115,6 @@
 		7C7740042B9DA19100B2E6E7 /* MusicPlayerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerCoordinator.swift; sourceTree = "<group>"; };
 		7C7740062B9DA19E00B2E6E7 /* ReelsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelsCoordinator.swift; sourceTree = "<group>"; };
 		7C7740082B9DA1DB00B2E6E7 /* MusicRecommendCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecommendCoordinator.swift; sourceTree = "<group>"; };
-		7C77400D2B9DA44C00B2E6E7 /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
-		7C77400F2B9DA45400B2E6E7 /* UserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewController.swift; sourceTree = "<group>"; };
-		7C7740112B9DA45B00B2E6E7 /* UserCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCoordinator.swift; sourceTree = "<group>"; };
 		7C7740132B9DA62F00B2E6E7 /* FMDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMDesign.swift; sourceTree = "<group>"; };
 		7C813DA82B9ADFEF00CDFF1D /* LilsMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LilsMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C813DAB2B9ADFEF00CDFF1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -265,32 +259,6 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		7C77400A2B9DA43400B2E6E7 /* UserScene */ = {
-			isa = PBXGroup;
-			children = (
-				7C7740112B9DA45B00B2E6E7 /* UserCoordinator.swift */,
-				7C77400C2B9DA44400B2E6E7 /* View */,
-				7C77400B2B9DA43F00B2E6E7 /* ViewModel */,
-			);
-			path = UserScene;
-			sourceTree = "<group>";
-		};
-		7C77400B2B9DA43F00B2E6E7 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				7C77400D2B9DA44C00B2E6E7 /* UserViewModel.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		7C77400C2B9DA44400B2E6E7 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				7C77400F2B9DA45400B2E6E7 /* UserViewController.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		7C7740172B9DB72400B2E6E7 /* CommonUI */ = {
 			isa = PBXGroup;
 			children = (
@@ -410,7 +378,6 @@
 				7C813DF72B9B05BE00CDFF1D /* MusicRecommendScene */,
 				7C916E0C2B9D9FD700C5F6C0 /* ReelsScene */,
 				7C773FF82B9DA12200B2E6E7 /* LibraryScene */,
-				7C77400A2B9DA43400B2E6E7 /* UserScene */,
 				7C813DDD2B9AE2F400CDFF1D /* MusicPlayerScene */,
 				7C813DE72B9AE35400CDFF1D /* MusicListScene */,
 			);
@@ -716,7 +683,6 @@
 				7C03F7D02BA179D800FB748C /* Array+.swift in Sources */,
 				7C7740052B9DA19100B2E6E7 /* MusicPlayerCoordinator.swift in Sources */,
 				7C813DD12B9AE27100CDFF1D /* BaseView.swift in Sources */,
-				7C7740102B9DA45400B2E6E7 /* UserViewController.swift in Sources */,
 				7C813DEB2B9AE39300CDFF1D /* MusicListViewController.swift in Sources */,
 				7C446E682BA623AB00AAC5CB /* ArtworkHeaderView.swift in Sources */,
 				7C131C5B2BA4ADC1004B3FF2 /* MiniPlayerView.swift in Sources */,
@@ -724,7 +690,6 @@
 				7C3927672BA32B150074F87E /* FMSlider.swift in Sources */,
 				7C813DE42B9AE33200CDFF1D /* MusicPlayerViewModel.swift in Sources */,
 				7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */,
-				7C77400E2B9DA44C00B2E6E7 /* UserViewModel.swift in Sources */,
 				7C131C592BA4730A004B3FF2 /* UserDefaultsManager.swift in Sources */,
 				7C7740032B9DA18700B2E6E7 /* MusicListCoordinator.swift in Sources */,
 				7C46F49C2BBB239900AC9960 /* TrendingFooterView.swift in Sources */,
@@ -736,7 +701,6 @@
 				7C3927712BA3420C0074F87E /* AlbumArtCell.swift in Sources */,
 				7C7740142B9DA62F00B2E6E7 /* FMDesign.swift in Sources */,
 				7C3927752BA34FF60074F87E /* PlaylistCell.swift in Sources */,
-				7C7740122B9DA45B00B2E6E7 /* UserCoordinator.swift in Sources */,
 				7C7740012B9DA16F00B2E6E7 /* LibraryCoordinator.swift in Sources */,
 				7C446E622BA5B7D800AAC5CB /* UserSetting.swift in Sources */,
 				7C3927732BA343B30074F87E /* ArtistCell.swift in Sources */,
