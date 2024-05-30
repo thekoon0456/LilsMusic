@@ -71,12 +71,6 @@
 		7C813DF62B9AF6A300CDFF1D /* MusicChartsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */; };
 		7C813DFD2B9B13AB00CDFF1D /* UIVIewController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813DFC2B9B13AB00CDFF1D /* UIVIewController+.swift */; };
 		7C813E032B9B15D900CDFF1D /* MusicListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C813E022B9B15D900CDFF1D /* MusicListCell.swift */; };
-		7C84FD362C08A0F00013AE4D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C84FD352C08A0F00013AE4D /* WidgetKit.framework */; };
-		7C84FD382C08A0F00013AE4D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C84FD372C08A0F00013AE4D /* SwiftUI.framework */; };
-		7C84FD3B2C08A0F00013AE4D /* LilsMusicWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C84FD3A2C08A0F00013AE4D /* LilsMusicWidgetBundle.swift */; };
-		7C84FD3D2C08A0F00013AE4D /* LilsMusicWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C84FD3C2C08A0F00013AE4D /* LilsMusicWidget.swift */; };
-		7C84FD412C08A0F20013AE4D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C84FD402C08A0F20013AE4D /* Assets.xcassets */; };
-		7C84FD4A2C08A1750013AE4D /* MusicAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C532BA44387004B3FF2 /* MusicAPIManager.swift */; };
 		7C916E072B9D99DC00C5F6C0 /* MusicRecommendViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C916E062B9D99DC00C5F6C0 /* MusicRecommendViewModel.swift */; };
 		7C916E092B9D9BC000C5F6C0 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C916E082B9D9BC000C5F6C0 /* Coordinator.swift */; };
 		7C916E0B2B9D9C5500C5F6C0 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C916E0A2B9D9C5500C5F6C0 /* AppCoordinator.swift */; };
@@ -87,6 +81,19 @@
 		7CF60D732B9EE60E001769BD /* UserLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF60D722B9EE60E001769BD /* UserLibrary.swift */; };
 		7CF64B882BA064640040E416 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF64B872BA064640040E416 /* PaddingLabel.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7C84FD782C08ADD10013AE4D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		7C03F7CB2BA177FA00FB748C /* UserPlaylistRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPlaylistRepository.swift; sourceTree = "<group>"; };
@@ -144,13 +151,6 @@
 		7C813DF52B9AF6A300CDFF1D /* MusicChartsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicChartsCell.swift; sourceTree = "<group>"; };
 		7C813DFC2B9B13AB00CDFF1D /* UIVIewController+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIVIewController+.swift"; sourceTree = "<group>"; };
 		7C813E022B9B15D900CDFF1D /* MusicListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicListCell.swift; sourceTree = "<group>"; };
-		7C84FD342C08A0F00013AE4D /* LilsMusicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LilsMusicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		7C84FD352C08A0F00013AE4D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
-		7C84FD372C08A0F00013AE4D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		7C84FD3A2C08A0F00013AE4D /* LilsMusicWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LilsMusicWidgetBundle.swift; sourceTree = "<group>"; };
-		7C84FD3C2C08A0F00013AE4D /* LilsMusicWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LilsMusicWidget.swift; sourceTree = "<group>"; };
-		7C84FD402C08A0F20013AE4D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7C84FD422C08A0F20013AE4D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7C916E062B9D99DC00C5F6C0 /* MusicRecommendViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRecommendViewModel.swift; sourceTree = "<group>"; };
 		7C916E082B9D9BC000C5F6C0 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		7C916E0A2B9D9C5500C5F6C0 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
@@ -181,15 +181,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7C84FD312C08A0F00013AE4D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7C84FD382C08A0F00013AE4D /* SwiftUI.framework in Frameworks */,
-				7C84FD362C08A0F00013AE4D /* WidgetKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -200,15 +191,6 @@
 				7C03F7CB2BA177FA00FB748C /* UserPlaylistRepository.swift */,
 			);
 			path = Repository;
-			sourceTree = "<group>";
-		};
-		7C131C552BA45D48004B3FF2 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				7C84FD352C08A0F00013AE4D /* WidgetKit.framework */,
-				7C84FD372C08A0F00013AE4D /* SwiftUI.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		7C2F2A582BB0486F00FE6CE2 /* Cell */ = {
@@ -298,9 +280,7 @@
 			isa = PBXGroup;
 			children = (
 				7C813DAA2B9ADFEF00CDFF1D /* LilsMusic */,
-				7C84FD392C08A0F00013AE4D /* LilsMusicWidget */,
 				7C813DA92B9ADFEF00CDFF1D /* Products */,
-				7C131C552BA45D48004B3FF2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -308,7 +288,6 @@
 			isa = PBXGroup;
 			children = (
 				7C813DA82B9ADFEF00CDFF1D /* LilsMusic.app */,
-				7C84FD342C08A0F00013AE4D /* LilsMusicWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -527,17 +506,6 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
-		7C84FD392C08A0F00013AE4D /* LilsMusicWidget */ = {
-			isa = PBXGroup;
-			children = (
-				7C84FD3A2C08A0F00013AE4D /* LilsMusicWidgetBundle.swift */,
-				7C84FD3C2C08A0F00013AE4D /* LilsMusicWidget.swift */,
-				7C84FD402C08A0F20013AE4D /* Assets.xcassets */,
-				7C84FD422C08A0F20013AE4D /* Info.plist */,
-			);
-			path = LilsMusicWidget;
-			sourceTree = "<group>";
-		};
 		7C916E0C2B9D9FD700C5F6C0 /* ReelsScene */ = {
 			isa = PBXGroup;
 			children = (
@@ -577,6 +545,7 @@
 				7C813DA52B9ADFEF00CDFF1D /* Frameworks */,
 				7C813DA62B9ADFEF00CDFF1D /* Resources */,
 				7C0F59CF2BB1CD08009BA3B0 /* ShellScript */,
+				7C84FD782C08ADD10013AE4D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -600,23 +569,6 @@
 			productReference = 7C813DA82B9ADFEF00CDFF1D /* LilsMusic.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7C84FD332C08A0F00013AE4D /* LilsMusicWidgetExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7C84FD492C08A0F20013AE4D /* Build configuration list for PBXNativeTarget "LilsMusicWidgetExtension" */;
-			buildPhases = (
-				7C84FD302C08A0F00013AE4D /* Sources */,
-				7C84FD312C08A0F00013AE4D /* Frameworks */,
-				7C84FD322C08A0F00013AE4D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = LilsMusicWidgetExtension;
-			productName = LilsMusicWidgetExtension;
-			productReference = 7C84FD342C08A0F00013AE4D /* LilsMusicWidgetExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -629,9 +581,6 @@
 				TargetAttributes = {
 					7C813DA72B9ADFEF00CDFF1D = {
 						CreatedOnToolsVersion = 15.2;
-					};
-					7C84FD332C08A0F00013AE4D = {
-						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
@@ -659,7 +608,6 @@
 			projectRoot = "";
 			targets = (
 				7C813DA72B9ADFEF00CDFF1D /* LilsMusic */,
-				7C84FD332C08A0F00013AE4D /* LilsMusicWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -672,14 +620,6 @@
 				7C813DB82B9ADFF000CDFF1D /* LaunchScreen.storyboard in Resources */,
 				7C813DB52B9ADFF000CDFF1D /* Assets.xcassets in Resources */,
 				7C0F59C92BB1CBAC009BA3B0 /* GoogleService-Info.plist in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7C84FD322C08A0F00013AE4D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7C84FD412C08A0F20013AE4D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -774,16 +714,6 @@
 				7C286FD92BA88B1700244559 /* MixCell.swift in Sources */,
 				7C813DD52B9AE29F00CDFF1D /* BaseCollectionViewCell.swift in Sources */,
 				7C446E662BA6150E00AAC5CB /* PlaylistMenuButton.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7C84FD302C08A0F00013AE4D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7C84FD3B2C08A0F00013AE4D /* LilsMusicWidgetBundle.swift in Sources */,
-				7C84FD3D2C08A0F00013AE4D /* LilsMusicWidget.swift in Sources */,
-				7C84FD4A2C08A1750013AE4D /* MusicAPIManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -993,70 +923,6 @@
 			};
 			name = Release;
 		};
-		7C84FD472C08A0F20013AE4D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W6X76DS4Z7;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LilsMusicWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LilsMusicWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.thekoon.LilsMusic.LilsMusicWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		7C84FD482C08A0F20013AE4D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = W6X76DS4Z7;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LilsMusicWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LilsMusicWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.thekoon.LilsMusic.LilsMusicWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1074,15 +940,6 @@
 			buildConfigurations = (
 				7C813DBD2B9ADFF000CDFF1D /* Debug */,
 				7C813DBE2B9ADFF000CDFF1D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7C84FD492C08A0F20013AE4D /* Build configuration list for PBXNativeTarget "LilsMusicWidgetExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7C84FD472C08A0F20013AE4D /* Debug */,
-				7C84FD482C08A0F20013AE4D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
