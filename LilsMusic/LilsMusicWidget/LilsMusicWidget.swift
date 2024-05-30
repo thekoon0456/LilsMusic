@@ -7,47 +7,63 @@
 
 import WidgetKit
 import SwiftUI
+import MusicKit
 
-struct Provider: AppIntentTimelineProvider {
+struct Provider: TimelineProvider {
     
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
-    }
-
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration)
+    func placeholder(in context: Context) -> MusicEntry {
+        let entry = MusicEntry(date: Date(), albumArt: nil, song: nil, artist: nil)
+        return entry
     }
     
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-            entries.append(entry)
+    func getSnapshot(in context: Context, completion: @escaping (MusicEntry) -> Void) {
+        let entry = MusicEntry(date: Date(), albumArt: nil, song: nil, artist: nil)
+        completion(entry)
+    }
+    
+    func getTimeline(in context: Context, completion: @escaping (Timeline<MusicEntry>) -> Void) {
+        Task {
+            let recentlyMusic = try? await MusicAPIManager.shared.requestRecentlyPlayed()
+            
+            var entries: [MusicEntry] = []
+            
+            if let recentlyPlayedMusic = recentlyMusic?.first {
+                // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+                let currentDate = Date()
+                for hourOffset in 0 ..< 5 {
+                    let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+                    let entry = MusicEntry(date: entryDate,
+                                           albumArt: recentlyPlayedMusic.artwork?.url(width: 500, height: 500),
+                                           song: recentlyPlayedMusic.title,
+                                           artist: recentlyPlayedMusic.artistName)
+                    entries.append(entry)
+                }
+            }
+            
+            completion(Timeline(entries: entries, policy: .atEnd))
         }
-
-        return Timeline(entries: entries, policy: .atEnd)
     }
 }
 
-struct SimpleEntry: TimelineEntry {
+struct MusicEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationAppIntent
+    let albumArt: URL?
+    let song: String?
+    let artist: String?
 }
 
 struct LilsMusicWidgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
+        ZStack {
+            AsyncImage(url: entry.albumArt)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack {
+                Spacer()
+                Text(entry.song ?? "")
+                Text(entry.artist ?? "")
+            }
         }
     }
 }
@@ -56,30 +72,23 @@ struct LilsMusicWidget: Widget {
     let kind: String = "LilsMusicWidget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
-            LilsMusicWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
+            if #available(iOS 17.0, *) {
+                LilsMusicWidgetEntryView(entry: entry)
+                    .containerBackground(.fill.tertiary, for: .widget)
+            } else {
+                LilsMusicWidgetEntryView(entry: entry)
+                    .padding()
+                    .background()
+            }
         }
+        .configurationDisplayName("Lil's Music")
+        .description("Add your Music")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .contentMarginsDisabled()
     }
 }
 
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
-    }
-}
-
-#Preview(as: .systemSmall) {
-    LilsMusicWidget()
-} timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
-}
+//#Preview {
+//    LilsMusicWidget() as! any View
+//}
