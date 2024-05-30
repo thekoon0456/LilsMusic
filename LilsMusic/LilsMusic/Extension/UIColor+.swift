@@ -32,5 +32,4 @@ extension UIColor {
     
     static let bgColor = UIColor(hex: "e8ebf1")
     static let tintColor = UIColor(hex: "92a8b6")
-//    static let tintColor = UIColor(hex: "e8ebf1")
 }
