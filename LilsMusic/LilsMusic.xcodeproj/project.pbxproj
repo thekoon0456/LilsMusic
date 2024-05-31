@@ -21,6 +21,7 @@
 		7C131C592BA4730A004B3FF2 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C582BA4730A004B3FF2 /* UserDefaultsManager.swift */; };
 		7C131C5B2BA4ADC1004B3FF2 /* MiniPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C131C5A2BA4ADC1004B3FF2 /* MiniPlayerView.swift */; };
 		7C131C5E2BA4B93F004B3FF2 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 7C131C5D2BA4B93F004B3FF2 /* RxGesture */; };
+		7C24D8A72C099780008C6C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C813DB42B9ADFF000CDFF1D /* Assets.xcassets */; };
 		7C286FD92BA88B1700244559 /* MixCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C286FD82BA88B1700244559 /* MixCell.swift */; };
 		7C2F2A5A2BB075A900FE6CE2 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F2A592BB075A900FE6CE2 /* LaunchViewController.swift */; };
 		7C2F2A5C2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F2A5B2BB0B4EB00FE6CE2 /* ReelsCellViewModel.swift */; };
@@ -711,6 +712,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C24D8A72C099780008C6C5D /* Assets.xcassets in Resources */,
 				7C84FD892C08AED50013AE4D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

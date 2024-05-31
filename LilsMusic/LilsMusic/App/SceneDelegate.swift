@@ -7,6 +7,8 @@
 
 import UIKit
 
+import WidgetKit
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -30,7 +32,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) { }
 
-    func sceneWillResignActive(_ scene: UIScene) { }
+    func sceneWillResignActive(_ scene: UIScene) {
+        WidgetCenter.shared.reloadAllTimelines()
+    }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         SubscriptionManager.shared.checkAppleMusicSubscriptionEligibility { bool in
