@@ -7,6 +7,7 @@
 
 import WidgetKit
 import SwiftUI
+
 import Kingfisher
 
 struct Provider: TimelineProvider {
@@ -36,7 +37,7 @@ struct Provider: TimelineProvider {
                 for hourOffset in 0 ..< 5 {
                     let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
                     let entry = MusicEntry(date: entryDate,
-                                           artwork: recentlyPlayedMusic.artwork?.url(width: 600, height: 600),
+                                           artwork: recentlyPlayedMusic.artwork?.url(width: 800, height: 800),
                                            song: recentlyPlayedMusic.title,
                                            singer: recentlyPlayedMusic.artistName)
                     entries.append(entry)
@@ -58,29 +59,36 @@ struct MusicEntry: TimelineEntry {
 
 struct LilsMusicWidgetEntryView : View {
     var entry: Provider.Entry
-
+    
     var body: some View {
-        ZStack {
+        VStack {
+            Spacer()
+            Text(entry.song ?? "최근 노래가 없습니다.")
+                .font(.footnote)
+                .foregroundColor(.white)
+                .shadow(color: .black, radius: 2, x: 1, y: 1)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 10)
+            Text(entry.singer ?? "노래를 재생해주세요.")
+                .font(.caption2)
+                .foregroundColor(.white)
+                .shadow(color: .black, radius: 2, x: 1, y: 1)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 10)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.bottom, 5)
+        .background {
             KFImage(entry.artwork)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-            
-            VStack {
-                Spacer()
-                Text(entry.song ?? "최근 노래가 없습니다.")
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.horizontal, 10)
-                Text(entry.singer ?? "노래를 재생해주세요.")
-                    .font(.caption2)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.horizontal, 10)
-            }
-            .padding(.bottom, 5)
+                .placeholder{
+                    Image(uiImage: UIImage(named: "lil") ?? UIImage())
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+            .resizable()
+            .aspectRatio(contentMode: .fill)
         }
     }
 }
