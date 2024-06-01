@@ -227,32 +227,3 @@ final class MusicAPIManager {
     //        try await MusicCatalogResourceRequest(matching: KeyPath<(FilterableMusicItem & Decodable).FilterType, Value>, equalTo: <#T##Value#>)<Genre>().response().items
     //    }
 }
-
-//// MARK: - Library Request
-//
-//extension MusicAPIManager {
-//    
-//    func requestLibraryAlbum() async throws -> MusicItemCollection<Album> {
-//        try await MusicLibraryRequest<Album>().response().items
-//    }
-//    
-//    func requestLibraryArtist() async throws -> MusicItemCollection<Artist> {
-//        try await MusicLibraryRequest<Artist>().response().items
-//    }
-//    
-//    func requestLibrarySong() async throws -> MusicItemCollection<Song> {
-//        try await MusicLibraryRequest<Song>().response().items
-//    }
-//    
-//    func requestLibraryTrack() async throws -> MusicItemCollection<Track> {
-//        try await MusicLibraryRequest<Track>().response().items
-//    }
-//    
-//    func requestLibraryGenre() async throws -> MusicItemCollection<Genre> {
-//        try await MusicLibraryRequest<Genre>().response().items
-//    }
-//    
-//    func requestLibraryMV() async throws -> MusicItemCollection<MusicVideo> {
-//        try await MusicLibraryRequest<MusicVideo>().response().items
-//    }
-//}
