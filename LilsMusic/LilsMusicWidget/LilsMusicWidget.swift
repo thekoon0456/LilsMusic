@@ -34,7 +34,7 @@ struct Provider: TimelineProvider {
                 var entries: [MusicEntry] = []
                 
                 let currentDate = Date()
-                for hourOffset in 0 ..< 5 {
+                for hourOffset in 0 ..< 1 {
                     let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
                     let entry = MusicEntry(date: entryDate,
                                            artwork: recentlyPlayedMusic.artwork?.url(width: 800, height: 800),
@@ -63,14 +63,14 @@ struct LilsMusicWidgetEntryView : View {
     var body: some View {
         VStack {
             Spacer()
-            Text(entry.song ?? "최근 노래가 없습니다.")
+            Text(entry.song ?? "")
                 .font(.footnote)
                 .foregroundColor(.white)
                 .shadow(color: .black, radius: 2, x: 1, y: 1)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .padding(.horizontal, 10)
-            Text(entry.singer ?? "노래를 재생해주세요.")
+            Text(entry.singer ?? "Play Your Music")
                 .font(.caption2)
                 .foregroundColor(.white)
                 .shadow(color: .black, radius: 2, x: 1, y: 1)
@@ -112,13 +112,6 @@ struct LilsMusicWidget: Widget {
         .contentMarginsDisabled()
     }
 }
-
-//#Preview(as: .systemSmall) {
-//    LilsMusicWidget()
-//} timeline: {
-//    SimpleEntry(date: .now, emoji: "😀")
-//    SimpleEntry(date: .now, emoji: "🤩")
-//}
 
 //#Preview(body: {
 //let imageURL = URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cf/97/05/cf970525-a2fd-a7e3-2812-0f9c3f3d2c33/888735947551.png/600x600bb.jpg")
