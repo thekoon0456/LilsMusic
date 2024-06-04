@@ -372,7 +372,7 @@ extension LibraryViewController {
                                                                          elementKind:  UICollectionView.elementKindSectionHeader,
                                                                          alignment: .topLeading)
                 let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: .init(widthDimension: .fractionalWidth(1),
-                                                                                           heightDimension: .absolute(20)),
+                                                                                           heightDimension: .absolute(24)),
                                                                          elementKind:  UICollectionView.elementKindSectionFooter,
                                                                          alignment: .bottomLeading)
                 section.boundarySupplementaryItems = [header, footer]
