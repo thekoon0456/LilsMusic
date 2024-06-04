@@ -57,7 +57,6 @@ struct MusicEntry: TimelineEntry {
 
 struct LilsMusicWidgetEntryView : View {
     
-    @State private var isImageLoaded = false
     var entry: Provider.Entry
     
     var body: some View {
@@ -79,15 +78,28 @@ struct LilsMusicWidgetEntryView : View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.bottom, 5)
         .background {
-            AsyncImage(url: entry.artwork) { image in
-                image
+            NetworkImage(url: entry.artwork)
+        }
+    }
+}
+
+struct  NetworkImage : View {
+    
+    private let url: URL?
+    
+    init(url: URL?) {
+        self.url = url
+    }
+    
+    var body: some  View {
+        Group {
+            if let url = url,
+               let imageData = try? Data (contentsOf: url),
+               let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .onAppear {
-                        isImageLoaded = true
-                        WidgetCenter.shared.reloadAllTimelines()
-                    }
-            } placeholder: {
+            } else {
                 Image(uiImage: UIImage(named: "lil") ?? UIImage())
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -116,11 +128,13 @@ struct LilsMusicWidget: Widget {
     }
 }
 
-#Preview(body: {
-let imageURL = URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cf/97/05/cf970525-a2fd-a7e3-2812-0f9c3f3d2c33/888735947551.png/600x600bb.jpg")
+//#Preview(body: {
+//    let imageURL = URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cf/97/05/cf970525-a2fd-a7e3-2812-0f9c3f3d2c33/888735947551.png/600x600bb.jpg")
+//
+//    return LilsMusicWidgetEntryView(entry: MusicEntry(date: Date(),
+//                                                      artwork: nil,
+//                                                      song: nil,
+//                                                      singer: nil))
+//})
 
-   return LilsMusicWidgetEntryView(entry: MusicEntry(date: Date(),
-                                               artwork: nil,
-                                               song: nil,
-                                               singer: nil))
-})
+//https://stackoverflow.com/questions/63086029/ios-widgetkit-remote-images-fails-to-load/63387751#63387751

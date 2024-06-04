@@ -28,13 +28,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = nav
     }
 
-    func sceneDidDisconnect(_ scene: UIScene) { }
+    func sceneDidDisconnect(_ scene: UIScene) { 
+        WidgetCenter.shared.reloadAllTimelines()
+    }
 
     func sceneDidBecomeActive(_ scene: UIScene) { }
 
-    func sceneWillResignActive(_ scene: UIScene) {
-        WidgetCenter.shared.reloadAllTimelines()
-    }
+    func sceneWillResignActive(_ scene: UIScene) { }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         SubscriptionManager.shared.checkAppleMusicSubscriptionEligibility { bool in
