@@ -8,8 +8,6 @@
 import WidgetKit
 import SwiftUI
 
-import Kingfisher
-
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> MusicEntry {
         return MusicEntry(date: Date(),
@@ -58,37 +56,42 @@ struct MusicEntry: TimelineEntry {
 }
 
 struct LilsMusicWidgetEntryView : View {
+    
+    @State private var isImageLoaded = false
     var entry: Provider.Entry
     
     var body: some View {
         VStack {
             Spacer()
-            Text(entry.song ?? "")
-                .font(.footnote)
-                .foregroundColor(.white)
-                .shadow(color: .black, radius: 2, x: 1, y: 1)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .padding(.horizontal, 10)
-            Text(entry.singer ?? "Play Your Music")
-                .font(.caption2)
-                .foregroundColor(.white)
-                .shadow(color: .black, radius: 2, x: 1, y: 1)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .padding(.horizontal, 10)
+            Group {
+                Text(entry.song ?? "")
+                    .font(.footnote)
+                    .foregroundColor(.white)
+                Text(entry.singer ?? "Play Your Music")
+                    .font(.caption2)
+            }
+            .foregroundColor(.white)
+            .shadow(color: .black, radius: 2, x: 1, y: 1)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .padding(.horizontal, 10)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.bottom, 5)
         .background {
-            KFImage(entry.artwork)
-                .placeholder{
-                    Image(uiImage: UIImage(named: "lil") ?? UIImage())
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                }
-            .resizable()
-            .aspectRatio(contentMode: .fill)
+            AsyncImage(url: entry.artwork) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .onAppear {
+                        isImageLoaded = true
+                        WidgetCenter.shared.reloadAllTimelines()
+                    }
+            } placeholder: {
+                Image(uiImage: UIImage(named: "lil") ?? UIImage())
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            }
         }
     }
 }
@@ -113,11 +116,11 @@ struct LilsMusicWidget: Widget {
     }
 }
 
-//#Preview(body: {
-//let imageURL = URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cf/97/05/cf970525-a2fd-a7e3-2812-0f9c3f3d2c33/888735947551.png/600x600bb.jpg")
+#Preview(body: {
+let imageURL = URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cf/97/05/cf970525-a2fd-a7e3-2812-0f9c3f3d2c33/888735947551.png/600x600bb.jpg")
 
-//    LilsMusicWidgetEntryView(entry: MusicEntry(date: Date(),
-//                                               artwork: nil,
-//                                               song: nil,
-//                                               singer: nil))
-//})
+   return LilsMusicWidgetEntryView(entry: MusicEntry(date: Date(),
+                                               artwork: nil,
+                                               song: nil,
+                                               singer: nil))
+})
