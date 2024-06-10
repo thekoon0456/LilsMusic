@@ -334,10 +334,9 @@
 			isa = PBXGroup;
 			children = (
 				7C813DBF2B9AE19600CDFF1D /* App */,
-				7C813DC62B9AE1DD00CDFF1D /* Manager */,
 				7C813DC32B9AE1BC00CDFF1D /* Data */,
-				7C03F7CA2BA177E300FB748C /* Repository */,
 				7C813DC52B9AE1C500CDFF1D /* Presenter */,
+				7C813DC62B9AE1DD00CDFF1D /* Manager */,
 				7C7740172B9DB72400B2E6E7 /* CommonUI */,
 				7C813DDC2B9AE2EC00CDFF1D /* Const */,
 				7C813DC02B9AE19F00CDFF1D /* Base */,
@@ -400,6 +399,7 @@
 			isa = PBXGroup;
 			children = (
 				7C813DC42B9AE1C200CDFF1D /* Model */,
+				7C03F7CA2BA177E300FB748C /* Repository */,
 			);
 			path = Data;
 			sourceTree = "<group>";
